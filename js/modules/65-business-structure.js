@@ -3,12 +3,12 @@
 function showBizStructureTab() {
     var c = document.getElementById("bizstructureTab");
     if (!c) return;
-    if (!window.currentCompany) {
+    if (!currentCompany) {
         c.innerHTML = "<p style=\"padding:20px;color:#888;\">Завантаження компанії...</p>";
         return;
     }
     var f = document.getElementById("bizIframe");
-    var expectedSrc = "biz-structure.html?company=" + encodeURIComponent(window.currentCompany);
+    var expectedSrc = "biz-structure.html?company=" + encodeURIComponent(currentCompany);
     if (!f) {
         f = document.createElement("iframe");
         f.id = "bizIframe";
