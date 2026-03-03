@@ -23,8 +23,9 @@ function showBizStructureTab() {
         f.id = "bizIframe";
         f.src = expectedSrc;
         f.style.width = "100%";
-        f.style.height = "calc(100vh - 180px)";
+        f.style.height = "calc(100vh - 130px)";
         f.style.border = "none";
+        f.style.display = "block";
         c.innerHTML = "";
         c.appendChild(f);
     }

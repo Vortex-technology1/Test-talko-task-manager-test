@@ -3919,10 +3919,22 @@ console.log('[BIZ] Company from URL:', window._bizCompanyId);
     }
 
     @media (max-width: 480px) {
-        /* Toolbar becomes more compact */
+        /* When embedded in TM iframe — hide toolbar, login handled by parent */
         .toolbar {
-            height: 44px;
-            padding: 0 6px;
+            height: 40px;
+            padding: 0 4px;
+        }
+        
+        /* Hide non-essential toolbar items on mobile */
+        .toolbar .user-info,
+        .toolbar .logout-btn,
+        .toolbar .theme-toggle,
+        .toolbar .toolbar-divider,
+        .toolbar .tool-btn.undo-redo-btn,
+        .toolbar .tool-btn#connectTool,
+        .toolbar .tool-btn#selectTool,
+        .toolbar .tool-btn#handTool {
+            display: none !important;
         }
 
         .toolbar-left {
@@ -6902,6 +6914,11 @@ console.log('[BIZ] Company from URL:', window._bizCompanyId);
 
     // === AUTHENTICATION ===
     function showLogin() {
+        // If embedded in TM iframe — don't show login, auth comes from parent
+        if (window.parent !== window) {
+            console.log('[AUTH] Embedded in iframe, skipping login screen');
+            return;
+        }
         const loginScreen = Utils.getElement('loginScreen');
         const appContainer = Utils.getElement('appContainer');
         if (loginScreen) loginScreen.style.display = 'flex';
@@ -7134,6 +7151,7 @@ console.log('[BIZ] Company from URL:', window._bizCompanyId);
                 
                 console.log('[SYNC] Received', msg.functions?.length || 0, 'functions from TM');
                 
+                try {
                 var oldFunctionsMap = {};
                 State.functions.forEach(f => { if (f.id) oldFunctionsMap[f.id] = f; });
                 
@@ -7174,9 +7192,23 @@ console.log('[BIZ] Company from URL:', window._bizCompanyId);
                         y: canvasPos ? canvasPos.y : null,
                         width: canvasPos ? canvasPos.width : 220,
                         height: canvasPos ? canvasPos.height : 140,
-                        // Meta
-                        created: tmFunc.createdAt ? new Date(tmFunc.createdAt).toISOString() : new Date().toISOString(),
-                        modified: tmFunc.updatedAt ? new Date(tmFunc.updatedAt).toISOString() : new Date().toISOString(),
+                        // Meta — handle Firestore Timestamp objects, strings, and Date objects
+                        created: (function() {
+                            var t = tmFunc.createdAt;
+                            if (!t) return new Date().toISOString();
+                            if (typeof t === 'string') return t;
+                            if (t.seconds) return new Date(t.seconds * 1000).toISOString();
+                            if (t instanceof Date) return t.toISOString();
+                            try { return new Date(t).toISOString(); } catch(e) { return new Date().toISOString(); }
+                        })(),
+                        modified: (function() {
+                            var t = tmFunc.updatedAt;
+                            if (!t) return new Date().toISOString();
+                            if (typeof t === 'string') return t;
+                            if (t.seconds) return new Date(t.seconds * 1000).toISOString();
+                            if (t instanceof Date) return t.toISOString();
+                            try { return new Date(t).toISOString(); } catch(e) { return new Date().toISOString(); }
+                        })(),
                         // Keep TM references
                         _tmHeadId: tmFunc.headId || '',
                         _tmAssigneeIds: tmFunc.assigneeIds || []
@@ -7227,6 +7259,11 @@ console.log('[BIZ] Company from URL:', window._bizCompanyId);
                 State.isLocalUpdate = false;
                 updateConnectionStatus('success', t('notification.data_synced'));
                 updateSaveIndicator('saved');
+                } catch(mapErr) {
+                    console.error('[SYNC] Error mapping functions:', mapErr);
+                    // Fallback: try direct Firestore read
+                    loadFromFirestoreLegacy();
+                }
                 break;
                 
             case 'FUNCTION_CREATED_CONFIRMED':

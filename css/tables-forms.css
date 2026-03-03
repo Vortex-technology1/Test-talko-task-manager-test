@@ -161,10 +161,14 @@
         
         .filters-row {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            flex-wrap: nowrap;
+            gap: 0.35rem;
             align-items: center;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
+        .filters-row::-webkit-scrollbar { display: none; }
+        .filters-row { scrollbar-width: none; }
         
         .btn-clear {
             background: #95a5a6;
