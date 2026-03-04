@@ -158,7 +158,7 @@
                 } else {
                     const dp = process.deadline.split('-');
                     const dayNum = parseInt(dp[2]);
-                    const monthShort = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'][parseInt(dp[1]) - 1];
+                    const monthShort = (typeof getMonthNames === 'function' ? getMonthNames() : ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'])[parseInt(dp[1]) - 1];
                     deadlineHTML = `<span><i data-lucide="calendar" class="icon icon-sm"></i> ${dayNum} ${monthShort}</span>`;
                 }
             }

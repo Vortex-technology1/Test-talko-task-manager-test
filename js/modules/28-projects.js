@@ -314,7 +314,7 @@
             
             const headerHTML = weeks.map(w => {
                 const pct = (w.days / totalDays * 100).toFixed(2);
-                const monthShort = ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру'][w.start.getMonth()];
+                const monthShort = (typeof getMonthNames === 'function' ? getMonthNames() : ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру'])[w.start.getMonth()];
                 return `<div class="timeline-header-label" style="flex:${pct};">${monthShort} T${w.num}</div>`;
             }).join('');
             
