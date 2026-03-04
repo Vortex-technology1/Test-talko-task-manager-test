@@ -61,7 +61,19 @@
         function toggleMoreTabs(e) {
             if (e) e.stopPropagation();
             const menu = document.getElementById('moreTabsMenu');
-            if (menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+            const btn = document.getElementById('moreTabsBtn');
+            if (!menu) return;
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+                return;
+            }
+            // Позиціонуємо відносно кнопки
+            if (btn) {
+                const rect = btn.getBoundingClientRect();
+                menu.style.top = (rect.bottom + 4) + 'px';
+                menu.style.left = rect.left + 'px';
+            }
+            menu.style.display = 'block';
         }
         function closeMoreTabs() {
             const menu = document.getElementById('moreTabsMenu');

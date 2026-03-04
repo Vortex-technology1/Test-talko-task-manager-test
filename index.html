@@ -309,7 +309,7 @@
                 <!-- More dropdown -->
                 <div style="position:relative;display:inline-block;" id="moreTabsDropdown">
                     <button class="tab-btn" onclick="toggleMoreTabs(event)" title="Ще" aria-label="Ще" id="moreTabsBtn"><i data-lucide="more-horizontal" class="icon"></i> <span>Ще</span></button>
-                    <div id="moreTabsMenu" style="display:none;position:absolute;top:100%;left:0;z-index:100;background:white;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);min-width:200px;padding:0.4rem;">
+                    <div id="moreTabsMenu" style="display:none;position:fixed;z-index:9999;background:white;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15);min-width:200px;padding:0.4rem;">
                         <button class="tab-btn" onclick="switchTab('processes');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="git-branch" class="icon icon-sm"></i> <span data-i18n="tabProcesses">Процеси</span></button>
                         <button class="tab-btn" onclick="switchTab('regular');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="repeat" class="icon icon-sm"></i> <span data-i18n="tabRegular">Регулярні</span></button>
                         <button class="tab-btn" onclick="switchTab('functions');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="settings" class="icon icon-sm"></i> <span data-i18n="tabFunctions">Функції</span></button>
