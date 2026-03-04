@@ -229,6 +229,40 @@
         } catch (e) { console.error('[STATS] loadAggregates:', e); }
     }
 
+    // Завантажує entries для масиву periodKeys (Firestore 'in' — чанки по 30)
+    async function loadEntriesMulti(pks) {
+        if (!currentCompany || !pks.length) return;
+        try {
+            const role = getUserRole();
+            let results = [];
+            // Чанки по 30 (Firestore limit for 'in')
+            for (let i = 0; i < pks.length; i += 30) {
+                const chunk = pks.slice(i, i + 30);
+                let q = entriesRef().where('periodKey', 'in', chunk);
+                if (role === 'employee' && statsCurrentScope === 'my') {
+                    q = entriesRef().where('periodKey', 'in', chunk).where('createdBy', '==', currentUser.uid);
+                }
+                const s = await q.get();
+                results.push(...s.docs.map(d => ({ id: d.id, ...d.data() })));
+            }
+            statsEntries = results;
+        } catch (e) { console.error('[STATS] loadEntriesMulti:', e); }
+    }
+
+    // Завантажує aggregates для масиву periodKeys
+    async function loadAggregatesMulti(pks) {
+        if (!currentCompany || !pks.length) return;
+        try {
+            let results = [];
+            for (let i = 0; i < pks.length; i += 30) {
+                const chunk = pks.slice(i, i + 30);
+                const s = await aggregatesRef().where('periodKey', 'in', chunk).get();
+                results.push(...s.docs.map(d => ({ id: d.id, ...d.data() })));
+            }
+            statsAggregates = results;
+        } catch (e) { console.error('[STATS] loadAggregatesMulti:', e); }
+    }
+
     // ========================
     //  FIRESTORE
     // ========================
@@ -861,11 +895,21 @@
 
         const pk = getStatsPeriodKey(statsPeriodOffset);
 
-        // Show loading
         c.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;"><div class="spinner" style="margin:0 auto;"></div></div>';
 
         try {
-            await Promise.all([loadMetrics(), loadEntries(pk), loadTargets(), loadAggregates(pk)]);
+            // Збираємо всі periodKeys що будуть відображатись (daily=14, weekly=12, monthly=8)
+            const allPeriodKeys = new Set([pk]);
+            ['daily','weekly','monthly'].forEach(freq => {
+                const count = freq === 'daily' ? 14 : freq === 'weekly' ? 12 : 8;
+                for (let i = 0; i < count; i++) allPeriodKeys.add(getStatsPeriodKey(-i, freq));
+            });
+            await Promise.all([
+                loadMetrics(),
+                loadEntriesMulti([...allPeriodKeys]),
+                loadTargets(),
+                loadAggregatesMulti([...allPeriodKeys]),
+            ]);
         } catch (e) {
             console.error('[STATS] load error:', e);
         }
@@ -913,7 +957,7 @@
     // ========================
     function renderFrequencyGroup(freq, metrics, fl) {
         // Generate period keys for last N periods
-        const periodCount = freq === 'daily' ? 7 : freq === 'weekly' ? 8 : 6;
+        const periodCount = freq === 'daily' ? 14 : freq === 'weekly' ? 12 : 8;
         const periods = [];
         for (let i = 0; i < periodCount; i++) {
             periods.push(getStatsPeriodKey(-i, freq));
