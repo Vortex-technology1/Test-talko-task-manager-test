@@ -44,6 +44,7 @@
     <link rel="stylesheet" href="css/animations-misc.css">
     <link rel="stylesheet" href="css/focus-mode.css">
     <link rel="stylesheet" href="css/undo-toast.css">
+    <link rel="stylesheet" href="css/statistics.css">
     </head>
 <body>
     <script>
@@ -888,42 +889,14 @@
 
             <!-- STATISTICS -->
             <div id="statisticsTab" class="tab-content">
-                <div class="controls" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
-                    <button class="btn btn-success" onclick="openMetricModal()" id="addMetricBtn"><i data-lucide="plus" class="icon"></i> <span data-i18n="addMetric">Метрика</span></button>
-                    <button class="btn" onclick="openQuickInputModal()" id="quickInputBtn"><i data-lucide="edit-3" class="icon"></i> <span data-i18n="quickInput">Внести дані</span></button>
-                    <button class="btn" onclick="runAIAnalysis()" id="aiAnalysisBtn" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;"><i data-lucide="sparkles" class="icon"></i> <span data-i18n="aiAnalysis">AI Аналіз</span></button>
-                    <div style="margin-left:auto;display:flex;gap:2px;background:#f3f4f6;border-radius:8px;padding:2px;">
-                        <button class="calendar-view-btn active" onclick="setStatsView('dashboard')" data-sview="dashboard" style="padding:0.35rem 0.7rem;font-size:0.8rem;border:none;border-radius:6px;cursor:pointer;background:white;font-weight:500;"><i data-lucide="layout-dashboard" class="icon icon-sm"></i> <span data-i18n="dashboard">Дашборд</span></button>
-                        <button class="calendar-view-btn" onclick="setStatsView('table')" data-sview="table" style="padding:0.35rem 0.7rem;font-size:0.8rem;border:none;border-radius:6px;cursor:pointer;background:transparent;font-weight:500;"><i data-lucide="table" class="icon icon-sm"></i> <span data-i18n="tableView">Таблиця</span></button>
-                        <button class="calendar-view-btn" onclick="setStatsView('charts')" data-sview="charts" style="padding:0.35rem 0.7rem;font-size:0.8rem;border:none;border-radius:6px;cursor:pointer;background:transparent;font-weight:500;"><i data-lucide="line-chart" class="icon icon-sm"></i> <span data-i18n="chartsView">Графіки</span></button>
-                    </div>
-                </div>
-                <!-- Scope tabs -->
-                <div style="display:flex;gap:0.5rem;margin:0.75rem 0;flex-wrap:wrap;">
-                    <button class="btn btn-sm active" onclick="setStatsScope('my')" id="statsScopeMy" data-i18n="scopeMy">Моє</button>
-                    <button class="btn btn-sm" onclick="setStatsScope('function')" id="statsScopeFunc" data-i18n="scopeFunction">Функції</button>
-                    <button class="btn btn-sm" onclick="setStatsScope('company')" id="statsScopeCompany" data-i18n="scopeCompany">Компанія</button>
-                    <div id="statsFunctionSelector" style="display:none;margin-left:0.5rem;"></div>
-                </div>
-                <!-- Period selector -->
-                <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;align-items:center;">
-                    <select id="statsPeriodType" onchange="renderStatistics()" style="padding:0.4rem 0.6rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;">
-                        <option value="daily" data-i18n="daily">Щоденно</option>
-                        <option value="weekly" selected data-i18n="weekly">Щотижнево</option>
-                        <option value="monthly" data-i18n="monthly">Щомісячно</option>
-                    </select>
-                    <button class="btn btn-sm" onclick="statsNavigatePeriod(-1)"><i data-lucide="chevron-left" class="icon icon-sm"></i></button>
-                    <span id="statsPeriodLabel" style="font-weight:600;font-size:0.85rem;min-width:120px;text-align:center;"></span>
-                    <button class="btn btn-sm" onclick="statsNavigatePeriod(1)"><i data-lucide="chevron-right" class="icon icon-sm"></i></button>
-                </div>
-                <!-- KPI Debts alert -->
+                <!-- Header: rendered by JS -->
+                <div id="statsHeaderBar"></div>
+                <!-- Scope + Period: rendered by JS -->
+                <div id="statsScopeBar"></div>
+                <!-- KPI Debts -->
                 <div id="statsKpiDebts" style="display:none;"></div>
-                <!-- AI Insights -->
-                <div id="statsAiInsights" style="display:none;"></div>
                 <!-- Main content -->
-                <div id="statisticsContainer">
-                    <div class="loading"><div class="spinner"></div></div>
-                </div>
+                <div id="statisticsContainer"></div>
             </div>
 
             <!-- BUSINESS STRUCTURE -->
