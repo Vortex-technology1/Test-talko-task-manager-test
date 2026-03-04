@@ -20,6 +20,9 @@
         .btn .icon, .tab-btn .icon { margin-right: 6px; }
         .action-btn .icon { margin: 0; }
         
+        html {
+            overflow-x: auto;
+        }
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: #f9fafb; 

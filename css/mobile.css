@@ -1,5 +1,9 @@
         /* Mobile optimizations */
         @media (max-width: 767px) {
+            html, body {
+                min-width: 0;
+                overflow-x: hidden;
+            }
             .filters {
                 display: flex;
                 overflow-x: auto;
