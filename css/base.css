@@ -28,8 +28,6 @@
             background: #f9fafb; 
             color: var(--dark);
             min-height: 100vh;
-            min-width: 1200px;
-            overflow-x: auto;
             -webkit-text-size-adjust: 100%;
         }
         
@@ -43,6 +41,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            min-width: 0;
         }
         
         .header-content { 
@@ -51,12 +50,13 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             gap: 0.5rem;
+            min-width: 0;
         }
         
-        .logo { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-        .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .logo { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+        .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap; flex-shrink: 0; }
         .notification-bell:hover { background: #f3f4f6 !important; }
         
         .header-btn {
