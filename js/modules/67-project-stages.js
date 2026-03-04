@@ -31,7 +31,12 @@
             if (projectId) q = q.where('projectId', '==', projectId);
             const snap = await q.get();
             const result = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            if (!projectId) projectStages = result;
+            if (projectId) {
+                // Merge: replace stages for this project, keep others
+                projectStages = projectStages.filter(s => s.projectId !== projectId).concat(result);
+            } else {
+                projectStages = result;
+            }
             return result;
         } catch (e) {
             console.error('[STAGES] loadStages:', e);
@@ -46,7 +51,11 @@
             if (projectId) q = q.where('projectId', '==', projectId);
             const snap = await q.get();
             const result = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            if (!projectId) projectMaterials = result;
+            if (projectId) {
+                projectMaterials = projectMaterials.filter(m => m.projectId !== projectId).concat(result);
+            } else {
+                projectMaterials = result;
+            }
             return result;
         } catch (e) {
             console.error('[STAGES] loadMaterials:', e);
@@ -103,7 +112,7 @@
 
     async function deleteStage(stageId) {
         if (!currentCompany || !stageId) return;
-        if (!confirm('Видалити етап? Задачі та матеріали будуть відєднані.')) return;
+        // confirm знаходиться в deleteStageUI — тут не дублюємо
         try {
             // Unlink tasks
             const linkedTasks = tasks.filter(t => t.stageId === stageId);
@@ -167,6 +176,14 @@
 
         if (requiredNotDelivered.length > 0 && stage.status !== 'blocked') {
             await updateStageStatus(stageId, 'blocked');
+            // Emit event
+            if (typeof window.createProjectEvent === 'function') {
+                window.createProjectEvent('stage_blocked', {
+                    projectId: stage.projectId, stageId,
+                    functionId: stage.ownerFunctionId || '',
+                    extra: { reason: 'materials', count: requiredNotDelivered.length }
+                });
+            }
         }
     }
 
@@ -243,7 +260,7 @@
         const us = typeof users !== 'undefined' ? users : [];
 
         const statusColors = {
-            planned: '#9ca3af', in_progress: '#3b82f6', blocked: '#ef4444', done: '#22c55e'
+            planned: '#9ca3af', in_progress: '#f59e0b', blocked: '#ef4444', done: '#22c55e'
         };
         const statusLabels = {
             planned: 'Заплановано', in_progress: 'В роботі', blocked: 'Заблоковано', done: 'Завершено'
@@ -293,16 +310,18 @@
                             ${mats.length > 0 ? `<span>Матеріали: ${matsDelivered}/${mats.length}</span>` : ''}
                         </div>
                     </div>
-                    <div style="display:flex;gap:2px;">
-                        <select onchange="updateStageStatusUI('${stage.id}', this.value)" style="font-size:0.72rem;padding:2px 4px;border:1px solid #e5e7eb;border-radius:6px;">
+                    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+                        <select onchange="updateStageStatusUI('${stage.id}', this.value)" style="font-size:0.72rem;padding:4px 6px;border:1px solid #e5e7eb;border-radius:8px;min-height:32px;max-width:120px;">
                             ${Object.entries(statusLabels).map(([k, v]) => `<option value="${k}" ${stage.status === k ? 'selected' : ''}>${v}</option>`).join('')}
                         </select>
-                        <button onclick="openStageModal('${stage.projectId}','${stage.id}')" style="border:none;background:transparent;cursor:pointer;padding:4px;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                        </button>
-                        <button onclick="deleteStageUI('${stage.id}')" style="border:none;background:transparent;cursor:pointer;padding:4px;color:#ef4444;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
+                        <div style="display:flex;gap:4px;">
+                            <button onclick="openStageModal('${stage.projectId}','${stage.id}')" title="Редагувати етап" aria-label="Редагувати етап" style="border:none;background:#f3f4f6;cursor:pointer;padding:6px;border-radius:8px;min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </button>
+                            <button onclick="deleteStageUI('${stage.id}')" title="Видалити етап" aria-label="Видалити етап" style="border:none;background:#fee2e2;cursor:pointer;padding:6px;border-radius:8px;min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;color:#dc2626;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div style="margin-top:6px;">
@@ -323,7 +342,7 @@
                             return `<div style="display:flex;align-items:center;gap:4px;font-size:0.75rem;padding:2px 0;cursor:pointer;" onclick="openTaskModal('${t.id}')">
                                 <span style="width:6px;height:6px;border-radius:50%;background:${stColor};flex-shrink:0;"></span>
                                 <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(t.title)}</span>
-                                <span style="font-size:0.65rem;color:${stColor};">${t.status === 'done' ? '✓' : t.status}</span>
+                                <span style="font-size:0.65rem;color:${stColor};">${t.status === 'done' ? '&check;' : t.status}</span>
                             </div>`;
                         }).join('') + (stageTasks.length > 5 ? `<div style="font-size:0.68rem;color:#9ca3af;text-align:center;">...і ще ${stageTasks.length - 5}</div>` : '')
                     }
@@ -372,15 +391,19 @@
         return mats.map(m => {
             const color = statusColors[m.status] || '#9ca3af';
             const label = statusLabels[m.status] || m.status;
+            const costInfo = m.costPlanned ? ` · ${Number(m.costPlanned).toLocaleString()}₴` : '';
+            const supplierInfo = m.supplierName ? ` · ${esc(m.supplierName)}` : '';
             return `
-            <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid #f3f4f6;font-size:0.8rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0;border-bottom:1px solid #f3f4f6;font-size:0.8rem;">
                 <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>
-                <span style="flex:1;font-weight:500;">${esc(m.name)}</span>
-                <span style="color:#9ca3af;">${m.qty} ${esc(m.unit || '')}</span>
-                <select onchange="updateMaterialStatusUI('${m.id}', this.value)" style="font-size:0.7rem;padding:1px 4px;border:1px solid #e5e7eb;border-radius:4px;background:${color}10;color:${color};">
+                <div style="flex:1;min-width:0;">
+                    <span style="font-weight:500;">${esc(m.name)}</span>
+                    <span style="color:#9ca3af;font-size:0.72rem;"> ${m.qty} ${esc(m.unit || '')}${costInfo}${supplierInfo}</span>
+                </div>
+                <select onchange="updateMaterialStatusUI('${m.id}', this.value)" style="font-size:0.72rem;padding:4px 6px;border:1px solid #e5e7eb;border-radius:6px;background:${color}10;color:${color};min-height:30px;">
                     ${Object.entries(statusLabels).map(([k, v]) => `<option value="${k}" ${m.status === k ? 'selected' : ''}>${v}</option>`).join('')}
                 </select>
-                <button onclick="deleteMaterialUI('${m.id}')" style="border:none;background:transparent;cursor:pointer;color:#d1d5db;padding:2px;">
+                <button onclick="deleteMaterialUI('${m.id}')" style="border:none;background:#fee2e2;cursor:pointer;color:#dc2626;padding:6px;border-radius:6px;min-width:28px;min-height:28px;display:flex;align-items:center;justify-content:center;">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>`;
@@ -476,45 +499,136 @@
     };
 
     // ========================
-    //  UI HANDLERS
+    //  UNDO TOAST (локальний для stages/materials)
     // ========================
+    function showUndoToast(message, onUndo, delayMs = 4000) {
+        const existing = document.getElementById('stagesUndoToast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.id = 'stagesUndoToast';
+        toast.style.cssText = `
+            position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+            background:#1f2937;color:white;padding:0.75rem 1.25rem;border-radius:12px;
+            box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:10002;
+            display:flex;align-items:center;gap:1rem;font-size:0.88rem;font-weight:500;
+            animation:slideInRight 0.25s ease;white-space:nowrap;
+        `;
+
+        const label = document.createElement('span');
+        label.textContent = message;
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Скасувати';
+        btn.style.cssText = `
+            background:#22c55e;color:white;border:none;padding:4px 12px;
+            border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;
+        `;
+
+        toast.appendChild(label);
+        toast.appendChild(btn);
+        document.body.appendChild(toast);
+
+        // Повертає Promise що резолвиться коли toast закривається
+        // resolved(true) = undo натиснуто, resolved(false) = таймаут
+        return new Promise((resolve) => {
+            let timer = null;
+
+            btn.onclick = async () => {
+                clearTimeout(timer);
+                toast.remove();
+                await onUndo();  // чекаємо Firestore перед resolve
+                resolve(true);
+            };
+
+            timer = setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+                resolve(false);
+            }, delayMs);
+        });
+    }
+
+    // ========================
+    let _stageActionLock = false;
     window.updateStageStatusUI = async function(stageId, newStatus) {
-        const stage = projectStages.find(s => s.id === stageId);
-        if (!stage) return;
-        await updateStageStatus(stageId, newStatus);
-        await loadStages(stage.projectId);
-        if (typeof window.renderProjectDetail === 'function') {
-            window.renderProjectDetail(stage.projectId);
-        }
+        if (_stageActionLock) return;
+        _stageActionLock = true;
+        try {
+            const stage = projectStages.find(s => s.id === stageId);
+            if (!stage) return;
+            const prevStatus = stage.status;
+            await updateStageStatus(stageId, newStatus);
+            await loadStages(stage.projectId);
+            if (typeof window.renderProjectDetail === 'function') {
+                window.renderProjectDetail(stage.projectId);
+            }
+            const statusLabels = { planned:'Заплановано', in_progress:'В роботі', blocked:'Заблоковано', done:'Завершено' };
+            // await — lock тримається поки toast відкритий (4 сек або undo)
+            // Це блокує повторну зміну select під час вікна undo
+            await showUndoToast(`Статус: ${statusLabels[newStatus] || newStatus}`, async () => {
+                await updateStageStatus(stageId, prevStatus);
+                await loadStages(stage.projectId);
+                if (typeof window.renderProjectDetail === 'function') window.renderProjectDetail(stage.projectId);
+            });
+        } finally { _stageActionLock = false; }
     };
 
     window.deleteStageUI = async function(stageId) {
+        if (_stageActionLock) return;
         const stage = projectStages.find(s => s.id === stageId);
         if (!stage) return;
-        const pid = stage.projectId;
-        await deleteStage(stageId);
-        await loadStages(pid);
-        if (typeof window.renderProjectDetail === 'function') {
-            window.renderProjectDetail(pid);
-        }
+        if (!await showConfirmModal('Видалити етап "' + (stage.name || '') + '"? Задачі будуть відв\'язані.', { danger: true })) return;
+        _stageActionLock = true;
+        try {
+            const pid = stage.projectId;
+            await deleteStage(stageId);
+            await loadStages(pid);
+            if (typeof window.renderProjectDetail === 'function') {
+                window.renderProjectDetail(pid);
+            }
+        } finally { _stageActionLock = false; }
     };
 
+    let _materialActionLock = false;
     window.updateMaterialStatusUI = async function(materialId, newStatus) {
-        await updateMaterial(materialId, { status: newStatus });
-        // Refresh
+        if (_materialActionLock) return;
+        _materialActionLock = true;
         const mat = projectMaterials.find(m => m.id === materialId);
-        if (mat) {
-            await loadMaterials(mat.projectId);
-            await loadStages(mat.projectId);
-            if (typeof window.renderProjectDetail === 'function') {
-                window.renderProjectDetail(mat.projectId);
+        const prevStatus = mat?.status;
+        try {
+            await updateMaterial(materialId, { status: newStatus });
+            if (newStatus === 'missing' && mat && typeof window.createProjectEvent === 'function') {
+                window.createProjectEvent('material_delayed', {
+                    projectId: mat.projectId, stageId: mat.stageId || '',
+                    extra: { materialName: mat.name, status: newStatus }
+                });
             }
+            if (mat) {
+                await loadMaterials(mat.projectId);
+                await loadStages(mat.projectId);
+                if (typeof window.renderProjectDetail === 'function') {
+                    window.renderProjectDetail(mat.projectId);
+                }
+            }
+            const statusLabels = { needed:'Потрібно', ordered:'Замовлено', delivering:'Доставляється', delivered:'Доставлено', used:'Використано', missing:'Відсутній' };
+            await showUndoToast(`Матеріал: ${statusLabels[newStatus] || newStatus}`, async () => {
+                if (!prevStatus) return;
+                await updateMaterial(materialId, { status: prevStatus });
+                if (mat) {
+                    await loadMaterials(mat.projectId);
+                    await loadStages(mat.projectId);
+                    if (typeof window.renderProjectDetail === 'function') window.renderProjectDetail(mat.projectId);
+                }
+            });
+        } finally {
+            _materialActionLock = false;
         }
     };
 
     window.deleteMaterialUI = async function(materialId) {
-        if (!confirm('Видалити матеріал?')) return;
         const mat = projectMaterials.find(m => m.id === materialId);
+        const matName = mat?.name ? `"${mat.name}"` : 'матеріал';
+        if (!await showConfirmModal(`Видалити ${matName}?`, { danger: true })) return;
         await deleteMaterial(materialId);
         if (mat) {
             await loadMaterials(mat.projectId);
@@ -525,17 +639,74 @@
     };
 
     // Quick add material
-    window.addMaterialQuick = async function(projectId, stageId) {
-        const name = prompt('Назва матеріалу:');
-        if (!name) return;
-        const qty = parseFloat(prompt('Кількість:', '1') || '1');
-        const unit = prompt('Одиниця (шт, м2, кг):', 'шт') || 'шт';
-
-        await createMaterial(projectId, stageId, { name, qty, unit });
-        await loadMaterials(projectId);
-        if (typeof window.renderProjectDetail === 'function') {
-            window.renderProjectDetail(projectId);
+    window.addMaterialQuick = function(projectId, stageId) {
+        let modal = document.getElementById('materialQuickModal');
+        if (!modal) {
+            modal = document.createElement('div'); modal.id = 'materialQuickModal'; modal.className = 'modal';
+            modal.innerHTML = '<div class="modal-content" style="max-width:420px;"></div>';
+            document.body.appendChild(modal);
         }
+        modal.querySelector('.modal-content').innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h3 style="font-size:1rem;font-weight:700;margin:0;">Додати матеріал</h3>
+                <span onclick="closeModal('materialQuickModal')" style="font-size:1.4rem;cursor:pointer;color:#9ca3af;">&times;</span>
+            </div>
+            <div style="margin-bottom:0.75rem;">
+                <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Назва *</label>
+                <input type="text" id="mqName" class="form-input" placeholder="Плитка, цемент, фарба..." style="border-radius:12px;" autofocus>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+                <div>
+                    <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Кількість</label>
+                    <input type="number" id="mqQty" class="form-input" value="1" min="0" step="0.1" style="border-radius:12px;">
+                </div>
+                <div>
+                    <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Одиниця</label>
+                    <select id="mqUnit" class="form-select" style="border-radius:12px;">
+                        <option value="шт">шт</option><option value="м2">м²</option><option value="м">м</option>
+                        <option value="кг">кг</option><option value="л">л</option><option value="уп">уп</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+                <div>
+                    <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Постачальник</label>
+                    <input type="text" id="mqSupplier" class="form-input" placeholder="Назва" style="border-radius:12px;">
+                </div>
+                <div>
+                    <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Планова дата</label>
+                    <input type="date" id="mqDeliveryDate" class="form-input" style="border-radius:12px;">
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem;">
+                <div>
+                    <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Планова вартість, ₴</label>
+                    <input type="number" id="mqCost" class="form-input" placeholder="0" min="0" style="border-radius:12px;">
+                </div>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn" onclick="closeModal('materialQuickModal')" style="flex:1;border-radius:12px;">Скасувати</button>
+                <button class="btn btn-success" onclick="saveMaterialQuick('${projectId}','${stageId}')" style="flex:1;border-radius:12px;">Додати</button>
+            </div>`;
+        modal.style.display = 'flex';
+        setTimeout(() => document.getElementById('mqName')?.focus(), 100);
+    };
+
+    window.saveMaterialQuick = async function(projectId, stageId) {
+        const name = document.getElementById('mqName')?.value?.trim();
+        if (!name) { showToast('Введіть назву', 'error'); return; }
+        const data = {
+            name,
+            qty: parseFloat(document.getElementById('mqQty')?.value) || 1,
+            unit: document.getElementById('mqUnit')?.value || 'шт',
+            supplierName: document.getElementById('mqSupplier')?.value?.trim() || '',
+            plannedDeliveryDate: document.getElementById('mqDeliveryDate')?.value || '',
+            costPlanned: parseFloat(document.getElementById('mqCost')?.value) || 0,
+        };
+        await createMaterial(projectId, stageId, data);
+        await loadMaterials(projectId);
+        closeModal('materialQuickModal');
+        if (typeof window.renderProjectDetail === 'function') window.renderProjectDetail(projectId);
         showToast('Матеріал додано', 'success');
     };
 

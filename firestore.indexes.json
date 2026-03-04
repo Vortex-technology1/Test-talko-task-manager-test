@@ -57,6 +57,14 @@
         { "fieldPath": "scope", "order": "ASCENDING" },
         { "fieldPath": "scopeId", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "projectStages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "projectId", "order": "ASCENDING" },
+        { "fieldPath": "order", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

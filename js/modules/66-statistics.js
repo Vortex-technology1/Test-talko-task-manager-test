@@ -396,7 +396,7 @@
     }
 
     async function deleteMetric(mid) {
-        if (!confirm(t('confirmDeleteMetric') || 'Видалити метрику та всі дані?')) return;
+        if (!await showConfirmModal(t('confirmDeleteMetric') || 'Видалити метрику та всі дані?', { danger: true })) return;
         try {
             const batch = db.batch();
             batch.delete(metricsRef().doc(mid));
@@ -748,17 +748,30 @@
         if (!h) return;
         const role = getUserRole();
         const canEdit = role === 'owner' || role === 'manager' || role === 'admin';
+        const metricCount = statsMetrics.length;
 
         h.innerHTML = `
         <div class="stats-header">
-            <div class="stats-header-title">${SVG.trendUp} ${t('tabStatistics') || 'Метрики'}</div>
+            <div class="stats-header-title">${SVG.trendUp} <span style="font-size:1.1rem;font-weight:700;">Статистика</span></div>
             <div class="stats-header-actions">
-                ${canEdit ? `<button class="stats-pill accent" onclick="openMetricModal()">${SVG.plus} ${t('addMetric') || 'Метрика'}</button>` : ''}
-                <button class="stats-pill" onclick="openQuickInputModal()">${SVG.edit} ${t('quickInput') || 'Внести дані'}</button>
+                ${canEdit ? `<button class="stats-pill accent" onclick="openMetricModal()" style="background:var(--primary);color:white;border-color:var(--primary);font-weight:700;padding:0.45rem 1rem;">${SVG.plus} Метрика</button>` : ''}
+                <button class="stats-pill" onclick="openQuickInputModal()" style="font-weight:600;">${SVG.edit} Внести дані</button>
                 <button class="stats-pill" onclick="runAIAnalysis()" style="color:#7c3aed;border-color:#e9d5ff;">${SVG.sparkles} AI</button>
                 <button class="stats-pill" onclick="openTrendsChart(statsMetrics[0]?.id || '')" style="color:#3b82f6;border-color:#dbeafe;">${SVG.barChart} Тренди</button>
             </div>
-        </div>`;
+        </div>
+        ${metricCount === 0 ? `
+        <div style="text-align:center;padding:2.5rem 1rem;background:white;border-radius:16px;margin-top:1rem;border:2px dashed #e5e7eb;">
+            <div style="margin-bottom:0.5rem;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+            <div style="font-weight:700;font-size:1rem;color:#374151;">Почніть з додавання показників</div>
+            <div style="color:#9ca3af;font-size:0.85rem;margin:0.5rem 0 1rem;">Натисніть "+ Метрика" щоб створити перший показник (виручка, ліди, конверсія...)</div>
+            ${canEdit ? `<button class="btn btn-success" onclick="openMetricModal()" style="padding:0.6rem 1.5rem;border-radius:14px;font-size:0.95rem;">
+                ${SVG.plus} Додати перший показник
+            </button>
+            <div style="margin-top:1rem;display:flex;justify-content:center;gap:0.5rem;">
+                <button class="btn btn-small" onclick="generateStatsDemoData()" style="font-size:0.78rem;background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;">Завантажити демо-дані</button>
+            </div>` : ''}
+        </div>` : ''}`;
     }
 
     // ========================
@@ -935,16 +948,16 @@
             const role = getUserRole();
             const canEdit = role === 'owner' || role === 'manager' || role === 'admin';
             html += `<th>
-                <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-                    <span style="display:flex;align-items:center;gap:4px;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+                    <span style="display:flex;align-items:center;gap:4px;font-size:0.78rem;">
                         <span style="width:8px;height:8px;border-radius:50%;background:${impColor};flex-shrink:0;"></span>
                         ${esc(m.name)}${unit}${privacy}${inverse}
                     </span>
                     ${respName ? `<span style="font-size:0.62rem;font-weight:400;color:${color};">● ${respName}</span>` : ''}
-                    <div style="display:flex;gap:2px;opacity:0.4;margin-top:1px;">
-                        ${canEdit ? `<button class="stats-comment-btn" onclick="openMetricModal('${m.id}')" title="Редагувати">${SVG.settings}</button>` : ''}
-                        ${canEdit ? `<button class="stats-comment-btn" onclick="deleteMetric('${m.id}')" title="Видалити" style="color:#ef4444;">${SVG.trash}</button>` : ''}
-                        <button class="stats-comment-btn" onclick="openTrendsChart('${m.id}')" title="Графік тренду">${SVG.barChart}</button>
+                    <div style="display:flex;gap:4px;margin-top:2px;">
+                        ${canEdit ? `<button class="stats-comment-btn" onclick="openMetricModal('${m.id}')" title="Редагувати" style="opacity:0.6;padding:3px 6px;">${SVG.settings}</button>` : ''}
+                        ${canEdit ? `<button class="stats-comment-btn" onclick="deleteMetric('${m.id}')" title="Видалити" style="color:#ef4444;opacity:0.6;padding:3px 6px;">${SVG.trash}</button>` : ''}
+                        <button class="stats-comment-btn" onclick="openTrendsChart('${m.id}')" title="Графік" style="opacity:0.6;padding:3px 6px;">${SVG.barChart}</button>
                     </div>
                 </div>
             </th>`;
@@ -983,16 +996,16 @@
                                 <div class="stats-prog-bar"><div class="stats-prog-fill" style="width:${Math.min(pct, 100)}%;background:${pctColor};"></div></div>
                                 <span class="stats-prog-pct" style="color:${pctColor};">${pct}%</span>
                             </div>
-                            ${entryId ? `<button class="stats-comment-btn" onclick="deleteEntry('${entryId}')" title="Видалити запис" style="color:#d1d5db;opacity:0;transition:opacity 0.15s;">${SVG.trash}</button>` : ''}
+                            ${entryId ? `<button class="stats-comment-btn stats-entry-del" onclick="deleteEntry('${entryId}')" title="Видалити запис" style="color:#d1d5db;opacity:0;transition:opacity 0.15s;">${SVG.trash}</button>` : ''}
                         </div>`;
                     } else {
                         cellHtml = `<div style="display:flex;align-items:center;gap:4px;justify-content:center;">
                             <span class="stats-val" onclick="openMetricDetail('${m.id}','${pk}')">${formatted}</span>
-                            ${entryId ? `<button class="stats-comment-btn" onclick="deleteEntry('${entryId}')" title="Видалити запис" style="color:#d1d5db;opacity:0;transition:opacity 0.15s;">${SVG.trash}</button>` : ''}
+                            ${entryId ? `<button class="stats-comment-btn stats-entry-del" onclick="deleteEntry('${entryId}')" title="Видалити запис" style="color:#d1d5db;opacity:0;transition:opacity 0.15s;">${SVG.trash}</button>` : ''}
                         </div>`;
                     }
                 } else {
-                    cellHtml = `<span class="stats-val-empty" onclick="openMetricDetail('${m.id}','${pk}')">—</span>`;
+                    cellHtml = `<span class="stats-val-empty" onclick="openMetricDetail('${m.id}','${pk}')" title="Натисніть для введення">+</span>`;
                 }
                 html += `<td>${cellHtml}</td>`;
             });
@@ -1261,7 +1274,7 @@
         if (ct) {
             ct.innerHTML = '<div style="padding:1rem;">' +
                 '<div style="background:#f0fdf4;padding:1rem;border-radius:12px;margin-bottom:1rem;">' +
-                '<h3 style="margin-bottom:0.5rem;">📊 ' + formatPeriodLabel(pk) + '</h3>' +
+                '<h3 style="margin-bottom:0.5rem;">' + formatPeriodLabel(pk) + '</h3>' +
                 md.map(m =>
                     '<div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #e5e7eb;">' +
                     '<span>' + m.name + '</span>' +
@@ -1270,7 +1283,7 @@
                     '</span></div>'
                 ).join('') + '</div>' +
                 '<div style="background:#eff6ff;padding:1rem;border-radius:12px;">' +
-                '<h3>🤖 ' + (t('aiReady') || 'AI підключення') + '</h3>' +
+                '<h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><line x1="12" y1="7" x2="12" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="16" y1="15" x2="16" y2="15"/></svg> ' + (t('aiReady') || 'AI підключення') + '</h3>' +
                 '<details style="margin-top:0.5rem;"><summary style="cursor:pointer;font-size:0.8rem;color:var(--info);">' +
                 (t('showPrompt') || 'Промпт') + '</summary>' +
                 '<pre style="font-size:0.7rem;white-space:pre-wrap;background:#f9fafb;padding:0.5rem;border-radius:8px;margin-top:0.5rem;max-height:200px;overflow-y:auto;">' +
@@ -1291,7 +1304,7 @@
     // Delete single entry
     window.deleteEntry = async function(entryId) {
         if (!entryId) return;
-        if (!confirm(t('confirmDeleteEntry') || 'Видалити цей запис?')) return;
+        if (!await showConfirmModal(t('confirmDeleteEntry') || 'Видалити цей запис?', { danger: true })) return;
         try {
             await entriesRef().doc(entryId).delete();
             showToast(t('deleted') || 'Видалено', 'success');
@@ -1580,7 +1593,7 @@
         };
 
         const nicheData = NICHES[niche.trim()];
-        if (!confirm('Згенерувати ' + nicheData.metrics.length + ' метрик для "' + nicheData.name + '" з даними за 10 тижнів?')) return;
+        if (!await showConfirmModal('Згенерувати ' + nicheData.metrics.length + ' метрик для "' + nicheData.name + '" з даними за 10 тижнів?', { danger: true })) return;
 
         showToast('Генерую "' + nicheData.name + '"...', 'info');
         try {
@@ -1626,6 +1639,222 @@
         } catch (e) { console.error('[STATS] demo:', e); showToast('Помилка: ' + e.message, 'error'); }
     }
 
+    // ========================
+    //  AUTO-METRICS ENGINE
+    //  Варіант A: автоматичний зв'язок tasks → metricEntries
+    // ========================
+
+    // Типи авто-джерел
+    const AUTO_SOURCES = {
+        auto_tasks_done:       { label: 'Виконані задачі',   unit: 'шт' },
+        auto_tasks_overdue:    { label: 'Прострочені задачі', unit: 'шт' },
+        auto_tasks_review:     { label: 'На перевірці',       unit: 'шт' },
+        auto_completion_rate:  { label: '% виконання',        unit: '%'  },
+    };
+
+    // Вибір джерела в UI metricModal
+    window.selectMetricSource = function(source) {
+        document.querySelectorAll('.metric-source-btn').forEach(btn => {
+            const active = btn.dataset.source === source;
+            btn.style.borderColor = active ? '#22c55e' : '#e5e7eb';
+            btn.style.background  = active ? '#f0fdf4' : 'white';
+            btn.style.color       = active ? '#16a34a' : '#374151';
+            btn.style.fontWeight  = active ? '600' : '400';
+        });
+        document.getElementById('metricInputType').value = source === 'manual' ? 'manual' : 'auto';
+        const autoBlock = document.getElementById('autoSpecBlock');
+        const preview   = document.getElementById('autoSpecPreview');
+        if (source !== 'manual') {
+            autoBlock.style.display = 'block';
+            // Зберігаємо тип у прихованому полі через autoSpec
+            autoBlock.dataset.autoSource = source;
+            if (preview) preview.textContent = AUTO_SOURCES[source]?.label || '';
+            // Підставляємо одиницю виміру
+            const unit = AUTO_SOURCES[source]?.unit;
+            if (unit) { try { selectMetricUnit(unit); } catch(e){} }
+        } else {
+            autoBlock.style.display = 'none';
+            autoBlock.dataset.autoSource = '';
+        }
+    };
+
+    // Патч saveMetric — читає autoSource з UI кнопок перед збереженням
+    const origSaveMetricFn = saveMetric;
+
+    // ========================
+    //  COMPUTE AUTO VALUE
+    //  Рахує значення автометрики за period
+    // ========================
+    function computeAutoValue(metric, periodKey) {
+        if (!metric?.autoSpec?.type) return null;
+        const src = metric.autoSpec.type;
+        if (!AUTO_SOURCES[src]) return null;
+
+        const freq = metric.frequency || 'weekly';
+        const allTasks = typeof tasks !== 'undefined' ? tasks : [];
+        const boundFuncs = metric.boundFunctions ? Object.keys(metric.boundFunctions) : [];
+
+        // Фільтруємо задачі за period
+        const periodTasks = allTasks.filter(tk => {
+            if (!isTaskInPeriod(tk, periodKey, freq)) return false;
+            // Якщо є прив'язка до функцій — фільтруємо
+            if (boundFuncs.length > 0) {
+                const func = typeof functions !== 'undefined'
+                    ? functions.find(f => f.name === tk.function)
+                    : null;
+                if (!func || !boundFuncs.includes(func.id)) return false;
+            }
+            return true;
+        });
+
+        if (src === 'auto_tasks_done') {
+            return periodTasks.filter(tk => tk.status === 'done').length;
+        }
+        if (src === 'auto_tasks_overdue') {
+            const today = getLocalDateStr ? getLocalDateStr() : new Date().toISOString().split('T')[0];
+            return periodTasks.filter(tk =>
+                tk.status !== 'done' && tk.deadlineDate && tk.deadlineDate < today
+            ).length;
+        }
+        if (src === 'auto_tasks_review') {
+            return periodTasks.filter(tk => tk.status === 'review').length;
+        }
+        if (src === 'auto_completion_rate') {
+            const total = periodTasks.length;
+            if (total === 0) return 0;
+            const done = periodTasks.filter(tk => tk.status === 'done').length;
+            return Math.round((done / total) * 100);
+        }
+        return null;
+    }
+
+    // Визначає чи задача потрапляє в period (по completedAt або deadlineDate)
+    function isTaskInPeriod(tk, periodKey, freq) {
+        // Для done — по completedAt; для решти — по deadlineDate
+        let dateStr = null;
+        if (tk.status === 'done' && tk.completedAt) {
+            const d = tk.completedAt.toDate ? tk.completedAt.toDate() : new Date(tk.completedAt);
+            dateStr = d.toISOString().split('T')[0];
+        } else if (tk.deadlineDate) {
+            dateStr = tk.deadlineDate;
+        } else if (tk.createdDate) {
+            dateStr = tk.createdDate;
+        }
+        if (!dateStr) return false;
+
+        if (freq === 'daily') return dateStr === periodKey;
+        if (freq === 'weekly') return toWeekKey(new Date(dateStr)) === periodKey;
+        // monthly: YYYY-MM
+        return dateStr.slice(0, 7) === periodKey;
+    }
+
+    // Патч getEntryForMetric — якщо метрика auto і немає ручного entry → повертаємо computed value
+    const _origGetEntry = getEntryForMetric;
+    // Перевизначаємо через замикання
+    window._computeAutoForMetric = function(metric, periodKey) {
+        if (!metric || metric.inputType !== 'auto') return null;
+        const val = computeAutoValue(metric, periodKey);
+        if (val === null) return null;
+        return { value: val, _auto: true };
+    };
+
+    // Інтегруємо в renderStatistics: для auto метрик показуємо computed value
+    const _origRenderStats = window.renderStatistics;
+    window.renderStatistics = function() {
+        // Перед рендером — проставляємо auto values в statsEntries (in-memory, без запису в Firestore)
+        injectAutoValues();
+        return _origRenderStats ? _origRenderStats() : renderStatistics();
+    };
+
+    function injectAutoValues() {
+        if (!statsMetrics || !statsMetrics.length) return;
+        const autoMetrics = statsMetrics.filter(m => m.inputType === 'auto' && m.autoSpec?.type);
+        if (!autoMetrics.length) return;
+
+        // Для кожної auto метрики і поточного + попередніх periods
+        const offsets = [-2, -1, 0];
+        autoMetrics.forEach(m => {
+            offsets.forEach(offset => {
+                const pk = getStatsPeriodKey(offset, m.frequency);
+                // Якщо немає ручного entry — додаємо computed
+                const existing = statsEntries.find(e => e.metricId === m.id && e.periodKey === pk);
+                if (!existing) {
+                    const val = computeAutoValue(m, pk);
+                    if (val !== null) {
+                        // Додаємо ephemeral entry (не пишемо в Firestore)
+                        statsEntries.push({
+                            id: `_auto_${m.id}_${pk}`,
+                            metricId: m.id,
+                            periodKey: pk,
+                            periodType: m.frequency,
+                            value: val,
+                            _auto: true,
+                            _ephemeral: true,
+                            createdBy: currentUser?.uid || '',
+                            scope: 'company',
+                            scopeId: currentCompany,
+                        });
+                    }
+                } else if (existing._ephemeral) {
+                    // Оновлюємо ephemeral якщо tasks змінились
+                    const val = computeAutoValue(m, pk);
+                    if (val !== null) existing.value = val;
+                }
+            });
+        });
+    }
+
+    // openMetricModal — відновлюємо source buttons при редагуванні
+    const _origOpenMetricModal = window.openMetricModal;
+    window.openMetricModal = function(mid) {
+        _origOpenMetricModal(mid);
+        // Після відкриття — встановлюємо source buttons
+        setTimeout(() => {
+            const m = mid ? statsMetrics.find(x => x.id === mid) : null;
+            const src = m?.autoSpec?.type || 'manual';
+            if (window.selectMetricSource) window.selectMetricSource(src);
+        }, 50);
+    };
+
+    // openMetricModal вже переглядений — додаємо відновлення autoSpec.type з метрики при edit
+    // (це робиться в setTimeout вище)
+
+    // Також патчимо saveMetric щоб читав autoSource з UI кнопок
+    window.saveMetric = async function() {
+        const autoBlock = document.getElementById('autoSpecBlock');
+        const autoSource = autoBlock?.dataset?.autoSource || '';
+        const isAuto = autoSource && autoSource !== 'manual';
+
+        // Встановлюємо hidden fields для оригінального saveMetric
+        const inputTypeEl = document.getElementById('metricInputType');
+        if (inputTypeEl) inputTypeEl.value = isAuto ? 'auto' : 'manual';
+
+        // autoSpec type — записуємо через тимчасовий element
+        if (isAuto) {
+            let el = document.getElementById('autoSpecType');
+            if (!el) {
+                el = document.createElement('input');
+                el.type = 'hidden'; el.id = 'autoSpecType';
+                document.body.appendChild(el);
+            }
+            el.value = autoSource;
+            // functionId — порожній (використовуються boundFunctions)
+            let elF = document.getElementById('autoSpecFunction');
+            if (!elF) {
+                elF = document.createElement('input');
+                elF.type = 'hidden'; elF.id = 'autoSpecFunction';
+                document.body.appendChild(elF);
+            }
+            elF.value = '';
+        }
+
+        return origSaveMetricFn();
+    };
+
+    // Expose computeAutoValue для можливих зовнішніх викликів
+    window.computeAutoValue = computeAutoValue;
+
+
     window.initStatistics = initStatistics;
     window.generateStatsDemoData = generateStatsDemoData;
     window.onStatsFunctionChange = onStatsFunctionChange;
@@ -1633,8 +1862,7 @@
     // Clear all stats data (admin only)
     window.clearAllStatsData = async function() {
         if (!currentCompany || !currentUser) return;
-        if (!confirm('ВИДАЛИТИ ВСІ метрики, записи, цілі? Це незворотно!')) return;
-        if (!confirm('Точно видалити? Друге підтвердження.')) return;
+        if (!await showConfirmModal('ВИДАЛИТИ ВСІ метрики, записи та цілі?\n\nЦя дія незворотна — відновлення неможливе.', { danger: true })) return;
 
         showToast('Видаляю...', 'info');
         try {

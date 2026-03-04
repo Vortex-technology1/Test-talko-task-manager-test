@@ -555,8 +555,11 @@
                 gap: 0.5rem;
             }
             
-            /* Hide AI buttons and full logout on mobile */
+            /* Hide AI buttons, support link, lang switcher on mobile */
             .header-ai-btn { display: none !important; }
+            #aiDropdown { display: none !important; }
+            .header-actions > a[href*="chatgpt"] { display: none !important; }
+            .header-actions > .hdr-dropdown:not(#notifDropdown):not(#userDropdown) { display: none !important; }
             .header-btn span { display: none; }
             .header-btn { 
                 padding: 0.5rem; 

@@ -81,8 +81,8 @@
             </div>
             <div class="header-actions">
                 <!-- 24/7 AI Support -->
-                <a href="https://chatgpt.com/g/g-69382bfa841881918aff7b50aa25a4f9-talko-task-manager-support" target="_blank" class="hdr-dropdown-btn" style="background:#22c55e;color:#fff;text-decoration:none;gap:0.35rem;" title="AI Підтримка 24/7">
-                    <i data-lucide="headphones" class="icon"></i> <span data-i18n="aiSupport">AI Підтримка 24/7</span>
+                <a href="https://chatgpt.com/g/g-69382bfa841881918aff7b50aa25a4f9-talko-task-manager-support" target="_blank" class="hdr-dropdown-btn hide-mobile" style="background:#22c55e;color:#fff;text-decoration:none;gap:0.35rem;padding:0.4rem 0.6rem;" title="AI Підтримка 24/7">
+                    <i data-lucide="headphones" class="icon"></i>
                 </a>
                 <!-- AI Assistants Dropdown -->
                 <div class="hdr-dropdown" id="aiDropdown">
@@ -130,19 +130,19 @@
                     </button>
                     <div class="hdr-dropdown-menu" id="langDropdownMenu">
                         <button class="hdr-dropdown-item lang-opt active" data-lang="ua" onclick="setLanguageFromDropdown('ua')">
-                            <span class="lang-flag">🇺🇦</span> Українська
+                            <span class="lang-flag"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">UA</span></span> Українська
                         </button>
                         <button class="hdr-dropdown-item lang-opt" data-lang="ru" onclick="setLanguageFromDropdown('ru')">
-                            <span class="lang-flag">🇷🇺</span> Русский
+                            <span class="lang-flag"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">RU</span></span> Русский
                         </button>
                         <button class="hdr-dropdown-item lang-opt" data-lang="pl" onclick="setLanguageFromDropdown('pl')">
-                            <span class="lang-flag">🇵🇱</span> Polski
+                            <span class="lang-flag"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">PL</span></span> Polski
                         </button>
                         <button class="hdr-dropdown-item lang-opt" data-lang="en" onclick="setLanguageFromDropdown('en')">
-                            <span class="lang-flag">🇬🇧</span> English
+                            <span class="lang-flag"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">EN</span></span> English
                         </button>
                         <button class="hdr-dropdown-item lang-opt" data-lang="de" onclick="setLanguageFromDropdown('de')">
-                            <span class="lang-flag">🇩🇪</span> Deutsch
+                            <span class="lang-flag"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">DE</span></span> Deutsch
                         </button>
                     </div>
                 </div>
@@ -184,11 +184,11 @@
                         <div id="selfRegForm">
                             <div class="auth-input-group">
                                 <label data-i18n="companyNameLabel">Назва компанії *</label>
-                                <input type="text" id="selfRegCompanyName" class="form-input" placeholder="ТОВ Моя Компанія" data-i18n-placeholder="companyNamePh" required>
+                                <input type="text" id="selfRegCompanyName" class="form-input" placeholder="ТОВ Моя Компанія" data-i18n-placeholder="companyNamePh" required aria-required="true">
                             </div>
                             <div class="auth-input-group">
                                 <label data-i18n="yourNameLabel">Ваше ім'я *</label>
-                                <input type="text" id="selfRegOwnerName" class="form-input" placeholder="Іван Петренко" data-i18n-placeholder="yourNamePh" required>
+                                <input type="text" id="selfRegOwnerName" class="form-input" placeholder="Іван Петренко" data-i18n-placeholder="yourNamePh" required aria-required="true">
                             </div>
                             <button onclick="selfRegisterCompany()" class="btn btn-success" style="width:100%;margin-top:0.5rem;" id="selfRegBtn">
                                 <i data-lucide="rocket" class="icon"></i> Створити компанію
@@ -294,27 +294,31 @@
         </div>
 
         <!-- MAIN INTERFACE -->
-        <div id="mainInterface" class="main-interface">
+        <div id="mainInterface" role="application" aria-label="TALKO Task Manager" class="main-interface">
             <!-- Pull-to-refresh indicator -->
             <div id="ptrIndicator" class="ptr-indicator">
                 <div class="ptr-spinner"></div>
                 <span data-i18n="updating">Оновлення...</span>
             </div>
             <div class="tab-navigation">
-                <button class="tab-btn active" onclick="switchTab('myday')" title="Мій день"><i data-lucide="sun" class="icon"></i> <span data-i18n="tabMyDay">Мій день</span></button>
-                <button class="tab-btn" onclick="switchTab('tasks')" title="Завдання"><i data-lucide="clipboard-list" class="icon"></i> <span data-i18n="tabTasks">Завдання</span></button>
-                <button class="tab-btn" onclick="switchTab('projects')" title="Проєкти"><i data-lucide="folder-kanban" class="icon"></i> <span data-i18n="tabProjects">Проєкти</span></button>
-                <button class="tab-btn" onclick="switchTab('control')" title="Контроль"><i data-lucide="layout-dashboard" class="icon"></i> <span data-i18n="tabControl">Контроль</span></button>
-                <button class="tab-btn" onclick="switchTab('processes')" title="Процеси"><i data-lucide="git-branch" class="icon"></i> <span data-i18n="tabProcesses">Процеси</span></button>
-                <button class="tab-btn" onclick="switchTab('regular')" title="Регулярні завдання"><i data-lucide="repeat" class="icon"></i> <span data-i18n="tabRegular">Регулярні</span></button>
-                <button class="tab-btn" onclick="switchTab('functions')" title="Функції компанії"><i data-lucide="settings" class="icon"></i> <span data-i18n="tabFunctions">Функції</span></button>
-                <button class="tab-btn" onclick="switchTab('users')" title="Співробітники"><i data-lucide="users" class="icon"></i> <span data-i18n="tabUsers">Команда</span></button>
-                <button class="tab-btn" onclick="switchTab('analytics')" title="Аналітика завдань"><i data-lucide="bar-chart-3" class="icon"></i> <span data-i18n="tabAnalytics">Аналітика</span></button>
-                <button class="tab-btn" onclick="switchTab('statistics')" id="statisticsTabBtn" style="display:none;" title="Статистика та KPI"><i data-lucide="trending-up" class="icon"></i> <span data-i18n="tabStatistics">Метрики</span></button>
-            <button class="tab-btn" onclick="switchTab('bizstructure')" data-tab="bizstructure" title="Бізнес-структура">
-                <i data-lucide="network" class="icon"></i> <span data-i18n="tabStructure">Структура</span>
-            </button>
-                <button class="tab-btn" onclick="switchTab('admin')" id="adminTabBtn" style="display:none;background:#fee2e2;color:#dc2626;" title="Адмін-панель"><i data-lucide="shield" class="icon"></i> <span data-i18n="tabAdmin">Адмін</span></button>
+                <button class="tab-btn active" onclick="switchTab('myday')" title="Мій день" aria-label="Мій день"><i data-lucide="sun" class="icon"></i> <span data-i18n="tabMyDay">Мій день</span></button>
+                <button class="tab-btn" onclick="switchTab('tasks')" title="Завдання" aria-label="Завдання"><i data-lucide="clipboard-list" class="icon"></i> <span data-i18n="tabTasks">Завдання</span></button>
+                <button class="tab-btn" onclick="switchTab('projects')" title="Проєкти" aria-label="Проєкти"><i data-lucide="folder-kanban" class="icon"></i> <span data-i18n="tabProjects">Проєкти</span></button>
+                <button class="tab-btn" onclick="switchTab('control')" title="Контроль" aria-label="Контроль"><i data-lucide="layout-dashboard" class="icon"></i> <span data-i18n="tabControl">Контроль</span></button>
+                <button class="tab-btn" onclick="switchTab('statistics')" id="statisticsTabBtn" style="display:none;" title="Статистика та KPI" aria-label="Статистика та KPI"><i data-lucide="trending-up" class="icon"></i> <span data-i18n="tabStatistics">Метрики</span></button>
+                <!-- More dropdown -->
+                <div style="position:relative;display:inline-block;" id="moreTabsDropdown">
+                    <button class="tab-btn" onclick="toggleMoreTabs(event)" title="Ще" aria-label="Ще" id="moreTabsBtn"><i data-lucide="more-horizontal" class="icon"></i> <span>Ще</span></button>
+                    <div id="moreTabsMenu" style="display:none;position:absolute;top:100%;left:0;z-index:100;background:white;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);min-width:200px;padding:0.4rem;">
+                        <button class="tab-btn" onclick="switchTab('processes');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="git-branch" class="icon icon-sm"></i> <span data-i18n="tabProcesses">Процеси</span></button>
+                        <button class="tab-btn" onclick="switchTab('regular');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="repeat" class="icon icon-sm"></i> <span data-i18n="tabRegular">Регулярні</span></button>
+                        <button class="tab-btn" onclick="switchTab('functions');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="settings" class="icon icon-sm"></i> <span data-i18n="tabFunctions">Функції</span></button>
+                        <button class="tab-btn" onclick="switchTab('users');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="users" class="icon icon-sm"></i> <span data-i18n="tabUsers">Команда</span></button>
+                        <button class="tab-btn" onclick="switchTab('analytics');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="bar-chart-3" class="icon icon-sm"></i> <span data-i18n="tabAnalytics">Аналітика</span></button>
+                        <button class="tab-btn" onclick="switchTab('bizstructure');closeMoreTabs();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;"><i data-lucide="network" class="icon icon-sm"></i> <span data-i18n="tabStructure">Структура</span></button>
+                        <button class="tab-btn" onclick="switchTab('admin');closeMoreTabs();" id="adminTabBtn" style="display:none;width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;background:#fee2e2;color:#dc2626;"><i data-lucide="shield" class="icon icon-sm"></i> <span data-i18n="tabAdmin">Адмін</span></button>
+                    </div>
+                </div>
             </div>
 
             <!-- MY DAY TAB -->
@@ -340,7 +344,7 @@
                             </div>
                             <span id="mydayProgressText" class="myday-progress-text">0/0</span>
                         </div>
-                        <button onclick="refreshMyDay()" class="myday-refresh-btn" title="Оновити" data-i18n-title="refresh">
+                        <button onclick="refreshMyDay()" class="myday-refresh-btn" title="Оновити" aria-label="Оновити" data-i18n-title="refresh">
                             <i data-lucide="refresh-cw" class="icon"></i>
                         </button>
                     </div>
@@ -509,7 +513,7 @@
                             <button class="tb tb-gray" id="archiveToggleBtn" onclick="toggleArchiveView()"><i data-lucide="archive" class="icon" style="width:13px;height:13px;"></i> <span data-i18n="archive">Архів</span></button>
                             <span class="tdiv"></span>
                             <div class="ttabs">
-                                <button class="task-type-tab active" data-value="" onclick="setTaskTypeFilter(this)" data-i18n="all" data-i18n="all">Всі</button>
+                                <button class="task-type-tab active" data-value="" onclick="setTaskTypeFilter(this)" data-i18n="all">Всі</button>
                                 <button class="task-type-tab" data-value="my" onclick="setTaskTypeFilter(this)"><span data-i18n="mine">Мої</span></button>
                                 <button class="task-type-tab" data-value="created" onclick="setTaskTypeFilter(this)" data-i18n="created">Створені</button>
                             </div>
@@ -595,15 +599,12 @@
             <div id="controlTab" class="tab-content">
                 <!-- Owner Project Dashboard -->
                 <div id="ownerProjectDashboard" style="margin-bottom:1rem;"></div>
-                <!-- AI Analysis button -->
-                <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+                <div class="controls" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+                    <h2 style="font-size:1.2rem;margin-bottom:0;" data-i18n="controlPanelTitle">Панель контролю завдань</h2>
                     <button class="btn" onclick="openAIBottleneckAnalysis()" style="padding:0.4rem 0.8rem;font-size:0.82rem;background:#f3e8ff;color:#7c3aed;border-color:#e9d5ff;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                        AI Аналіз вузьких місць
+                        AI Аналіз
                     </button>
-                </div>
-                <div class="controls">
-                    <h2 style="font-size:1.2rem;margin-bottom:0;" data-i18n="controlPanelTitle">Панель контролю завдань</h2>
                 </div>
                 <div class="filters-row" style="background:white;padding:1rem;border-radius:12px;margin-bottom:1rem;box-shadow:var(--shadow);">
                     <span style="display:flex;align-items:center;gap:0.3rem;"><i data-lucide="user" class="icon icon-sm"></i> <span data-i18n="assigneeLabel">Виконавець:</span></span>
@@ -679,7 +680,7 @@
                             <button class="calendar-view-btn" data-view="timeline" onclick="setProjectView('timeline')" data-i18n="timelineView">Таймлайн</button>
                         </div>
                         <button class="btn btn-success" onclick="openProjectModal()"><i data-lucide="plus" class="icon"></i> <span class="hide-mobile" data-i18n="newProject">Новий проєкт</span></button>
-                        <button class="btn" onclick="openProjectTemplatePicker()" style="padding:0.4rem 0.8rem;font-size:0.8rem;"><i data-lucide="copy" class="icon icon-sm"></i> <span class="hide-mobile">Із шаблону</span></button>
+                        <button class="btn" onclick="openProjectTemplatePicker()" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#f0fdf4;color:#16a34a;border-color:#bbf7d0;"><i data-lucide="copy" class="icon icon-sm"></i> <span class="hide-mobile">Із шаблону</span></button>
                     </div>
                 </div>
                 
@@ -718,11 +719,11 @@
                         </button>
                     </div>
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                        <a href="https://chatgpt.com/g/g-693ec18df2c0819194f1c3de7404d6fe-talko-ai-business-process" target="_blank" class="btn" style="background:linear-gradient(135deg,#8b5cf6,#6366f1);color:white;border:none;">
-                            <i data-lucide="sparkles" class="icon"></i> <span data-i18n="aiAssistant">AI-асистент</span>
-                        </a>
-                        <button class="btn" onclick="openProcessTemplatesModal()"><i data-lucide="file-cog" class="icon"></i> <span data-i18n="templates">Шаблони</span></button>
                         <button class="btn btn-success" onclick="openStartProcessModal()"><i data-lucide="play" class="icon"></i> <span data-i18n="startProcess">Запустити</span></button>
+                        <button class="btn" onclick="openProcessTemplatesModal()"><i data-lucide="file-cog" class="icon"></i> <span class="hide-mobile" data-i18n="templates">Шаблони</span></button>
+                        <a href="https://chatgpt.com/g/g-693ec18df2c0819194f1c3de7404d6fe-talko-ai-business-process" target="_blank" class="btn hide-mobile" title="AI Асистент бізнес-процесів" style="background:linear-gradient(135deg,#8b5cf6,#6366f1);color:white;border:none;">
+                            <i data-lucide="sparkles" class="icon"></i> <span data-i18n="aiAssistant">AI</span>
+                        </a>
                     </div>
                 </div>
                 
@@ -922,15 +923,13 @@
                 <div style="background:white;border-radius:12px;padding:1rem;box-shadow:var(--shadow);margin-bottom:1rem;">
                     <h3 style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;">
                         <span><i data-lucide="building-2" class="icon"></i> Компанії</span>
-                        <div style="display:flex;gap:0.5rem;">
-                            <button onclick="clearAllStatsData()" class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#fee2e2;color:#dc2626;" title="Видалити ВСІ метрики та дані">
-                                <i data-lucide="trash-2" class="icon icon-sm"></i> Clear Stats
-                            </button>
-                            <button onclick="generateStatsDemoData()" class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#f0fdf4;color:#16a34a;" title="Згенерувати демо-метрики">
+                        <div style="display:flex;gap:0.5rem;align-items:center;">
+                            <button onclick="generateStatsDemoData()" class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#f0fdf4;color:#16a34a;" title="Згенерувати демо-метрики" aria-label="Згенерувати демо-метрики">
                                 <i data-lucide="bar-chart-3" class="icon icon-sm"></i> Demo Stats
                             </button>
-                            <button onclick="clearAllStatsData()" class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#fee2e2;color:#dc2626;" title="Видалити всі метрики">
-                                <i data-lucide="trash-2" class="icon icon-sm"></i> Clear
+                            <div style="width:1px;height:20px;background:#e5e7eb;margin:0 2px;"></div>
+                            <button onclick="clearAllStatsData()" class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;" title="Незворотно видалити ВСІ метрики та дані" aria-label="Незворотно видалити ВСІ метрики та дані">
+                                <i data-lucide="trash-2" class="icon icon-sm"></i>
                             </button>
                             <button onclick="openAiAssistantsModal()" class="btn" style="padding:0.4rem 0.8rem;font-size:0.8rem;background:#f3e8ff;color:#7c3aed;">
                                 <i data-lucide="bot" class="icon icon-sm"></i> AI
@@ -964,7 +963,7 @@
                             </div>
                             
                             <div style="padding:0.75rem;background:#f0fdf4;border-radius:8px;border-left:3px solid #16a34a;">
-                                <strong style="color:#16a34a;">⚙️ Налаштування AI</strong>
+                                <strong style="color:#16a34a;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Налаштування AI</strong>
                                 <div style="margin-top:0.3rem;line-height:1.6;">
                                     1. Кнопка "AI" → ввести OpenAI ключ<br>
                                     2. Промпти асистентів → можна редагувати<br>
@@ -974,7 +973,7 @@
                             </div>
                             
                             <div style="padding:0.75rem;background:#fef2f2;border-radius:8px;border-left:3px solid #ef4444;">
-                                <strong style="color:#dc2626;">🚫 Блокування</strong>
+                                <strong style="color:#dc2626;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Блокування</strong>
                                 <div style="margin-top:0.3rem;line-height:1.6;">
                                     OFF → компанія заблоковано (не можуть увійти)<br>
                                     ON → розблокувати<br>
@@ -983,7 +982,7 @@
                             </div>
                             
                             <div style="padding:0.75rem;background:#fefce8;border-radius:8px;border-left:3px solid #f59e0b;">
-                                <strong style="color:#b45309;">📅 Google Calendar</strong>
+                                <strong style="color:#b45309;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Google Calendar</strong>
                                 <div style="margin-top:0.3rem;line-height:1.6;">
                                     <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" style="color:#2563eb;">Google Console → Audience</a><br>
                                     "+ Add users" → email клієнта → Save<br>
@@ -992,7 +991,7 @@
                             </div>
                             
                             <div style="padding:0.75rem;background:#faf5ff;border-radius:8px;border-left:3px solid #8b5cf6;">
-                                <strong style="color:#7c3aed;">🔗 Telegram Bot</strong>
+                                <strong style="color:#7c3aed;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Telegram Bot</strong>
                                 <div style="margin-top:0.3rem;line-height:1.6;">
                                     Token в Firebase Secrets (не в коді)<br>
                                     Webhook URL: /telegramWebhook<br>
@@ -1001,7 +1000,7 @@
                             </div>
                             
                             <div style="padding:0.75rem;background:#f8fafc;border-radius:8px;border-left:3px solid #64748b;">
-                                <strong style="color:#475569;">🚀 Deploy</strong>
+                                <strong style="color:#475569;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg> Deploy</strong>
                                 <div style="margin-top:0.3rem;line-height:1.6;">
                                     GitHub push → Vercel auto-deploy<br>
                                     Functions: firebase deploy --only functions<br>
@@ -1017,12 +1016,12 @@
 
     <!-- MODALS -->
     <!-- PROJECT MODAL -->
-    <div id="projectModal" class="modal">
+    <div id="projectModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
         <div class="modal-content" style="max-width:560px;">
-            <div class="modal-header"><span class="close" onclick="closeModal('projectModal')">&times;</span><h2 id="projectModalTitle" data-i18n="newProject">Новий проєкт</h2></div>
+            <div class="modal-header"><button class="close" onclick="closeModal('projectModal')" aria-label="Закрити діалог">&times;</button><h2 id="projectModalTitle" data-i18n="newProject">Новий проєкт</h2></div>
             <div class="modal-body">
                 <form id="projectForm" onsubmit="saveProject(event)">
-                    <div class="form-group"><label class="form-label" data-i18n="projectNameLabel">Назва проєкту *</label><input type="text" id="projectName" class="form-input" required placeholder="Наприклад: Редизайн сайту" data-i18n-placeholder="projectNamePh"></div>
+                    <div class="form-group"><label class="form-label" data-i18n="projectNameLabel">Назва проєкту *</label><input type="text" id="projectName" class="form-input" required placeholder="Наприклад: Редизайн сайту" data-i18n-placeholder="projectNamePh" aria-required="true"></div>
                     <div class="form-grid">
                         <div class="form-group"><label class="form-label" data-i18n="startDate">Дата старту</label><input type="date" id="projectStartDate" class="form-input"></div>
                         <div class="form-group"><label class="form-label" data-i18n="deadline">Дедлайн</label><input type="date" id="projectDeadline" class="form-input"></div>
@@ -1051,7 +1050,7 @@
                     </div>
                     <input type="hidden" id="projectEditId" value="">
                     <div class="form-actions" style="margin-top:1rem;">
-                        <button type="button" class="btn" onclick="closeModal('projectModal')" data-i18n="cancel" data-i18n="cancel">Скасувати</button>
+                        <button type="button" class="btn" onclick="closeModal('projectModal')" data-i18n="cancel">Скасувати</button>
                         <button type="submit" class="btn btn-success"><i data-lucide="check" class="icon"></i> Зберегти</button>
                     </div>
                 </form>
@@ -1060,18 +1059,27 @@
     </div>
 
     <!-- TASK MODAL -->
-    <div id="taskModal" class="modal">
+    <div id="taskModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
         <div class="modal-content">
-            <div class="modal-header"><span class="close" onclick="closeModal('taskModal')">&times;</span><h2 id="taskModalTitle" data-i18n="newTask">Нове завдання</h2></div>
+            <div class="modal-header"><button class="close" onclick="closeModal('taskModal')" aria-label="Закрити діалог">&times;</button><h2 id="taskModalTitle" data-i18n="newTask">Нове завдання</h2></div>
             <div class="modal-body">
                 <form id="taskForm" onsubmit="saveTask(event)">
                     <div class="form-grid">
-                        <div class="form-group full-width"><label class="form-label" data-i18n="title">Назва *</label><input type="text" id="taskTitle" class="form-input" required></div>
+                        <div class="form-group full-width"><label class="form-label" data-i18n="title">Назва *</label><input type="text" id="taskTitle" class="form-input" required aria-required="true"></div>
                         <div class="form-group"><label class="form-label" data-i18n="function">Функція</label><select id="taskFunction" class="form-select"><option value="" data-i18n="noFunction">Без функції</option></select></div>
                         <div class="form-group"><label class="form-label">Проєкт</label><select id="taskProject" class="form-select" onchange="onTaskProjectChange()"><option value="" data-i18n="noProject">Без проєкту</option></select></div>
                         <div class="form-group"><label class="form-label">Етап</label><select id="taskStage" class="form-select"><option value="">Без етапу</option></select></div>
                         <div class="form-group"><label class="form-label" data-i18n="assignee">Виконавець *</label><select id="taskAssignee" class="form-select" required><option value="" data-i18n="select">Оберіть</option></select></div>
-                        <div class="form-group"><label class="form-label" data-i18n="deadlineDate">Дедлайн (дата) *</label><input type="date" id="taskDeadlineDate" class="form-input" required></div>
+                        <div class="form-group"><label class="form-label" data-i18n="deadlineDate">Дедлайн (дата) *</label><input type="date" id="taskDeadlineDate" class="form-input" required aria-required="true"></div>
+                        
+                        <!-- ACCORDION: Розширені налаштування -->
+                        <div class="form-group full-width" style="margin-bottom:0;">
+                            <button type="button" id="taskAdvancedToggle" onclick="toggleTaskAdvanced()" style="display:flex;align-items:center;gap:0.5rem;background:#f9fafb;border:1px dashed #d1d5db;border-radius:10px;padding:0.5rem 1rem;cursor:pointer;font-size:0.85rem;color:#6b7280;width:100%;justify-content:space-between;">
+                                <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> <span data-i18n="advancedSettings">Розширені налаштування</span></span>
+                                <span id="taskAdvancedArrow" style="font-size:0.7rem;transition:transform 0.2s;">▼</span>
+                            </button>
+                        </div>
+                        <div id="taskAdvancedPanel" style="display:none;">
                         <div class="form-group"><label class="form-label" data-i18n="startTime">Початок</label><input type="time" id="taskDeadlineTime" class="form-input"></div>
                         <div class="form-group"><label class="form-label" data-i18n="endDuration">Кінець / Тривалість</label>
                             <div style="display:flex;gap:8px;align-items:center;">
@@ -1153,7 +1161,7 @@
                                     <button type="button" id="timeTrackBtn" onclick="toggleTimeTracker()" style="padding:0.5rem 1rem;border:none;border-radius:8px;background:#22c55e;color:white;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;">
                                         <i data-lucide="play" class="icon icon-sm"></i> <span data-i18n="startTimer">Старт</span>
                                     </button>
-                                    <button type="button" onclick="addManualTime()" style="padding:0.5rem 0.75rem;border:1px solid #d1d5db;border-radius:8px;background:white;cursor:pointer;font-size:0.85rem;" title="Додати час вручну" data-i18n-title="addTimeManually">
+                                    <button type="button" onclick="addManualTime()" style="padding:0.5rem 0.75rem;border:1px solid #d1d5db;border-radius:8px;background:white;cursor:pointer;font-size:0.85rem;" title="Додати час вручну" aria-label="Додати час вручну" data-i18n-title="addTimeManually">
                                         <i data-lucide="plus" class="icon icon-sm"></i>
                                     </button>
                                 </div>
@@ -1221,12 +1229,13 @@
                             </label>
                             <div id="taskNotifyUsers" style="margin-top:0.5rem;"></div>
                         </div>
+                        </div><!-- /taskAdvancedPanel -->
                     </div>
                     <div id="taskReviewActions" style="display:none;padding:0.75rem 1rem;margin:0.5rem 0;border-radius:12px;">
                         <div id="taskActionsLabel" style="font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem;"></div>
                         <div id="taskActionsButtons" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
                     </div>
-                    <div class="form-actions"><button type="button" class="btn" onclick="closeModal('taskModal')" data-i18n="cancel">Скасувати</button><button type="submit" class="btn btn-success" data-i18n="save" data-i18n="save" data-i18n="save">Зберегти</button></div>
+                    <div class="form-actions"><button type="button" class="btn" onclick="closeModal('taskModal')" data-i18n="cancel">Скасувати</button><button type="submit" class="btn btn-success" data-i18n="save">Зберегти</button></div>
                 </form>
                 
                 <!-- COMMENTS SECTION -->
@@ -1295,13 +1304,13 @@
         </div>
     </div>
 
-    <div id="functionModal" class="modal">
+    <div id="functionModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="functionModalTitle">
         <div class="modal-content">
-            <div class="modal-header"><span class="close" onclick="closeModal('functionModal')">&times;</span><h2 id="functionModalTitle" data-i18n="newFunction">Нова функція</h2></div>
+            <div class="modal-header"><button class="close" onclick="closeModal('functionModal')" aria-label="Закрити діалог">&times;</button><h2 id="functionModalTitle" data-i18n="newFunction">Нова функція</h2></div>
             <div class="modal-body">
                 <form id="functionForm" onsubmit="saveFunction(event)">
                     <div class="form-grid">
-                        <div class="form-group"><label class="form-label" data-i18n="title">Назва *</label><input type="text" id="functionName" class="form-input" required></div>
+                        <div class="form-group"><label class="form-label" data-i18n="title">Назва *</label><input type="text" id="functionName" class="form-input" required aria-required="true"></div>
                         <div class="form-group"><label class="form-label"><i data-lucide="crown" class="icon icon-sm"></i> <span data-i18n="head">Головний *</span></label><select id="functionHead" class="form-select" required><option value="" data-i18n="select">Оберіть</option></select></div>
                         <div class="form-group full-width"><label class="form-label" data-i18n="description">Опис</label><textarea id="functionDescription" class="form-textarea"></textarea></div>
                         <div class="form-group full-width"><label class="form-label"><i data-lucide="users" class="icon icon-sm"></i> <span data-i18n="members">Учасники</span></label><div id="functionAssignees" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;"></div></div>
@@ -1313,10 +1322,10 @@
     </div>
 
     <!-- MERGE FUNCTIONS MODAL -->
-    <div id="mergeFunctionsModal" class="modal">
+    <div id="mergeFunctionsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="mergeFunctionsModalTitle">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('mergeFunctionsModal')">&times;</span>
+                <button class="close" onclick="closeModal('mergeFunctionsModal')" aria-label="Закрити діалог">&times;</button>
                 <h2><i data-lucide="git-merge" class="icon"></i> <span data-i18n="mergeFunctions">Об'єднати функції</span></h2>
             </div>
             <div class="modal-body">
@@ -1326,7 +1335,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label" data-i18n="newFunctionName">Назва об'єднаної функції *</label>
-                    <input type="text" id="mergedFunctionName" class="form-input" placeholder="Введіть назву..." data-i18n-placeholder="enterName" required>
+                    <input type="text" id="mergedFunctionName" class="form-input" placeholder="Введіть назву..." data-i18n-placeholder="enterName" required aria-required="true">
                 </div>
                 <div id="mergePreview" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:1rem;margin-top:1rem;">
                     <div style="font-weight:600;color:#16a34a;margin-bottom:0.5rem;"><i data-lucide="info" class="icon icon-sm"></i> Буде об'єднано:</div>
@@ -1343,10 +1352,10 @@
     </div>
 
     <!-- PROCESS TEMPLATES MODAL -->
-    <div id="processTemplatesModal" class="modal">
+    <div id="processTemplatesModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="processTemplatesModalTitle">
         <div class="modal-content" style="max-width:700px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('processTemplatesModal')">&times;</span>
+                <button class="close" onclick="closeModal('processTemplatesModal')" aria-label="Закрити діалог">&times;</button>
                 <h2><i data-lucide="file-cog" class="icon"></i> <span data-i18n="processTemplates">Шаблони процесів</span></h2>
             </div>
             <div class="modal-body">
@@ -1363,10 +1372,10 @@
     </div>
 
     <!-- EDIT PROCESS TEMPLATE MODAL -->
-    <div id="editProcessTemplateModal" class="modal">
+    <div id="editProcessTemplateModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="editProcessTemplateModalTitle">
         <div class="modal-content" style="max-width:600px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('editProcessTemplateModal')">&times;</span>
+                <button class="close" onclick="closeModal('editProcessTemplateModal')" aria-label="Закрити діалог">&times;</button>
                 <h2 id="editTemplateTitle"><i data-lucide="file-cog" class="icon"></i> <span data-i18n="newTemplate">Новий шаблон</span></h2>
             </div>
             <div class="modal-body">
@@ -1374,7 +1383,7 @@
                     <input type="hidden" id="processTemplateId">
                     <div class="form-group">
                         <label class="form-label" data-i18n="templateName">Назва шаблону *</label>
-                        <input type="text" id="processTemplateName" class="form-input" placeholder="Наприклад: Обробка замовлення" data-i18n-placeholder="processNamePh" required>
+                        <input type="text" id="processTemplateName" class="form-input" placeholder="Наприклад: Обробка замовлення" data-i18n-placeholder="processNamePh" required aria-required="true">
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="templateDescription">Опис</label>
@@ -1399,10 +1408,10 @@
     </div>
 
     <!-- START PROCESS MODAL -->
-    <div id="startProcessModal" class="modal">
+    <div id="startProcessModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="startProcessModalTitle">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('startProcessModal')">&times;</span>
+                <button class="close" onclick="closeModal('startProcessModal')" aria-label="Закрити діалог">&times;</button>
                 <h2><i data-lucide="play" class="icon"></i> <span data-i18n="startProcess">Запустити процес</span></h2>
             </div>
             <div class="modal-body">
@@ -1415,7 +1424,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="processName">Назва процесу *</label>
-                        <input type="text" id="startProcessName" class="form-input" placeholder="Наприклад: Замовлення #127 - Клієнт Іванов" data-i18n-placeholder="processInstancePh" required>
+                        <input type="text" id="startProcessName" class="form-input" placeholder="Наприклад: Замовлення #127 - Клієнт Іванов" data-i18n-placeholder="processInstancePh" required aria-required="true">
                     </div>
                     <div class="form-group">
                         <label class="form-label"><i data-lucide="tag" class="icon icon-sm"></i> <span data-i18n="processObject">Об'єкт / Клієнт</span> <span data-i18n="optional" style="color:var(--gray);font-weight:normal;">(опціонально)</span></label>
@@ -1441,10 +1450,10 @@
     </div>
 
     <!-- VIEW PROCESS MODAL -->
-    <div id="viewProcessModal" class="modal">
+    <div id="viewProcessModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="viewProcessModalTitle">
         <div class="modal-content" style="max-width:600px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('viewProcessModal')">&times;</span>
+                <button class="close" onclick="closeModal('viewProcessModal')" aria-label="Закрити діалог">&times;</button>
                 <h2 id="viewProcessTitle"><i data-lucide="git-branch" class="icon"></i> Процес</h2>
             </div>
             <div class="modal-body">
@@ -1455,13 +1464,13 @@
         </div>
     </div>
 
-    <div id="regularTaskModal" class="modal">
+    <div id="regularTaskModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="regularTaskModalTitle">
         <div class="modal-content">
-            <div class="modal-header"><span class="close" onclick="closeModal('regularTaskModal')">&times;</span><h2 data-i18n="regularTask">Регулярне завдання</h2></div>
+            <div class="modal-header"><button class="close" onclick="closeModal('regularTaskModal')" aria-label="Закрити діалог">&times;</button><h2 data-i18n="regularTask">Регулярне завдання</h2></div>
             <div class="modal-body">
                 <form id="regularTaskForm" onsubmit="saveRegularTask(event)">
                     <div class="form-grid">
-                        <div class="form-group full-width"><label class="form-label" data-i18n="title">Назва *</label><input type="text" id="regularTaskTitle" class="form-input" required></div>
+                        <div class="form-group full-width"><label class="form-label" data-i18n="title">Назва *</label><input type="text" id="regularTaskTitle" class="form-input" required aria-required="true"></div>
                         <div class="form-group"><label class="form-label" data-i18n="function">Функція *</label><select id="regularTaskFunction" class="form-select" required><option value="" data-i18n="select">Оберіть</option></select></div>
                         <div class="form-group"><label class="form-label" data-i18n="assignee" data-i18n="assigneeLabel">Виконавець</label><select id="regularTaskAssignee" class="form-select"><option value="">З функції (авто)</option></select></div>
                         <div class="form-group"><label class="form-label" data-i18n="periodicity">Періодичність *</label><select id="regularTaskPeriod" class="form-select" onchange="updatePeriodOptions()"><option value="weekly" data-i18n="weekly">Щотижня</option><option value="monthly" data-i18n="monthly">Щомісяця</option><option value="quarterly" data-i18n="quarterly">Щокварталу</option></select></div>
@@ -1497,7 +1506,7 @@
                             </div>
                         </div>
                         <div class="form-group" id="dayOfMonthGroup" style="display:none;"><label class="form-label" data-i18n="dayOfMonth">День місяця *</label><select id="regularTaskDayOfMonth" class="form-select"><option value="1">1</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="last" data-i18n="lastDay">Останній день</option></select></div>
-                        <div class="form-group"><label class="form-label" data-i18n="startRequired">Початок *</label><input type="time" id="regularTaskTimeStart" class="form-input" value="10:00" required></div>
+                        <div class="form-group"><label class="form-label" data-i18n="startRequired">Початок *</label><input type="time" id="regularTaskTimeStart" class="form-input" value="10:00" required aria-required="true"></div>
                         <div class="form-group"><label class="form-label" data-i18n="endDuration">Кінець / Тривалість</label>
                             <div style="display:flex;gap:8px;align-items:center;">
                                 <select id="regularTaskTimeMode" class="form-select" style="width:auto;" onchange="toggleRegularTimeMode()">
@@ -1554,14 +1563,14 @@
         </div>
     </div>
 
-    <div id="inviteModal" class="modal">
+    <div id="inviteModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="inviteModalTitle">
         <div class="modal-content">
-            <div class="modal-header"><span class="close" onclick="closeModal('inviteModal')">&times;</span><h2 data-i18n="inviteTitle">Запрошення</h2></div>
+            <div class="modal-header"><button class="close" onclick="closeModal('inviteModal')" aria-label="Закрити діалог">&times;</button><h2 data-i18n="inviteTitle">Запрошення</h2></div>
             <div class="modal-body">
                 <form id="inviteForm" onsubmit="sendInvite(event)">
                     <div class="form-group">
                         <label class="form-label" data-i18n="employeeEmail">Email співробітника *</label>
-                        <input type="email" id="inviteEmail" class="form-input" required>
+                        <input type="email" id="inviteEmail" class="form-input" required aria-required="true">
                     </div>
                     <div class="form-group" style="margin-top:0.75rem;">
                         <label class="form-label" data-i18n="role" data-i18n="role" data-i18n="role">Роль</label>
@@ -1580,13 +1589,13 @@
 
     <div id="userModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header"><span class="close" onclick="closeModal('userModal')">&times;</span><h2 id="userModalTitle" data-i18n="editEmployee">Редагувати співробітника</h2></div>
+            <div class="modal-header"><button class="close" onclick="closeModal('userModal')" aria-label="Закрити діалог">&times;</button><h2 id="userModalTitle" data-i18n="editEmployee">Редагувати співробітника</h2></div>
             <div class="modal-body">
                 <form id="userForm" onsubmit="saveUser(event)">
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label class="form-label" data-i18n="name">Ім'я *</label>
-                            <input type="text" id="userName" class="form-input" required>
+                            <input type="text" id="userName" class="form-input" required aria-required="true">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Email</label>
@@ -1802,26 +1811,26 @@
 
     <!-- Bottom Navigation & Overlays -->
     <!-- Bottom Navigation for Mobile -->
-    <nav class="bottom-nav" id="bottomNav">
-        <div class="bottom-nav-items">
-            <button class="bottom-nav-btn active" onclick="switchTab('myday')" data-tab="myday">
+    <nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="Основна навігація">
+        <div class="bottom-nav-items" role="tablist">
+            <button class="bottom-nav-btn active" onclick="switchTab('myday')" data-tab="myday" role="tab" aria-label="Мій день">
                 <i data-lucide="sun" class="icon"></i>
                 <span data-i18n="tabMyDay">Мій день</span>
             </button>
-            <button class="bottom-nav-btn" onclick="switchTab('tasks')" data-tab="tasks" style="position:relative;">
+            <button class="bottom-nav-btn" onclick="switchTab('tasks')" data-tab="tasks" style="position:relative;" role="tab" aria-label="Завдання">
                 <i data-lucide="clipboard-list" class="icon"></i>
                 <span id="overdueNavBadge" style="display:none;position:absolute;top:2px;right:12px;background:#ef4444;color:white;font-size:0.55rem;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 4px;line-height:1;"></span>
                 <span data-i18n="tabTasks">Завдання</span>
             </button>
-            <button class="bottom-nav-btn" onclick="switchTab('control')" data-tab="control">
+            <button class="bottom-nav-btn" onclick="switchTab('control')" data-tab="control" role="tab" aria-label="Контроль">
                 <i data-lucide="layout-dashboard" class="icon"></i>
                 <span data-i18n="tabControl">Контроль</span>
             </button>
-            <button class="bottom-nav-btn" onclick="switchTab('regular')" data-tab="regular">
-                <i data-lucide="repeat" class="icon"></i>
-                <span data-i18n="tabRegular">Регулярні</span>
+            <button class="bottom-nav-btn" onclick="switchTab('projects')" data-tab="projects" role="tab" aria-label="Проєкти">
+                <i data-lucide="folder" class="icon"></i>
+                <span data-i18n="tabProjects">Проєкти</span>
             </button>
-            <button class="bottom-nav-btn" onclick="openMobileMenu()" data-tab="more">
+            <button class="bottom-nav-btn" onclick="openMobileMenu()" data-tab="more" role="tab" aria-label="Більше опцій">
                 <i data-lucide="more-horizontal" class="icon"></i>
                 <span data-i18n="more">Ще</span>
             </button>
@@ -1829,7 +1838,7 @@
     </nav>
     
     <!-- FAB for adding tasks -->
-    <button class="fab-add" id="fabAdd">
+    <button class="fab-add" id="fabAdd" aria-label="Додати" title="Додати задачу">
         <i data-lucide="plus" class="icon"></i>
     </button>
     
@@ -1995,7 +2004,7 @@
     <div id="aiGeneratorModal" class="modal">
         <div class="modal-content" style="max-width:600px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('aiGeneratorModal')">&times;</span>
+                <button class="close" onclick="closeModal('aiGeneratorModal')" aria-label="Закрити діалог">&times;</button>
                 <h2><i data-lucide="sparkles" class="icon" style="color:#8b5cf6;"></i> <span data-i18n="aiStructureGenerator">AI Структура</span></h2>
             </div>
             <div class="modal-body">
@@ -2030,7 +2039,7 @@
     <div id="importStructureModal" class="modal">
         <div class="modal-content" style="max-width:600px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('importStructureModal')">&times;</span>
+                <button class="close" onclick="closeModal('importStructureModal')" aria-label="Закрити діалог">&times;</button>
                 <h2><i data-lucide="upload" class="icon"></i> <span data-i18n="importStructure">Імпорт структури</span></h2>
             </div>
             <div class="modal-body">
@@ -2049,7 +2058,7 @@
     <div id="aiAssistantsModal" class="modal">
         <div class="modal-content" style="max-width:650px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('aiAssistantsModal')">&times;</span>
+                <button class="close" onclick="closeModal('aiAssistantsModal')" aria-label="Закрити діалог">&times;</button>
                 <h2><i data-lucide="bot" class="icon" style="color:#8b5cf6;"></i> <span data-i18n="aiAssistantsConfig">AI Асистенти</span></h2>
             </div>
             <div class="modal-body">
@@ -2156,11 +2165,11 @@
                 
                 <!-- Language -->
                 <div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-                    <button class="btn" onclick="setLanguageFromDropdown('ua');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangUA">🇺🇦 UA</button>
-                    <button class="btn" onclick="setLanguageFromDropdown('ru');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangRU">🇷🇺 RU</button>
-                    <button class="btn" onclick="setLanguageFromDropdown('pl');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangPL">🇵🇱 PL</button>
-                    <button class="btn" onclick="setLanguageFromDropdown('en');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangEN">🇬🇧 EN</button>
-                    <button class="btn" onclick="setLanguageFromDropdown('de');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangDE">🇩🇪 DE</button>
+                    <button class="btn" onclick="setLanguageFromDropdown('ua');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangUA"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">UA</span> UA</button>
+                    <button class="btn" onclick="setLanguageFromDropdown('ru');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangRU"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">RU</span> RU</button>
+                    <button class="btn" onclick="setLanguageFromDropdown('pl');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangPL"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">PL</span> PL</button>
+                    <button class="btn" onclick="setLanguageFromDropdown('en');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangEN"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">EN</span> EN</button>
+                    <button class="btn" onclick="setLanguageFromDropdown('de');closeMobileMenu();" style="flex:1;justify-content:center;padding:0.5rem;font-size:0.8rem;min-width:44px;" id="mLangDE"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:15px;background:#374151;color:white;font-size:0.6rem;font-weight:700;border-radius:3px;letter-spacing:0.03em;">DE</span> DE</button>
                 </div>
                 
                 <!-- SuperAdmin: Demo data -->
@@ -2545,14 +2554,44 @@
             <input type="hidden" id="metricFormula" value="">
             <input type="hidden" id="metricAlertEnabled" value="false">
             <input type="hidden" id="metricAlertThreshold" value="20">
-            <div id="autoSpecBlock" style="display:none;"></div>
+
+            <!-- AUTO SOURCE — вибір типу джерела -->
+            <div class="form-group" style="margin-top:0.75rem;">
+                <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Джерело даних</label>
+                <div style="display:flex;gap:0.5rem;margin-top:0.4rem;flex-wrap:wrap;">
+                    <button type="button" class="metric-source-btn active" data-source="manual" onclick="selectMetricSource('manual')"
+                        style="padding:0.4rem 0.85rem;border-radius:10px;font-size:0.82rem;border:2px solid #22c55e;background:#f0fdf4;color:#16a34a;font-weight:600;cursor:pointer;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Ручний ввід
+                    </button>
+                    <button type="button" class="metric-source-btn" data-source="auto_tasks_done" onclick="selectMetricSource('auto_tasks_done')"
+                        style="padding:0.4rem 0.85rem;border-radius:10px;font-size:0.82rem;border:2px solid #e5e7eb;background:white;color:#374151;cursor:pointer;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Виконані задачі
+                    </button>
+                    <button type="button" class="metric-source-btn" data-source="auto_tasks_overdue" onclick="selectMetricSource('auto_tasks_overdue')"
+                        style="padding:0.4rem 0.85rem;border-radius:10px;font-size:0.82rem;border:2px solid #e5e7eb;background:white;color:#374151;cursor:pointer;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Прострочені задачі
+                    </button>
+                    <button type="button" class="metric-source-btn" data-source="auto_tasks_review" onclick="selectMetricSource('auto_tasks_review')"
+                        style="padding:0.4rem 0.85rem;border-radius:10px;font-size:0.82rem;border:2px solid #e5e7eb;background:white;color:#374151;cursor:pointer;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> На перевірці
+                    </button>
+                    <button type="button" class="metric-source-btn" data-source="auto_completion_rate" onclick="selectMetricSource('auto_completion_rate')"
+                        style="padding:0.4rem 0.85rem;border-radius:10px;font-size:0.82rem;border:2px solid #e5e7eb;background:white;color:#374151;cursor:pointer;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> % виконання
+                    </button>
+                </div>
+                <div id="autoSpecBlock" style="margin-top:0.6rem;padding:0.6rem 0.8rem;background:#f8fafc;border-radius:10px;font-size:0.82rem;color:#6b7280;display:none;">
+                    Дані будуть розраховуватись автоматично з задач за обраний період.
+                    <br><span id="autoSpecPreview" style="color:#374151;font-weight:500;"></span>
+                </div>
+            </div>
 
             <!-- Footer buttons -->
             <div style="display:flex;gap:0.5rem;margin-top:1rem;align-items:center;">
-                <button class="btn" onclick="if(statsEditingMetricId && confirm('Видалити показник?')) deleteMetric(statsEditingMetricId)" id="metricDeleteBtn" style="display:none;width:48px;height:48px;background:#fee2e2;color:#ef4444;border-radius:14px;padding:0;flex-shrink:0;">
+                <button class="btn" onclick="showConfirmModal('Видалити показник?',{danger:true}).then(ok=>ok&&deleteMetric(statsEditingMetricId))" id="metricDeleteBtn" style="display:none;width:48px;height:48px;background:#fee2e2;color:#ef4444;border-radius:14px;padding:0;flex-shrink:0;" aria-label="Видалити метрику">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
-                <button class="btn" onclick="closeModal('metricModal')" style="flex:1;padding:0.7rem;border-radius:14px;font-size:0.95rem;font-weight:600;">Скасувати</button>
+                <button class="btn" onclick="closeModal('metricModal')" style="flex:1;padding:0.7rem;border-radius:14px;font-size:0.95rem;font-weight:600;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;">Скасувати</button>
                 <button class="btn btn-success" onclick="saveMetric()" style="flex:1;padding:0.7rem;border-radius:14px;font-size:0.95rem;font-weight:600;">Зберегти</button>
             </div>
         </div>
@@ -2562,7 +2601,7 @@
     <div id="quickInputModal" class="modal">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('quickInputModal')">&times;</span>
+                <button class="close" onclick="closeModal('quickInputModal')" aria-label="Закрити діалог">&times;</button>
                 <h2><i data-lucide="edit-3" class="icon" style="color:var(--primary);"></i> <span data-i18n="quickInput">Внести дані</span></h2>
             </div>
             <div id="quickInputDate" style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.75rem;">
@@ -2579,7 +2618,7 @@
     <div id="aiAnalysisModal" class="modal">
         <div class="modal-content" style="max-width:700px;max-height:85vh;overflow-y:auto;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('aiAnalysisModal')">&times;</span>
+                <button class="close" onclick="closeModal('aiAnalysisModal')" aria-label="Закрити діалог">&times;</button>
                 <h2><i data-lucide="sparkles" class="icon" style="color:#8b5cf6;"></i> <span data-i18n="aiAnalysisTitle">AI Аналіз метрик</span></h2>
             </div>
             <div id="aiAnalysisContent">
@@ -2592,7 +2631,7 @@
     <div id="trendsChartModal" class="modal">
         <div class="modal-content" style="max-width:800px;max-height:85vh;overflow-y:auto;">
             <div class="modal-header">
-                <span class="close" onclick="closeModal('trendsChartModal')">&times;</span>
+                <button class="close" onclick="closeModal('trendsChartModal')" aria-label="Закрити діалог">&times;</button>
                 <h2 id="trendsChartTitle" style="display:flex;align-items:center;gap:0.5rem;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Графік трендів</h2>
             </div>
             <!-- Metric pills for multi-select -->
@@ -2608,6 +2647,29 @@
             <div id="trendsChartLegend" style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:0.75rem;font-size:0.78rem;"></div>
         </div>
     </div>
+        <!-- ARIA LIVE REGION для dynamic announcements -->
+    <div id="ariaLiveRegion" role="status" aria-live="polite" aria-atomic="true" style="position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;"></div>
+    <div id="ariaAlertRegion" role="alert" aria-live="assertive" aria-atomic="true" style="position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;"></div>
+
+    <!-- ERROR BOUNDARY: перехоплюємо JS-краші — показуємо toast замість білого екрану -->
+    <script>
+        window.onerror = function(msg, src, line, col, err) {
+            if (typeof showToast === 'function') {
+                showToast('Помилка застосунку. Спробуйте перезавантажити сторінку.', 'error', 10000);
+            }
+            console.error('[APP CRASH]', msg, src + ':' + line, err);
+            return false; // не блокуємо стандартну обробку
+        };
+        window.addEventListener('unhandledrejection', function(e) {
+            const code = e.reason?.code || '';
+            // Ігноруємо Firestore permission-denied (штатна ситуація)
+            if (code.includes('permission') || code === 'PERMISSION_DENIED') return;
+            if (typeof showToast === 'function') {
+                showToast('Мережева помилка. Перевірте підключення.', 'error', 8000);
+            }
+            console.error('[UNHANDLED REJECTION]', e.reason);
+        });
+    </script>
 
 </body>
 </html>

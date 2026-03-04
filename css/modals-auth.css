@@ -51,6 +51,30 @@
         .form-textarea { resize: vertical; min-height: 70px; cursor: text; }
         .form-textarea::-webkit-resizer { background: linear-gradient(135deg, transparent 40%, #d1d5db 40%, #d1d5db 45%, transparent 45%, transparent 60%, #d1d5db 60%, #d1d5db 65%, transparent 65%); }
         .form-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; flex-wrap: wrap; }
+        .form-actions .btn:not(.btn-success):not(.btn-danger) {
+            background: transparent;
+            color: #6b7280;
+            border-color: #e5e7eb;
+            font-size: 0.85rem;
+            padding: 0.45rem 0.9rem;
+        }
+        .form-actions .btn-success, .form-actions .btn-danger {
+            padding: 0.55rem 1.4rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            min-width: 110px;
+        }
+        
+        /* Sticky form-actions в taskModal — кнопка Зберегти не ховається під клавіатурою */
+        #taskModal .form-actions {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 0.75rem 0 0.25rem;
+            margin-top: 0.75rem;
+            border-top: 1px solid #f3f4f6;
+            z-index: 1;
+        }
         
         .dashboard-cards {
             display: grid;

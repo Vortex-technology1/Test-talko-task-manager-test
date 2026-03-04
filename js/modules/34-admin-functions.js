@@ -95,7 +95,7 @@
             if (!isSuperAdmin) return;
             const newState = !currentlyDisabled;
             const action = newState ? t('blockAction') : t('unblockAction');
-            if (!confirm(t('confirmCompanyAction').replace('{action}', action))) return;
+            if (!await showConfirmModal(t('confirmCompanyAction').replace('{action}', action), { danger: true })) return;
             
             try {
                 await db.collection('companies').doc(companyId).update({ disabled: newState });
@@ -103,7 +103,7 @@
                 loadAdminCompanies();
             } catch (e) {
                 console.error('Toggle disabled error:', e);
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             }
         }
         
@@ -113,7 +113,7 @@
             // Підтвердження з інформацією про те що буде видалено
             const confirmMsg = t('deleteCompanyConfirm').replace('{name}', companyName).replace('{users}', usersCount).replace('{tasks}', tasksCount);
             
-            if (!confirm(confirmMsg)) return;
+            if (!await showConfirmModal(confirmMsg, { danger: true })) return;
             
             // Друге підтвердження для безпеки
             const confirmMsg2 = t('deleteCompanyConfirm2').replace('{name}', companyName);
@@ -226,7 +226,7 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                alert(t('companyCreated').replace('{name}', companyName).replace('{email}', email).replace('{password}', password));
+                showAlertModal(t('companyCreated').replace('{name}', companyName).replace('{email}', email).replace('{password}', password));
                 
                 document.getElementById('adminCreateForm').reset();
                 
@@ -234,7 +234,7 @@
                 loadAdminCompanies();
                 
             } catch (e) {
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             }
             
             btn.disabled = false;

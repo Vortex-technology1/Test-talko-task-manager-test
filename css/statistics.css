@@ -156,22 +156,23 @@
 .stats-table thead th {
     position: sticky;
     top: 0;
-    background: #fafbfc;
-    font-weight: 600;
+    background: #f0f2f5;
+    font-weight: 700;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #6b7280;
-    padding: 0.6rem 0.75rem;
+    color: #374151;
+    padding: 0.7rem 0.75rem 0.5rem;
     text-align: center;
-    border-bottom: 1px solid #f0f1f3;
+    border-bottom: 2px solid #e5e7eb;
     white-space: nowrap;
 }
 .stats-table thead th:first-child { text-align: left; }
 .stats-table tbody tr {
     transition: background 0.12s;
 }
-.stats-table tbody tr:hover { background: #f9fafb; }
+.stats-table tbody tr:hover { background: #f0fdf4; }
+.stats-table tbody tr:hover .stats-entry-del { opacity: 1 !important; }
 .stats-table tbody td {
     padding: 0.6rem 0.75rem;
     border-bottom: 1px solid #f3f4f6;
@@ -218,7 +219,20 @@
 .stats-val-empty {
     color: #d1d5db;
     font-weight: 400;
-    font-style: italic;
+    font-style: normal;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1px dashed transparent;
+    transition: all 0.15s;
+}
+.stats-val-empty:hover {
+    color: #22c55e;
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+.stats-val-empty::after {
+    content: '';
 }
 
 /* ---- Progress Bar (inline) ---- */
@@ -305,7 +319,8 @@
     color: #d1d5db;
     transition: all 0.12s;
 }
-.stats-comment-btn:hover { background: #f3f4f6; color: var(--info); }
+.stats-comment-btn:hover { background: #f3f4f6; color: var(--info); opacity: 1 !important; }
+.stats-table thead th:hover .stats-comment-btn { opacity: 1 !important; }
 .stats-comment-btn.has-comment { color: var(--info); }
 
 /* ---- Period Row Header ---- */

@@ -157,12 +157,12 @@
             renderFunctionsStructure();
         }
         
-        function removeCategory(idx) {
+        async function removeCategory(idx) {
             const cats = getStructureCategories();
             const cat = cats[idx];
             const funcsInCat = functions.filter(f => f.category === cat);
             if (funcsInCat.length > 0) {
-                if (!confirm((t('categoryHasFunctions')))) return;
+                if (!await showConfirmModal((t('categoryHasFunctions')), { danger: true })) return;
                 funcsInCat.forEach(f => { f.category = ''; });
                 // Save to Firestore
                 const batch = db.batch();
@@ -240,7 +240,7 @@
             }
             
             if (selected.length > 5) {
-                alert(t('mergeSelectMaxFive'));
+                showAlertModal(t('mergeSelectMaxFive'));
                 return;
             }
             
@@ -279,12 +279,12 @@
             const newName = document.getElementById('mergedFunctionName').value.trim();
             
             if (selected.length < 2) {
-                alert(t('mergeSelectMinTwo'));
+                showAlertModal(t('mergeSelectMinTwo'));
                 return;
             }
             
             if (!newName) {
-                alert(t('mergeEnterName'));
+                showAlertModal(t('mergeEnterName'));
                 return;
             }
             
@@ -391,11 +391,11 @@
                 // Оновлюємо локальні дані
                 await loadAllData();
                 
-                alert(t('mergeSuccess'));
+                showAlertModal(t('mergeSuccess'));
                 
             } catch (error) {
                 console.error('Merge functions error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             } finally {
                 executeBtn.disabled = false;
                 executeBtn.innerHTML = `<i data-lucide="git-merge" class="icon"></i> <span data-i18n="merge">${t('merge')}</span>`;

@@ -375,6 +375,22 @@
                         if (!functions.find(f => f.id === item.id)) {
                             functions.unshift(item);
                         }
+                        // Відновлюємо ownerFunctionId в stages що були очищені при deleteFunction
+                        if (typeof window.projectStages !== 'undefined') {
+                            const stagesToRestore = window.projectStages.filter(s => s._prevOwnerFunctionId === item.id);
+                            if (stagesToRestore.length > 0) {
+                                const rb = db.batch();
+                                stagesToRestore.forEach(s => {
+                                    s.ownerFunctionId = item.id;
+                                    delete s._prevOwnerFunctionId;
+                                    rb.update(
+                                        db.collection('companies').doc(currentCompany).collection('projectStages').doc(s.id),
+                                        { ownerFunctionId: item.id }
+                                    );
+                                });
+                                await rb.commit();
+                            }
+                        }
                     }
                     restored++;
                 } catch (error) {
@@ -399,7 +415,7 @@
             affectedProjects.forEach(pid => autoUpdateProjectStatus(pid));
             
             if (failed > 0) {
-                alert(t('restorePartial').replace('{ok}', restored).replace('{total}', restored + failed).replace('{fail}', failed));
+                showAlertModal(t('restorePartial').replace('{ok}', restored).replace('{total}', restored + failed).replace('{fail}', failed));
             } else if (restored > 0) {
                 showToast(t('restoreSuccess').replace('{n}', restored), 'success');
             }
@@ -451,7 +467,7 @@
                 refreshCurrentView();
                 hideUndoToast();
                 console.error('deleteTask error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             }
         }
 

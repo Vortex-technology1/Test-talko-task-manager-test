@@ -28,9 +28,9 @@
                 document.getElementById('inviteLinkText').value = link;
                 document.getElementById('inviteLink').style.display = 'block';
                 
-                alert(t('inviteCreated'));
+                showAlertModal(t('inviteCreated'));
             } catch (e) {
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             }
         }
 
@@ -38,32 +38,33 @@
             const input = document.getElementById('inviteLinkText');
             input.select();
             document.execCommand('copy');
-            alert(t('copied'));
+            showAlertModal(t('copied'));
         }
 
         async function deleteUser(id) {
             const u = users.find(x => x.id === id);
-            if (u?.role === 'owner') { alert(t('cannotDeleteOwner')); return; }
-            if (!confirm(t('deleteConfirm'))) return;
+            if (u?.role === 'owner') { showAlertModal(t('cannotDeleteOwner')); return; }
+            if (!await showConfirmModal(t('deleteConfirm'), { danger: true })) return;
             
             const base = db.collection('companies').doc(currentCompany);
-            await base.collection('users').doc(id).delete();
             
-            // Cascade cleanup (batch for atomicity)
+            // Cascade cleanup (chunked batch для атомарності + Firestore limit 500)
+            // ВАЖЛИВО: спочатку cascade, потім user.delete()
+            // Якщо cascade впаде — юзер залишається, задачі не залишаться orphaned
             try {
-                const cascadeBatch = db.batch();
-                let batchOps = 0;
+                const base2 = db.collection('companies').doc(currentCompany);
+                const allOps = []; // { ref, type: 'update'|'delete', data? }
                 
                 functions.forEach(f => {
                     if (f.assigneeIds?.includes(id) || f.headId === id) {
                         const upd = {};
                         if (f.assigneeIds?.includes(id)) { f.assigneeIds = f.assigneeIds.filter(uid => uid !== id); upd.assigneeIds = f.assigneeIds; }
                         if (f.headId === id) { f.headId = f.assigneeIds?.[0] || ''; upd.headId = f.headId; }
-                        cascadeBatch.update(base.collection('functions').doc(f.id), upd);
-                        batchOps++;
+                        allOps.push({ type: 'update', ref: base2.collection('functions').doc(f.id), data: upd });
                     }
                 });
-                // FIX: Reassign tasks assigned to deleted user → fallback assignee
+                
+                // Fallback assignee для задач видаленого юзера
                 const fallbackAssignee = users.find(u => u.role === 'owner' && u.id !== id) 
                     || users.find(u => u.role === 'manager' && u.id !== id);
                 const fallbackId = fallbackAssignee?.id || '';
@@ -71,7 +72,6 @@
                 
                 tasks.forEach(tk => {
                     const upd = {}; let need = false;
-                    // Reassign primary assignee
                     if (tk.assigneeId === id) {
                         tk.assigneeId = fallbackId;
                         tk.assigneeName = fallbackName;
@@ -79,37 +79,30 @@
                         upd.assigneeName = fallbackName;
                         need = true;
                     }
-                    // Clean up array fields
                     ['coExecutorIds','observerIds','notifyOnComplete'].forEach(fld => {
                         if (tk[fld]?.includes(id)) { tk[fld] = tk[fld].filter(uid => uid !== id); upd[fld] = tk[fld]; need = true; }
                     });
-                    if (need) { cascadeBatch.update(base.collection('tasks').doc(tk.id), upd); batchOps++; }
+                    if (need) allOps.push({ type: 'update', ref: base2.collection('tasks').doc(tk.id), data: upd });
                 });
                 
-                // FIX: Firestore batch limit = 500 ops — use chunked writes
-                if (batchOps > 0) {
-                    if (batchOps <= 450) {
-                        await cascadeBatch.commit();
-                    } else {
-                        // Rebuild in chunks of 450
-                        let chunkBatch = db.batch(); let chunkCount = 0;
-                        const allUpdates = [];
-                        tasks.forEach(tk => {
-                            const upd = {};
-                            if (tk.assigneeId === fallbackId && tk._justReassigned) { upd.assigneeId = fallbackId; upd.assigneeName = fallbackName; }
-                            ['coExecutorIds','observerIds','notifyOnComplete'].forEach(fld => {
-                                if (tk[fld] && !tk[fld].includes(id) && tk['_cleaned_' + fld]) upd[fld] = tk[fld];
-                            });
-                            if (Object.keys(upd).length > 0) allUpdates.push({ id: tk.id, upd });
-                        });
-                        for (const item of allUpdates) {
-                            chunkBatch.update(base.collection('tasks').doc(item.id), item.upd);
-                            if (++chunkCount >= 450) { await chunkBatch.commit(); chunkBatch = db.batch(); chunkCount = 0; }
-                        }
-                        if (chunkCount > 0) await chunkBatch.commit();
-                    }
+                // Chunked commits — Firestore limit 500 ops/batch
+                const CHUNK = 450;
+                for (let i = 0; i < allOps.length; i += CHUNK) {
+                    const batch = db.batch();
+                    allOps.slice(i, i + CHUNK).forEach(op => {
+                        if (op.type === 'delete') batch.delete(op.ref);
+                        else batch.update(op.ref, op.data);
+                    });
+                    await batch.commit();
                 }
-            } catch (e) { console.warn('[deleteUser] cascade:', e); }
+            } catch (e) {
+                console.error('[deleteUser] cascade failed:', e);
+                showToast('Помилка при очищенні задач: ' + e.message, 'error');
+                return; // cascade впала — НЕ видаляємо юзера, дані цілі
+            }
+            
+            // Видаляємо юзера тільки після успішного cascade
+            await base.collection('users').doc(id).delete();
             
             const idx = users.findIndex(x => x.id === id);
             if (idx >= 0) users.splice(idx, 1);
@@ -120,7 +113,15 @@
         function renderUsers() {
             const c = document.getElementById('usersContainer');
             if (users.length === 0) {
-                c.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><h3>${t('noUsers')}</h3></div>`;
+                c.innerHTML = `<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;">
+                    <div style="margin-bottom:0.75rem;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                    <h3 style="margin-bottom:0.5rem;">${t('noUsers') || 'Немає користувачів'}</h3>
+                    <p style="color:#6b7280;margin-bottom:1rem;">${t('inviteFirst') || 'Запросіть першого співробітника в команду'}</p>
+                    <button class="btn btn-success" onclick="openInviteModal()">
+                        <i data-lucide="user-plus" class="icon"></i> ${t('invite') || 'Запросити'}
+                    </button>
+                </div>`;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
                 return;
             }
             
@@ -422,6 +423,6 @@
                 renderFunctions();
                 updateSelects();
             } catch (e) {
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             }
         }

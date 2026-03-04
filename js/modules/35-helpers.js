@@ -57,6 +57,22 @@
             return d.toLocaleDateString(getLocale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
+        // More tabs dropdown
+        function toggleMoreTabs(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('moreTabsMenu');
+            if (menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+        function closeMoreTabs() {
+            const menu = document.getElementById('moreTabsMenu');
+            if (menu) menu.style.display = 'none';
+        }
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('moreTabsDropdown');
+            if (dd && !dd.contains(e.target)) closeMoreTabs();
+        });
+
         function switchTab(tabName) {
             // Reset project detail when leaving projects tab
             if (tabName !== 'projects' && openProjectId) {
@@ -66,12 +82,32 @@
             document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
             var tabEl = document.getElementById(tabName + 'Tab'); if (tabEl) tabEl.classList.add('active');
-            document.querySelector(`[onclick="switchTab('${tabName}')"]`)?.classList.add('active');
+            // Find matching tab button (including inside dropdown)
+            // Find matching tab button — нормалізуємо пробіли в onclick для надійності
+            var matchBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+            if (!matchBtn) {
+                // Шукаємо серед всіх tab-btn з closeMoreTabs (dropdown)
+                document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                    var oc = (btn.getAttribute('onclick') || '').replace(/\s/g, '');
+                    if (oc === `switchTab('${tabName}');closeMoreTabs();` || oc === `switchTab('${tabName}');closeMoreTabs()`) {
+                        matchBtn = btn;
+                    }
+                });
+            }
+            if (matchBtn) matchBtn.classList.add('active');
+            // Highlight "Ще" if secondary tab is active
+            var secondaryTabs = ['processes','regular','functions','users','analytics','bizstructure','admin'];
+            var moreBtn = document.getElementById('moreTabsBtn');
+            if (moreBtn) { if (secondaryTabs.includes(tabName)) moreBtn.classList.add('active'); else moreBtn.classList.remove('active'); }
             
             // Update bottom nav
             document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.tab === tabName) btn.classList.add('active');
+                // Підсвічуємо "Ще" якщо активна secondary вкладка
+                if (btn.dataset.tab === 'more' && secondaryTabs.includes(tabName)) {
+                    btn.classList.add('active');
+                }
             });
             
             // Update FAB
@@ -157,18 +193,39 @@
             const fab = document.getElementById('fabAdd');
             if (!fab) return;
             
-            if (tabName === 'tasks') {
+            if (tabName === 'tasks' || tabName === 'myday') {
                 fab.style.display = 'flex';
+                fab.setAttribute('aria-label', 'Додати задачу');
+                fab.setAttribute('title', 'Додати задачу');
                 fab.onclick = () => openTaskModal();
             } else if (tabName === 'regular') {
                 fab.style.display = 'flex';
+                fab.setAttribute('aria-label', 'Додати регулярну задачу');
+                fab.setAttribute('title', 'Додати регулярну задачу');
                 fab.onclick = () => openRegularTaskModal();
             } else if (tabName === 'projects') {
                 fab.style.display = 'flex';
+                fab.setAttribute('aria-label', 'Новий проєкт');
+                fab.setAttribute('title', 'Новий проєкт');
                 fab.onclick = () => openProjectModal();
             } else {
                 fab.style.display = 'none';
             }
+        }
+        
+        // Дефолтний FAB обробник при завантаженні (до першого switchTab)
+        (function initFabDefault() {
+            const fab = document.getElementById('fabAdd');
+            if (fab && !fab.onclick) fab.onclick = () => openTaskModal();
+        })();
+
+        function toggleTaskAdvanced() {
+            const panel = document.getElementById('taskAdvancedPanel');
+            const arrow = document.getElementById('taskAdvancedArrow');
+            if (!panel) return;
+            const isOpen = panel.style.display !== 'none';
+            panel.style.display = isOpen ? 'none' : 'contents';
+            if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
         }
         
         function renderAnalytics() {
@@ -415,11 +472,19 @@
             </div>`;
         }
 
+        // Модалки що мають власний editingId/editingUserId — скидаємо тільки їх
+        const PRIMARY_MODALS = ['taskModal', 'userModal', 'regularTaskModal'];
+
         function closeModal(id) {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
-            editingId = null;
-            editingUserId = null;
+            // Скидаємо editing state тільки якщо закривається primary модалка.
+            // Вторинні модалки (materialQuickModal, stageModal, qcModal тощо)
+            // не повинні скидати editingId — інакше відкрита задача губиться.
+            if (PRIMARY_MODALS.includes(id)) {
+                editingId = null;
+                editingUserId = null;
+            }
             checkModalState();
         }
         

@@ -134,7 +134,7 @@
     };
 
     window.deleteStandardUI = async function(id) {
-        if (!confirm('Видалити стандарт?')) return;
+        if (!await showConfirmModal('Видалити стандарт?', { danger: true })) return;
         try {
             await standardsRef().doc(id).delete();
             closeModal('standardModal');
@@ -172,6 +172,37 @@
             </div>`;
         }).join('');
     }
+
+    window.openQCRejectModal = function(qcId) {
+        let modal = document.getElementById('qcRejectModal');
+        if (!modal) {
+            modal = document.createElement('div'); modal.id = 'qcRejectModal'; modal.className = 'modal';
+            modal.innerHTML = '<div class="modal-content" style="max-width:400px;"></div>';
+            document.body.appendChild(modal);
+        }
+        modal.querySelector('.modal-content').innerHTML = `
+            <div style="margin-bottom:1rem;">
+                <h3 style="font-size:1rem;font-weight:700;color:#dc2626;">Відхилити QC</h3>
+                <p style="font-size:0.82rem;color:#6b7280;margin:0.25rem 0;">Буде створена задача на переробку</p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Причина відхилення *</label>
+                <textarea id="qcRejectReason" class="form-textarea" rows="3" placeholder="Опишіть що саме не відповідає стандарту..." style="border-radius:12px;" autofocus></textarea>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn" onclick="closeModal('qcRejectModal')" style="flex:1;border-radius:12px;">Скасувати</button>
+                <button class="btn" onclick="confirmQCReject('${qcId}')" style="flex:1;border-radius:12px;background:#fee2e2;color:#dc2626;border-color:#fecaca;">Відхилити</button>
+            </div>`;
+        modal.style.display = 'flex';
+        setTimeout(() => document.getElementById('qcRejectReason')?.focus(), 100);
+    };
+
+    window.confirmQCReject = function(qcId) {
+        const reason = document.getElementById('qcRejectReason')?.value?.trim() || '';
+        if (!reason) { showToast('Вкажіть причину', 'error'); return; }
+        closeModal('qcRejectModal');
+        window.updateQCStatus(qcId, 'rejected', reason);
+    };
 
     // ========================
     //  QUALITY CONTROL (QC)
@@ -287,8 +318,8 @@
                     <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>
                     <span style="flex:1;">${std ? esc(std.name) : 'QC'} — ${label}</span>
                     ${q.status === 'pending' ? `
-                        <button onclick="event.stopPropagation();updateQCStatus('${q.id}','approved','')" style="border:none;background:#dcfce7;color:#16a34a;font-size:0.68rem;padding:2px 8px;border-radius:6px;cursor:pointer;">✓</button>
-                        <button onclick="event.stopPropagation();updateQCStatus('${q.id}','rejected',prompt('Причина відхилення:'))" style="border:none;background:#fee2e2;color:#dc2626;font-size:0.68rem;padding:2px 8px;border-radius:6px;cursor:pointer;">✕</button>
+                        <button onclick="event.stopPropagation();updateQCStatus('${q.id}','approved','')" style="border:none;background:#dcfce7;color:#16a34a;font-size:0.68rem;padding:2px 8px;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+                        <button onclick="event.stopPropagation();openQCRejectModal('${q.id}')" style="border:none;background:#fee2e2;color:#dc2626;font-size:0.68rem;padding:2px 8px;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     ` : ''}
                 </div>`;
             }).join('')}
@@ -378,7 +409,7 @@
     };
 
     window.deleteProjectTemplateUI = async function(id) {
-        if (!confirm('Видалити шаблон?')) return;
+        if (!await showConfirmModal('Видалити шаблон?', { danger: true })) return;
         try {
             await templatesRef().doc(id).delete();
             closeModal('projectTemplateModal');
@@ -392,14 +423,49 @@
         const tpl = projectTemplatesData.find(t => t.id === templateId);
         if (!tpl) { showToast('Шаблон не знайдено', 'error'); return; }
 
-        const projectName = prompt('Назва проєкту:', tpl.name + ' — ' + new Date().toLocaleDateString('uk'));
-        if (!projectName) return;
+        // Modal instead of prompt
+        let modal = document.getElementById('tplProjectNameModal');
+        if (!modal) {
+            modal = document.createElement('div'); modal.id = 'tplProjectNameModal'; modal.className = 'modal';
+            modal.innerHTML = '<div class="modal-content" style="max-width:420px;"></div>';
+            document.body.appendChild(modal);
+        }
+        const defName = tpl.name + ' — ' + new Date().toLocaleDateString('uk');
+        modal.querySelector('.modal-content').innerHTML = `
+            <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.75rem;">Створити проєкт з шаблону</h3>
+            <div style="margin-bottom:0.75rem;">
+                <label style="font-size:0.78rem;font-weight:600;color:#6b7280;">Назва проєкту</label>
+                <input type="text" id="tplProjName" class="form-input" value="${esc(defName)}" style="border-radius:12px;" autofocus>
+            </div>
+            <div style="font-size:0.78rem;color:#9ca3af;margin-bottom:1rem;">Шаблон: ${esc(tpl.name)} · ${(tpl.stages||[]).length} етапів</div>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn" onclick="closeModal('tplProjectNameModal')" style="flex:1;border-radius:12px;">Скасувати</button>
+                <button class="btn btn-success" onclick="executeCreateFromTemplate('${templateId}')" style="flex:1;border-radius:12px;">Створити</button>
+            </div>`;
+        modal.style.display = 'flex';
+        setTimeout(() => document.getElementById('tplProjName')?.focus(), 100);
+    };
+
+    window.executeCreateFromTemplate = async function(templateId) {
+        // Fallback: якщо дані застаріли або порожні після reload — перезавантажуємо
+        if (projectTemplatesData.length === 0) {
+            await loadProjectTemplates();
+        }
+        const tpl = projectTemplatesData.find(t => t.id === templateId);
+        if (!tpl) { showToast("Шаблон не знайдено — можливо його видалили", "error"); closeModal("tplProjectNameModal"); return; }
+        const projectName = document.getElementById('tplProjName')?.value?.trim();
+        if (!projectName) { showToast('Введіть назву', 'error'); return; }
+        closeModal('tplProjectNameModal');
 
         const funcs = typeof functions !== 'undefined' ? functions : [];
 
         try {
+            const batch = db.batch();
+
             // 1. Create project
-            const projRef = await db.collection('companies').doc(currentCompany).collection('projects').add({
+            const projRef = db.collection('companies').doc(currentCompany).collection('projects').doc();
+            const projectId = projRef.id;
+            batch.set(projRef, {
                 name: projectName,
                 status: 'active',
                 startDate: getLocalDateStr(),
@@ -408,11 +474,9 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 creatorId: currentUser.uid,
             });
-            const projectId = projRef.id;
-            projects.unshift({ id: projectId, name: projectName, status: 'active', startDate: getLocalDateStr(), color: '#22c55e' });
 
-            // 2. Create stages
-            const stagesRef = db.collection('companies').doc(currentCompany).collection('projectStages');
+            // 2. Create all stages in batch
+            const stagesCol = db.collection('companies').doc(currentCompany).collection('projectStages');
             let dayOffset = 0;
             const startDate = new Date();
 
@@ -427,7 +491,8 @@
                 const stageEnd = new Date(stageStart);
                 stageEnd.setDate(stageEnd.getDate() + (s.defaultDurationDays || 0));
 
-                await stagesRef.add({
+                const stageRef = stagesCol.doc();
+                batch.set(stageRef, {
                     projectId,
                     name: s.name,
                     order: s.order || 1,
@@ -445,16 +510,19 @@
                 dayOffset += s.defaultDurationDays || 0;
             }
 
+            // Atomic commit — all or nothing
+            await batch.commit();
+
+            projects.unshift({ id: projectId, name: projectName, status: 'active', startDate: getLocalDateStr(), color: '#22c55e' });
             showToast('Проєкт "' + projectName + '" створено з ' + (tpl.stages || []).length + ' етапами', 'success');
 
-            // Refresh
             if (typeof renderProjects === 'function') renderProjects();
             if (typeof updateProjectSelects === 'function') updateProjectSelects();
             if (typeof window.openProjectDetail === 'function') window.openProjectDetail(projectId);
 
         } catch (e) {
             console.error('[TPL] createFromTemplate:', e);
-            showToast('Помилка: ' + e.message, 'error');
+            showToast('Помилка створення: ' + e.message, 'error');
         }
     };
 
@@ -484,7 +552,7 @@
                         <div style="font-size:0.72rem;color:#9ca3af;">${stageCount} етапів · ~${totalDays} днів</div>
                     </div>
                     <div style="display:flex;gap:4px;">
-                        <button onclick="event.stopPropagation();closeModal('projectTemplatePicker');openProjectTemplateModal('${tpl.id}');" style="border:none;background:#f3f4f6;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:0.7rem;">✏️</button>
+                        <button onclick="event.stopPropagation();closeModal('projectTemplatePicker');openProjectTemplateModal('${tpl.id}');" style="border:none;background:#f3f4f6;padding:4px 8px;border-radius:6px;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </div>
                 </div>`;

@@ -5,6 +5,9 @@
 (function() {
     'use strict';
 
+    // Дедуплікація cost_overrun — один запис в Firestore на проєкт на день
+    const _costOverrunEmitted = new Set();
+
     // ========================
     //  OWNER PROJECT DASHBOARD
     // ========================
@@ -83,6 +86,21 @@
                         project: p,
                         message: `Перевитрата матеріалів: ${Math.round(actualMatCost).toLocaleString()} / ${Math.round(p.plannedMaterialCost).toLocaleString()} ₴`,
                     });
+                    // Emit cost_overrun event — один раз на проєкт на добу
+                    if (typeof window.createProjectEvent === 'function') {
+                        const dedupeKey = p.id + ':' + new Date().toISOString().split('T')[0];
+                        if (!_costOverrunEmitted.has(dedupeKey)) {
+                            _costOverrunEmitted.add(dedupeKey);
+                            window.createProjectEvent('cost_overrun', {
+                                projectId: p.id,
+                                extra: {
+                                    actual: Math.round(actualMatCost),
+                                    planned: Math.round(p.plannedMaterialCost),
+                                    overrunPct: Math.round((actualMatCost / p.plannedMaterialCost - 1) * 100),
+                                }
+                            });
+                        }
+                    }
                 }
             }
         });
@@ -92,17 +110,23 @@
 
         // Render
         let html = `<div style="margin-bottom:1.5rem;">
-            <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                Проєкти (${activeProjects.length})
-                ${alerts.length > 0 ? `<span style="background:#ef4444;color:white;font-size:0.68rem;padding:2px 8px;border-radius:8px;">${alerts.filter(a=>a.severity==='critical').length} критичних</span>` : ''}
-            </h3>`;
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                <h3 style="font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;margin:0;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    Проєкти (${activeProjects.length})
+                    ${alerts.length > 0 ? `<span style="background:#ef4444;color:white;font-size:0.68rem;padding:2px 8px;border-radius:8px;">${alerts.filter(a=>a.severity==='critical').length} критичних</span>` : ''}
+                </h3>
+                <button onclick="openAIBottleneckAnalysis()" style="border:none;background:#f3e8ff;color:#7c3aed;padding:6px 14px;border-radius:10px;font-size:0.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    AI Аналіз
+                </button>
+            </div>`;
 
         // Alerts block
         if (alerts.length > 0) {
             html += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:0.75rem;margin-bottom:0.75rem;">
                 ${alerts.slice(0, 6).map(a => {
-                    const icon = a.type === 'blocked' ? '🚫' : a.type === 'overdue' ? '⏰' : a.type === 'material' ? '📦' : '💰';
+                    const icon = '';
                     const bg = a.severity === 'critical' ? '#fee2e2' : '#fef3c7';
                     return `<div style="display:flex;align-items:center;gap:0.5rem;padding:4px 0;font-size:0.78rem;">
                         <span>${icon}</span>
@@ -316,8 +340,8 @@
         const severityColors = { critical: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
         const severityLabels = { critical: 'Критично', warning: 'Увага', info: 'Інфо' };
         const typeIcons = {
-            stage_blocked: '🚫', function_overload: '👥', stalled_stage: '🐌',
-            supplier_issue: '📦', budget_overrun: '💰'
+            stage_blocked: '', function_overload: '', stalled_stage: '',
+            supplier_issue: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>', budget_overrun: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'
         };
 
         let html = `
@@ -331,7 +355,7 @@
 
         if (bottlenecks.length === 0) {
             html += `<div style="text-align:center;padding:2rem;">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">✅</div>
+                <div style="margin-bottom:0.5rem;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div>
                 <div style="font-weight:700;font-size:1rem;">Вузьких місць не знайдено</div>
                 <div style="color:#9ca3af;font-size:0.85rem;margin-top:0.25rem;">Всі проєкти працюють в нормі</div>
             </div>`;
@@ -344,7 +368,7 @@
             bottlenecks.forEach((b, i) => {
                 const color = severityColors[b.severity] || '#9ca3af';
                 const label = severityLabels[b.severity] || '';
-                const icon = typeIcons[b.type] || '⚠️';
+                const icon = typeIcons[b.type] || '';
 
                 html += `<div style="border:1px solid #e5e7eb;border-left:4px solid ${color};border-radius:12px;padding:0.75rem 1rem;margin-bottom:0.75rem;${b.severity==='critical'?'background:#fef2f2;':''}">
                     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:6px;">
@@ -384,7 +408,7 @@
         }
 
         try {
-            await db.collection('companies').doc(currentCompany).collection('tasks').add({
+            const newTask = {
                 title,
                 description,
                 status: 'new',
@@ -395,8 +419,20 @@
                 creatorId: currentUser.uid,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            });
+            };
+            const ref = await db.collection('companies').doc(currentCompany).collection('tasks').add(newTask);
+            // Оновлюємо локальний масив без повного reload
+            if (typeof tasks !== 'undefined') {
+                tasks.unshift({ ...newTask, id: ref.id, createdAt: new Date(), updatedAt: new Date() });
+            }
             showToast('Задачу створено', 'success');
+            // Оновлюємо всі активні views
+            if (typeof renderMyDay === 'function') renderMyDay();
+            if (typeof refreshCurrentView === 'function') refreshCurrentView();
+            if (typeof renderControl === 'function') {
+                const controlTab = document.getElementById('controlTab');
+                if (controlTab && controlTab.classList.contains('active')) renderControl();
+            }
         } catch (e) {
             showToast('Помилка: ' + e.message, 'error');
         }

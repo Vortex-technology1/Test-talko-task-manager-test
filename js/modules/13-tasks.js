@@ -6,6 +6,12 @@
             updateSelects();
             updateProjectSelects();
             
+            // Accordion: закриваємо при новій задачі, розкриваємо при редагуванні
+            const advPanel = document.getElementById('taskAdvancedPanel');
+            const advArrow = document.getElementById('taskAdvancedArrow');
+            if (advPanel) advPanel.style.display = id ? 'contents' : 'none';
+            if (advArrow) advArrow.style.transform = id ? 'rotate(180deg)' : '';
+            
             // Initialize comments section
             initTaskComments(id);
             

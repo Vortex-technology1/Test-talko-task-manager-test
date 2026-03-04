@@ -479,7 +479,7 @@
                 renderMyDay();
             } catch (error) {
                 console.error('Error toggling task:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
                 // Відновлюємо UI при помилці
                 if (checkbox && !currentDone) {
                     checkbox.classList.remove('checked');

@@ -50,7 +50,7 @@
             
             // Rate limiting
             if (!rateLimiter.check('saveFunction')) {
-                alert(t('tooManyRequests'));
+                showAlertModal(t('tooManyRequests'));
                 return;
             }
             
@@ -62,7 +62,7 @@
             
             const errors = validateFunctionData(funcData);
             if (errors.length > 0) {
-                alert(errors.join('\n'));
+                showAlertModal(errors.join('\n'));
                 return;
             }
             
@@ -141,7 +141,7 @@
                 if (typeof sendFunctionsToIframe === 'function') sendFunctionsToIframe();
             } catch (error) {
                 console.error('saveFunction error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             } finally {
                 isSaving = false;
                 if (submitBtn) submitBtn.disabled = false;
@@ -156,7 +156,7 @@
             const funcName = func.name || t('function');
             const usedInTemplates = processTemplates.filter(pt => pt.steps?.some(s => s.function === funcName));
             if (usedInTemplates.length > 0) {
-                if (!confirm(funcName + ' → ' + usedInTemplates.map(pt => pt.name).join(', ') + '\n\n' + (t('deleteConfirm')))) return;
+                if (!await showConfirmModal(funcName + ' → ' + usedInTemplates.map(pt => pt.name).join(', ') + '\n\n' + (t('deleteConfirm')), { danger: true })) return;
             }
             
             // Оптимістичне видалення
@@ -182,6 +182,23 @@
                 
                 await batch.commit();
                 
+                // Cascade: очищаємо ownerFunctionId в projectStages
+                if (typeof window.projectStages !== 'undefined') {
+                    const affectedStages = window.projectStages.filter(s => s.ownerFunctionId === id);
+                    if (affectedStages.length > 0) {
+                        const stageBatch = db.batch();
+                        affectedStages.forEach(s => {
+                            s._prevOwnerFunctionId = id; // зберігаємо для Undo
+                            s.ownerFunctionId = '';
+                            stageBatch.update(
+                                db.collection('companies').doc(currentCompany).collection('projectStages').doc(s.id),
+                                { ownerFunctionId: '' }
+                            );
+                        });
+                        await stageBatch.commit();
+                    }
+                }
+                
                 // Sync to canvas
                 if (typeof sendFunctionsToIframe === 'function') sendFunctionsToIframe();
             } catch (error) {
@@ -193,7 +210,7 @@
                 renderFunctions();
                 hideUndoToast();
                 console.error('deleteFunction error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             }
         }
 
@@ -202,7 +219,12 @@
             const activeFunctions = functions.filter(f => f.status !== 'archived');
             
             if (activeFunctions.length === 0) {
-                c.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><h3>${t('noFunctions')}</h3><p>${t('createFirstFunction')}</p></div>`;
+                c.innerHTML = `<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;">
+                    <div style="margin-bottom:0.75rem;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+                    <h3 style="margin-bottom:0.5rem;">${t('noFunctions') || 'Немає функцій'}</h3>
+                    <p style="color:#6b7280;margin-bottom:1rem;">${t('createFirstFunction') || 'Додайте першу бізнес-функцію для структуризації роботи'}</p>
+                    <button class="btn btn-success" onclick="openFunctionModal()">+ ${t('addFunction') || 'Додати функцію'}</button>
+                </div>`;
                 const mergeBtn = document.getElementById('mergeFunctionsBtn');
                 if (mergeBtn) mergeBtn.style.display = 'none';
                 return;

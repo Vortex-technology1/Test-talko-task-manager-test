@@ -76,7 +76,7 @@
                 tasks[taskIndex] = originalTask;
                 renderMyDay();
                 refreshCurrentView();
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             }
         }
         
@@ -126,7 +126,7 @@
                 tasks[taskIndex] = originalTask;
                 renderMyDay();
                 refreshCurrentView();
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             }
         }
         
@@ -174,6 +174,6 @@
                 tasks[taskIndex] = originalTask;
                 renderMyDay();
                 refreshCurrentView();
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             }
         }

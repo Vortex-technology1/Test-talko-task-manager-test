@@ -74,7 +74,7 @@
     
     async function saveIncident() {
         const title = document.getElementById('incidentTitle').value.trim();
-        if (!title) { alert(t('enterName')); return; }
+        if (!title) { showAlertModal(t('enterName')); return; }
         
         const data = {
             title,
@@ -98,7 +98,7 @@
             showToast(t('incidentSaved'), 'success', 2000);
         } catch(e) {
             console.error('saveIncident:', e);
-            alert(t('error') + ': ' + e.message);
+            showAlertModal(t('error') + ': ' + e.message);
         }
     }
     

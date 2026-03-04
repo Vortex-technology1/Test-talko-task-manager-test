@@ -6,13 +6,22 @@
             if (currentCalendarView === 'list') renderTasks();
             else if (currentCalendarView === 'kanban' || currentCalendarView === 'deadlines') renderKanbanBoard(currentCalendarView);
             else renderCalendar();
+            // Оновлюємо Control і Projects якщо активні
+            const controlTab = document.getElementById('controlTab');
+            if (controlTab && controlTab.classList.contains('active') && typeof renderControl === 'function') {
+                renderControl();
+            }
+            const projectsTab = document.getElementById('projectsTab');
+            if (projectsTab && projectsTab.classList.contains('active') && !openProjectId && typeof renderProjects === 'function') {
+                renderProjects();
+            }
         }
         
         function renderKanbanBoard(mode) {
             const container = document.getElementById('kanbanContainer');
             if (!container) return;
             
-            console.log(`[Kanban] Rendering mode=${mode}, total tasks=${tasks.length}`);
+// console.log(`[Kanban] Rendering mode=${mode}, total tasks=${tasks.length}`);
             
             // Apply same filters as list view
             const selectedStatuses = getSelectedStatuses();
@@ -36,7 +45,7 @@
                 return true;
             });
             
-            console.log(`[Kanban] Filtered: ${filtered.length}, statuses: [${selectedStatuses}], funcF="${funcF}", assigneeF="${assigneeF}", tf="${tf}"`);
+// console.log(`[Kanban] Filtered: ${filtered.length}, ...`);
             
             let columns;
             
@@ -296,6 +305,15 @@
                 kanbanDropLock = false; return;
             }
             
+            // FEAT-007: deadline drag перевіряє allowDeadlineChange
+            if (mode === 'deadlines' && typeof canEditDeadline === 'function') {
+                const isPrivileged = role === 'owner' || role === 'admin' || role === 'manager';
+                if (!isPrivileged && !canEditDeadline(task)) {
+                    showToast(t('noPermissionDeadline') || 'Зміна строків заборонена власником', 'error');
+                    kanbanDropLock = false; return;
+                }
+            }
+            
             if (mode === 'kanban') {
                 // STATUS DRAG: change status
                 const oldStatus = task.status;
@@ -385,6 +403,10 @@
             }
             
             renderKanbanBoard(mode);
+            // Оновлюємо MyDay і Control — вони залежать від task.status/deadlineDate
+            if (typeof renderMyDay === 'function') renderMyDay();
+            const controlTab = document.getElementById('controlTab');
+            if (controlTab?.classList.contains('active') && typeof renderControl === 'function') renderControl();
             kanbanDropLock = false;
         }
         
