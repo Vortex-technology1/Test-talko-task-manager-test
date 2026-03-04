@@ -21,7 +21,6 @@
         .action-btn .icon { margin: 0; }
         
         html {
-            width: 1200px;
             overflow-x: auto;
         }
         body { 
@@ -29,7 +28,6 @@
             background: #f9fafb; 
             color: var(--dark);
             min-height: 100vh;
-            width: 100%;
             -webkit-text-size-adjust: 100%;
         }
         
@@ -47,7 +45,8 @@
         }
         
         .header-content { 
-            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex; 
             justify-content: space-between; 
             align-items: center;
@@ -154,7 +153,7 @@
         
         .mobile-logout-btn { display: none; }
         
-        .container { width: 100%; padding: 1rem; box-sizing: border-box; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1rem; }
         
         .tab-navigation { 
             display: flex; 
