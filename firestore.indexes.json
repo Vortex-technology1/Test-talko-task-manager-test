@@ -57,13 +57,6 @@
         { "fieldPath": "scope", "order": "ASCENDING" },
         { "fieldPath": "scopeId", "order": "ASCENDING" }
       ]
-    },
-    {
-      "collectionGroup": "metrics",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
     }
   ],
   "fieldOverrides": []
