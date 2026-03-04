@@ -3,17 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-        // Десктоп: фіксований viewport 1200px — при звуженні вікна скрол а не стискання
-        // Мобіль: стандартний device-width
-        (function() {
-            if (!/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                document.querySelector('meta[name=viewport]').setAttribute(
-                    'content', 'width=1200, initial-scale=1.0'
-                );
-            }
-        })();
-    </script>
     <meta name="theme-color" content="#22c55e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2725,22 +2714,6 @@
             }
             console.error('[UNHANDLED REJECTION]', e.reason);
         });
-    </script>
-
-    <script>
-        // Фіксуємо мінімальну ширину — при звуженні вікна з'являється горизонтальний скрол
-        (function() {
-            var MIN_WIDTH = 1200;
-            function applyMinWidth() {
-                if (window.innerWidth < MIN_WIDTH) {
-                    document.documentElement.style.minWidth = MIN_WIDTH + 'px';
-                } else {
-                    document.documentElement.style.minWidth = '';
-                }
-            }
-            applyMinWidth();
-            window.addEventListener('resize', applyMinWidth);
-        })();
     </script>
 
 </body>
