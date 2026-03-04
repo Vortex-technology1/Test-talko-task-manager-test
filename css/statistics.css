@@ -145,12 +145,13 @@
     border-radius: 14px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     overflow-x: auto;
+    overflow-y: visible;
     margin-bottom: 1rem;
     -webkit-overflow-scrolling: touch;
 }
 .stats-table {
     width: 100%;
-    min-width: 700px;
+    min-width: max-content;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 0.82rem;
