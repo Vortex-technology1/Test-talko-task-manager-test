@@ -246,6 +246,9 @@ document.addEventListener('mousedown', function(e) {
         </div>
     </header>
 
+    <!-- ESCALATION STICKY BANNER -->
+    <div id="escalationBanner" style="display:none;"></div>
+
     <div class="container">
         <!-- LOADING -->
         <div id="loadingPage" class="loading">
@@ -276,7 +279,7 @@ document.addEventListener('mousedown', function(e) {
                                 <input type="text" id="selfRegOwnerName" class="form-input" placeholder="Іван Петренко" data-i18n-placeholder="yourNamePh" required aria-required="true">
                             </div>
                             <button onclick="selfRegisterCompany()" class="btn btn-success" style="width:100%;margin-top:0.5rem;" id="selfRegBtn">
-                                <i data-lucide="rocket" class="icon"></i> Створити компанію
+                                <i data-lucide="rocket" class="icon"></i> <span data-i18n="createCompany">Створити компанію</span>
                             </button>
                         </div>
                         <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
@@ -1025,7 +1028,7 @@ document.addEventListener('mousedown', function(e) {
             <div id="usersTab" class="tab-content">
                 <div class="controls" style="padding-bottom:0;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem;">
-                        <h2 style="font-size:1.1rem;margin:0;"><i data-lucide="users" class="icon"></i> Команда</h2>
+                        <h2 style="font-size:1.1rem;margin:0;"><i data-lucide="users" class="icon"></i> <span data-i18n="team">Команда</span></h2>
                         <button class="btn btn-success" onclick="openInviteModal()" id="inviteBtn" style="display:none;">
                             <i data-lucide="user-plus" class="icon"></i> <span data-i18n="invite">Запросити</span>
                         </button>
@@ -1069,7 +1072,7 @@ document.addEventListener('mousedown', function(e) {
                                 <select id="inviteRoleDesktop" style="width:100%;padding:0.6rem 0.75rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.9rem;">
                                     <option value="employee">Співробітник</option>
                                     <option value="manager">Менеджер</option>
-                                    <option value="admin">Адміністратор</option>
+                                    <option value="admin" data-i18n="adminRole">Адміністратор</option>
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-success" style="width:100%;padding:0.7rem;">
@@ -1080,7 +1083,7 @@ document.addEventListener('mousedown', function(e) {
                             <p style="font-size:0.8rem;color:#16a34a;margin:0 0 0.5rem;font-weight:600;">✓ Запрошення створено. Скопіюйте посилання:</p>
                             <div style="display:flex;gap:0.5rem;">
                                 <input id="inviteLinkText" readonly style="flex:1;padding:0.5rem;border:1px solid #bbf7d0;border-radius:6px;font-size:0.78rem;background:white;">
-                                <button onclick="copyInviteLink()" class="btn btn-success" style="padding:0.5rem 0.75rem;white-space:nowrap;">Копіювати</button>
+                                <button onclick="copyInviteLink()" class="btn btn-success" style="padding:0.5rem 0.75rem;white-space:nowrap;"><span data-i18n="copy">Копіювати</span></button>
                             </div>
                         </div>
                     </div>
@@ -1868,8 +1871,8 @@ document.addEventListener('mousedown', function(e) {
                         <input type="email" id="inviteEmailMobile" class="form-input" required aria-required="true">
                     </div>
                     <div class="form-group" style="margin-top:0.75rem;">
-                        <label class="form-label" data-i18n="role" data-i18n="role" data-i18n="role">Роль</label>
-                        <select id="inviteRoleMobile" class="form-select"><option value="employee" data-i18n="roleEmployee">Співробітник</option><option value="manager" data-i18n="roleManager">Менеджер</option><option value="admin">Адміністратор</option></select>
+                        <label class="form-label" data-i18n="role">Роль</label>
+                        <select id="inviteRoleMobile" class="form-select"><option value="employee" data-i18n="roleEmployee">Співробітник</option><option value="manager" data-i18n="roleManager">Менеджер</option><option value="admin" data-i18n="adminRole">Адміністратор</option></select>
                     </div>
                     <div id="inviteLink" style="margin-top:1rem;padding:1rem;background:#e3f2fd;border-radius:8px;display:none;">
                         <p style="font-size:0.85rem;margin-bottom:0.5rem;"><strong data-i18n="inviteLinkLabel">Посилання для входу:</strong></p>
@@ -2115,7 +2118,7 @@ document.addEventListener('mousedown', function(e) {
             </button>
             <button class="bottom-nav-btn" onclick="switchTab('tasks')" data-tab="tasks" style="position:relative;" role="tab" aria-label="Завдання">
                 <i data-lucide="clipboard-list" class="icon"></i>
-                <span id="overdueNavBadge" style="display:none;position:absolute;top:2px;right:12px;background:#ef4444;color:white;font-size:0.55rem;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 4px;line-height:1;"></span>
+                <span id="overdueNavBadge" style="display:none;position:absolute;top:2px;right:12px;background:#ef4444;color:white;font-size:0.65rem;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 4px;line-height:1;"></span>
                 <span data-i18n="tabTasks">Завдання</span>
             </button>
             <button class="bottom-nav-btn" onclick="switchTab('control')" data-tab="control" role="tab" aria-label="Контроль">
@@ -2408,7 +2411,7 @@ document.addEventListener('mousedown', function(e) {
                     <i data-lucide="list-plus" class="icon icon-sm"></i> <span data-i18n="taskGenAI">Як ставити завдання</span>
                 </a>
                 <a href="https://chatgpt.com/g/g-69382bfa841881918aff7b50aa25a4f9-talko-task-manager-support" target="_blank" class="btn" style="justify-content:center;background:#3b82f6;color:white;font-size:0.75rem;padding:0.5rem;margin-bottom:0.5rem;width:100%;" onclick="closeMobileMenu();">
-                    <i data-lucide="message-circle" class="icon icon-sm"></i> <span data-i18n="aiSupport" data-i18n="support">Підтримка</span>
+                    <i data-lucide="message-circle" class="icon icon-sm"></i> <span data-i18n="aiSupport">Підтримка</span>
                 </a>
                 <div id="ownerAiButtons" style="display:none;grid-template-columns:1fr 1fr;gap:0.4rem;margin-bottom:0.75rem;">
                     <button class="btn" onclick="openAiGeneratorModal();closeMobileMenu();" style="justify-content:center;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;font-size:0.75rem;padding:0.5rem;">

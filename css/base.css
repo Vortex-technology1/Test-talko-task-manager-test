@@ -238,3 +238,62 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
+
+/* ---- ESCALATION STICKY BANNER ---- */
+#escalationBanner {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    box-sizing: border-box;
+}
+#escalationBanner .esc-banner-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+#escalationBanner .esc-banner-item:hover { opacity: 0.92; }
+#escalationBanner .esc-banner-critical {
+    background: #dc2626;
+    color: white;
+}
+#escalationBanner .esc-banner-warning {
+    background: #f97316;
+    color: white;
+}
+#escalationBanner .esc-banner-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 1.1rem;
+    line-height: 1;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+#escalationBanner .esc-banner-close:hover { color: white; background: rgba(0,0,0,0.15); }
+#escalationBanner .esc-banner-tasks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+}
+#escalationBanner .esc-task-chip {
+    background: rgba(0,0,0,0.18);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -1060,8 +1060,13 @@
             const canEdit = (typeof hasPermission === 'function') ? hasPermission('editMetrics') : (role === 'owner' || role === 'admin' || role === 'manager');
             html += `<th title="${esc(m.name)}${respName ? ' · ' + respName : ''}" style="position:relative;">
                 <div class="th-inner">
-                    <span style="color:${impColor};font-size:9px;">▸</span> ${esc(m.name)}${unit}${inverse}${privacy}
-                    ${respName ? ` <span style="font-weight:400;opacity:0.5;">· ${respName}</span>` : ''}
+                    <div class="th-metric-name">
+                        <span style="color:${impColor};font-size:8px;margin-right:2px;">▸</span>${esc(m.name)}${inverse}${privacy}
+                    </div>
+                    <div class="th-metric-meta">
+                        ${m.unit ? `<span class="th-unit">${esc(m.unit)}</span>` : ''}
+                        ${respName ? `<span class="th-resp">${respName}</span>` : ''}
+                    </div>
                 </div>
                 <div class="th-actions" style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);display:flex;gap:1px;opacity:0;transition:opacity 0.1s;">
                     ${canEdit ? `<button class="stats-comment-btn" onclick="openMetricModal('${m.id}')" title="Редагувати" style="width:18px;height:18px;padding:1px;">${SVG.settings}</button>` : ''}

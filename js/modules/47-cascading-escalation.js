@@ -31,8 +31,68 @@
             return `<span class="escalation-badge escalation-${level.level}" title="${level.label}"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> ${level.label}</span>`;
         }
         
+        function renderEscalationBanner() {
+            const banner = document.getElementById('escalationBanner');
+            if (!banner) return;
+
+            const canSee = (typeof hasPermission === 'function' && hasPermission('viewControl'))
+                || currentUserData?.role === 'owner'
+                || currentUserData?.role === 'manager';
+
+            if (!canSee || !tasks || tasks.length === 0) {
+                banner.style.display = 'none';
+                banner.innerHTML = '';
+                return;
+            }
+
+            const level3 = tasks.filter(t => !t.status || t.status !== 'done')
+                .filter(t => getEscalationLevel(t)?.level === 3);
+            const level2 = tasks.filter(t => !t.status || t.status !== 'done')
+                .filter(t => getEscalationLevel(t)?.level === 2);
+
+            if (level3.length === 0 && level2.length === 0) {
+                banner.style.display = 'none';
+                banner.innerHTML = '';
+                return;
+            }
+
+            const isCritical = level3.length > 0;
+            const items = isCritical ? level3 : level2;
+            const msg = isCritical
+                ? t('escalationCritical').replace('{n}', level3.length)
+                : t('escalationWarning').replace('{n}', level2.length);
+            const cls = isCritical ? 'esc-banner-critical' : 'esc-banner-warning';
+
+            const chips = items.slice(0, 5).map(tk =>
+                `<span class="esc-task-chip" onclick="openTaskModal('${tk.id}')" title="${(tk.title||'').replace(/"/g,'')}">${(tk.title||'').substring(0,30)}${(tk.title||'').length > 30 ? '…' : ''}</span>`
+            ).join('');
+            const moreCount = items.length > 5 ? `<span class="esc-task-chip">+${items.length - 5}</span>` : '';
+
+            banner.style.display = 'block';
+            banner.innerHTML = `
+                <div class="esc-banner-item ${cls}" onclick="switchTab('tasks')">
+                    <div style="flex:1;min-width:0;">
+                        <div>⚠️ ${msg}</div>
+                        ${chips || moreCount ? `<div class="esc-banner-tasks">${chips}${moreCount}</div>` : ''}
+                    </div>
+                    <button class="esc-banner-close" onclick="event.stopPropagation();dismissEscalationBanner()" title="Закрити">×</button>
+                </div>`;
+        }
+
+        window.dismissEscalationBanner = function() {
+            const banner = document.getElementById('escalationBanner');
+            if (banner) { banner.style.display = 'none'; }
+            // Повторно показати через 30 хвилин
+            setTimeout(() => { if (typeof renderEscalationBanner === 'function') renderEscalationBanner(); }, 30 * 60 * 1000);
+        };
+
+        window.renderEscalationBanner = renderEscalationBanner;
+
         async function checkEscalations() {
             if (!currentCompany) return;
+
+            // Оновлюємо sticky банер
+            renderEscalationBanner();
             
             const overdueTasks = tasks.filter(t => {
                 if (t.status === 'done') return false;
@@ -45,15 +105,6 @@
             // Групуємо по рівнях
             const level2 = overdueTasks.filter(t => getEscalationLevel(t)?.level === 2);
             const level3 = overdueTasks.filter(t => getEscalationLevel(t)?.level === 3);
-            
-            // Показуємо сповіщення для менеджерів та овнерів
-            if ((typeof hasPermission === 'function' && hasPermission('viewControl')) || currentUserData?.role === 'owner' || currentUserData?.role === 'manager') {
-                if (level3.length > 0) {
-                    showToast(t('escalationCritical').replace('{n}', level3.length), 'error', 8000);
-                } else if (level2.length > 0) {
-                    showToast(t('escalationWarning').replace('{n}', level2.length), 'warning', 5000);
-                }
-            }
             
             // Логуємо ескалації які ще не логувались сьогодні
             const today = getLocalDateStr();
