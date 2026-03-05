@@ -61,39 +61,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Вішаємо на всі скролящі контейнери через делегацію
     document.addEventListener('scroll', function() { closeNavDropdowns(); }, { passive: true, capture: true });
 });
-// Перевіряємо позицію відкритого dropdown кожен кадр — закриваємо якщо кнопка змістилась
+// Закриваємо при будь-якому русі мишки або touch поза кнопками dropdown
 (function() {
-    var lastY = null;
-    var activeMenuId = null;
-    var activeWrapperId = null;
-    // Підключаємось до toggleNavDropdown щоб знати який відкрито
-    var _orig = window.toggleNavDropdown;
-    window.toggleNavDropdown = function(menuId, wrapperId, e) {
-        activeMenuId = menuId;
-        activeWrapperId = wrapperId;
-        lastY = null;
-        _orig(menuId, wrapperId, e);
-    };
-    function tick() {
-        if (activeMenuId) {
-            var menu = document.getElementById(activeMenuId);
-            if (menu && menu.style.display === 'block') {
-                var wrapper = activeWrapperId ? document.getElementById(activeWrapperId) : null;
-                if (wrapper) {
-                    var rect = wrapper.getBoundingClientRect();
-                    if (lastY !== null && Math.abs(rect.top - lastY) > 2) {
-                        closeNavDropdowns();
-                        activeMenuId = null;
-                    }
-                    lastY = rect.top;
-                }
-            } else {
-                activeMenuId = null;
-            }
-        }
-        requestAnimationFrame(tick);
+    var dropdownBtnIds = ['tasksTabBtn','analyticsTabBtn','sysTabBtn','workTabBtn'];
+    var dropdownMenuIds = ['tasksTabMenu','analyticsTabMenu','sysTabMenu','workTabMenu'];
+
+    function isInsideDropdown(target) {
+        return dropdownBtnIds.concat(dropdownMenuIds).some(function(id) {
+            var el = document.getElementById(id);
+            return el && el.contains(target);
+        });
     }
-    requestAnimationFrame(tick);
+
+    function anyMenuOpen() {
+        return dropdownMenuIds.some(function(id) {
+            var el = document.getElementById(id);
+            return el && el.style.display === 'block';
+        });
+    }
+
+    // Закриваємо при русі мишки поза dropdown (десктоп)
+    document.addEventListener('mousemove', function(e) {
+        if (!anyMenuOpen()) return;
+        if (!isInsideDropdown(e.target)) {
+            closeNavDropdowns();
+        }
+    }, { passive: true });
+
+    // Закриваємо при touch-move (мобільний скрол)
+    document.addEventListener('touchstart', function(e) {
+        if (!anyMenuOpen()) return;
+        if (!isInsideDropdown(e.target)) {
+            closeNavDropdowns();
+        }
+    }, { passive: true, capture: true });
 })();
 // Найнадійніше — закриваємо при натисканні кнопки миші поза dropdown
 document.addEventListener('mousedown', function(e) {
