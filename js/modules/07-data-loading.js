@@ -172,6 +172,7 @@
                     // Check escalations after data is loaded
                     checkEscalations();
                     if (typeof initUsersTabVisibility === 'function') initUsersTabVisibility();
+                if (typeof initOwnerDashboardVisibility === 'function') initOwnerDashboardVisibility();
                     // Load manual incidents for journal
                     loadManualIncidents().catch(() => {});
                     // Load project-driven data (stages, materials, QC) for owner dashboard

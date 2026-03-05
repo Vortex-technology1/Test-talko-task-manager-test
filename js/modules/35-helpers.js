@@ -137,7 +137,7 @@
             // Підсвічуємо кнопку групи якщо активна її вкладка
             // Підсвічування dropdown-батьків по новій структурі меню
             var tasksTabs    = ['tasks','regular'];
-            var analyticsTabs = ['statistics','analytics'];
+            var analyticsTabs = ['statistics','analytics','ownerDashboard'];
             var sysTabs      = ['functions','bizstructure','users','admin'];
 
             var tasksBtn     = document.getElementById('tasksTabBtn');
@@ -187,6 +187,7 @@
                 case 'statistics': renderStatistics(); break;
                 case 'admin': renderAdminPanel(); break;
                 case 'bizstructure': if (typeof showBizStructureTab === 'function') showBizStructureTab(); break;
+                case 'ownerDashboard': if (typeof renderOwnerDashboard === 'function') renderOwnerDashboard(); break;
             }
             
             updateOverdueBadges();

@@ -861,17 +861,12 @@
                 <button class="stats-pill" onclick="openTrendsChart(statsMetrics[0]?.id || '')" style="color:#3b82f6;border-color:#dbeafe;">${SVG.barChart} Тренди</button>
             </div>
         </div>
-        ${metricCount === 0 ? `
-        <div style="text-align:center;padding:2.5rem 1rem;background:white;border-radius:16px;margin-top:1rem;border:2px dashed #e5e7eb;">
-            <div style="margin-bottom:0.5rem;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-            <div style="font-weight:700;font-size:1rem;color:#374151;">Почніть з додавання показників</div>
-            <div style="color:#9ca3af;font-size:0.85rem;margin:0.5rem 0 1rem;">Натисніть "+ Метрика" щоб створити перший показник (виручка, ліди, конверсія...)</div>
-            ${canEdit ? `<button class="btn btn-success" onclick="openMetricModal()" style="padding:0.6rem 1.5rem;border-radius:14px;font-size:0.95rem;">
-                ${SVG.plus} Додати перший показник
+        ${metricCount === 0 && canEdit ? `
+        <div style="text-align:center;padding:2rem 1rem;background:#f9fafb;border-radius:12px;margin-top:1rem;border:1.5px dashed #e5e7eb;">
+            <div style="font-weight:600;font-size:0.95rem;color:#6b7280;margin-bottom:0.75rem;">Метрик ще немає — додайте першу</div>
+            <button class="btn btn-success" onclick="openMetricModal()" style="padding:0.5rem 1.25rem;border-radius:10px;font-size:0.9rem;">
+                ${SVG.plus} Додати метрику
             </button>
-            ${typeof isSuperAdmin !== 'undefined' && isSuperAdmin ? `<div style="margin-top:1rem;display:flex;justify-content:center;gap:0.5rem;">
-                <button class="btn btn-small" onclick="generateStatsDemoData()" style="font-size:0.78rem;background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;">Завантажити демо-дані</button>
-            </div>` : ''}` : ''}
         </div>` : ''}`;
     }
 

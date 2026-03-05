@@ -70,6 +70,99 @@
             renderTeamDashboard();
         }
         
+        // Клік по картці — показати відповідний список
+        window.filterControlByCard = function(type) {
+            const content = document.getElementById('controlContent');
+            if (!content) return;
+
+            const now = new Date();
+            const today = getLocalDateStr(now);
+            const tm = new Date(now); tm.setDate(tm.getDate() + 1);
+            const tomorrow = getLocalDateStr(tm);
+            const af = document.getElementById('controlAssigneeFilter')?.value || '';
+            const ff = document.getElementById('controlFunctionFilter')?.value || '';
+
+            let filtered = tasks.filter(task => {
+                if (!isTaskVisibleToUser(task)) return false;
+                if (af && task.assigneeId !== af) return false;
+                if (ff && task.function !== ff) return false;
+                return true;
+            });
+
+            let title = '';
+            if (type === 'urgent') {
+                filtered = filtered.filter(t => {
+                    const d = parseDeadline(t).date;
+                    return d && d < today && t.status !== 'done' && t.status !== 'review';
+                });
+                title = '🔴 Прострочені завдання';
+            } else if (type === 'warning') {
+                filtered = filtered.filter(t => {
+                    const d = parseDeadline(t).date;
+                    return (d === today || d === tomorrow) && t.status !== 'done' && t.status !== 'review';
+                });
+                title = '🟡 Сьогодні і завтра';
+            } else if (type === 'active') {
+                filtered = filtered.filter(t => t.status === 'progress');
+                title = '🔵 В роботі';
+            } else if (type === 'completed') {
+                filtered = filtered.filter(t => t.status === 'done');
+                title = '🟢 Завершені';
+            }
+
+            // Підсвічуємо активну картку
+            document.querySelectorAll('.dashboard-card').forEach(el => {
+                el.style.outline = '';
+                el.style.outlineOffset = '';
+            });
+            const cardMap = {urgent:'.dashboard-card.urgent',warning:'.dashboard-card.warning',active:'.dashboard-card.active',completed:'.dashboard-card.completed'};
+            const activeCard = document.querySelector(cardMap[type]);
+            if (activeCard) { activeCard.style.outline = '3px solid rgba(255,255,255,0.7)'; activeCard.style.outlineOffset = '-3px'; }
+
+            if (filtered.length === 0) {
+                content.innerHTML = `<div style="padding:2rem;text-align:center;color:#9ca3af;">${title} — завдань немає</div>`;
+                return;
+            }
+
+            const rows = filtered.map(task => {
+                const assignee = users.find(u => u.id === task.assigneeId);
+                const name = assignee ? (assignee.name || assignee.email).split(' ')[0] : '—';
+                const d = parseDeadline(task).date || '';
+                const isOverdue = d && d < today && task.status !== 'done';
+                const dateColor = isOverdue ? '#ef4444' : '#6b7280';
+                return `<tr style="cursor:pointer;" onclick="openTaskModal('${task.id}')">
+                    <td style="padding:0.6rem 0.75rem;font-weight:500;color:#1a1a1a;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(task.title||'')}</td>
+                    <td style="padding:0.6rem 0.75rem;color:#6b7280;font-size:0.85rem;white-space:nowrap;">${esc(name)}</td>
+                    <td style="padding:0.6rem 0.75rem;color:${dateColor};font-size:0.85rem;white-space:nowrap;">${d || '—'}</td>
+                    <td style="padding:0.6rem 0.75rem;font-size:0.82rem;">${task.function ? `<span style="background:#f3f4f6;border-radius:4px;padding:1px 6px;">${esc(task.function)}</span>` : ''}</td>
+                </tr>`;
+            }).join('');
+
+            content.innerHTML = `
+                <div style="background:white;border-radius:8px;overflow:hidden;border:1px solid #f3f4f6;">
+                    <div style="padding:0.75rem 1rem;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">
+                        <span style="font-weight:600;font-size:0.95rem;">${title}</span>
+                        <span style="font-size:0.82rem;color:#9ca3af;">${filtered.length} завдань</span>
+                    </div>
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#fafafa;font-size:0.78rem;color:#9ca3af;text-transform:uppercase;letter-spacing:0.04em;">
+                                <th style="padding:0.5rem 0.75rem;text-align:left;font-weight:600;">Завдання</th>
+                                <th style="padding:0.5rem 0.75rem;text-align:left;font-weight:600;">Виконавець</th>
+                                <th style="padding:0.5rem 0.75rem;text-align:left;font-weight:600;">Дедлайн</th>
+                                <th style="padding:0.5rem 0.75rem;text-align:left;font-weight:600;">Функція</th>
+                            </tr>
+                        </thead>
+                        <tbody style="divide-y:#f9fafb;">
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>`;
+
+            // Скролимо до списку
+            content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        };
+
         function renderControlContent() {
             const viewType = document.getElementById('controlViewType')?.value || 'briefing';
             const af = document.getElementById('controlAssigneeFilter')?.value;
