@@ -148,10 +148,12 @@
     overflow-y: visible;
     margin-bottom: 1rem;
     -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 .stats-table {
     width: 100%;
-    min-width: max-content;
+    min-width: 600px; /* мінімум щоб таблиця не розвалилась — скрол всередині wrap */
     border-collapse: separate;
     border-spacing: 0;
     font-size: 0.82rem;

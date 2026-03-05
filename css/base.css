@@ -160,27 +160,31 @@
 
         .container { 
             max-width: 100%; 
+            width: 100%;
             margin: 0 auto; 
             padding: 1rem;
             box-sizing: border-box;
         }
-        
-        /* Tab panels that should have max-width centering */
-        #mydayTab,
-        #controlTab,
-        #statisticsTab,
-        #analyticsTab,
-        #adminTab,
-        #functionsTab,
-        #usersTab,
-        #processesTab,
-        #projectsTab,
-        #bizstructureTab {
-            max-width: 1400px;
-            margin: 0 auto;
+
+        /* Всі вкладки — повна ширина, без обмежень */
+        .tab-content {
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        /* Tasks tab: full width, no side constraints */
+        /* Статистика: таблиця скролиться горизонтально всередині, але обгортка — на всю ширину */
+        #statisticsTab .stats-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            box-sizing: border-box;
+        }
+
+        /* Мій день: картки завдань на всю ширину */
+        #mydayTab {
+            width: 100%;
+        }
+
+        /* Tasks та Regular: таблиця без скролу, колонки стискаються */
         #tasksTab,
         #regularTab {
             max-width: 100%;
