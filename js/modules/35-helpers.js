@@ -136,7 +136,7 @@
             if (!matchBtn) {
                 document.querySelectorAll('.tab-btn').forEach(function(btn) {
                     var oc = (btn.getAttribute('onclick') || '').replace(/\s/g,'');
-                    if (oc === \`switchTab('\${tabName}');closeNavDropdowns();\`) matchBtn = btn;
+                    if (oc === 'switchTab(\'' + tabName + '\');closeNavDropdowns();') matchBtn = btn;
                 });
             }
             

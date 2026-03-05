@@ -7,6 +7,41 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TALKO Tasks">
+<script>
+// ===== EARLY NAV FUNCTIONS — мають бути доступні до завантаження модулів =====
+function toggleNavDropdown(menuId, wrapperId, e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById(menuId);
+    var wrapper = document.getElementById(wrapperId);
+    var btn = wrapper ? wrapper.querySelector('button') : null;
+    if (!menu) return;
+    var isOpen = menu.style.display === 'block';
+    closeNavDropdowns();
+    if (isOpen) return;
+    if (btn) {
+        var rect = btn.getBoundingClientRect();
+        menu.style.top = (rect.bottom + 4) + 'px';
+        menu.style.left = rect.left + 'px';
+    }
+    menu.style.display = 'block';
+}
+function closeNavDropdowns() {
+    ['tasksTabMenu','analyticsTabMenu','sysTabMenu','workTabMenu'].forEach(function(id) {
+        var m = document.getElementById(id);
+        if (m) m.style.display = 'none';
+    });
+}
+function toggleMoreTabs(e) {}
+function closeMoreTabs() { closeNavDropdowns(); }
+document.addEventListener('click', function(e) {
+    var dropdowns = ['tasksTabDropdown','analyticsTabDropdown','sysTabDropdown','workTabDropdown'];
+    var inside = dropdowns.some(function(id) {
+        var el = document.getElementById(id);
+        return el && el.contains(e.target);
+    });
+    if (!inside) closeNavDropdowns();
+});
+</script>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
