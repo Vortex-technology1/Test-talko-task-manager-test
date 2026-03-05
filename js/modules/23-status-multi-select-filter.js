@@ -220,15 +220,24 @@
             const sortClass = (field) => taskSortField === field ? 'sortable sort-active' : 'sortable';
             
             let html = `
-                <table class="tasks-table" style="table-layout:fixed;">
+                <table class="tasks-table" style="table-layout:auto;width:100%;">
+                    <colgroup>
+                        <col class="col-title"    style="width:35%;"><!-- Назва завдання — завжди видима -->
+                        <col class="col-assignee" style="width:14%;"><!-- Виконавець -->
+                        <col class="col-creator"  style="width:13%;"><!-- Автор — ховається при звуженні -->
+                        <col class="col-deadline" style="width:12%;"><!-- Дедлайн -->
+                        <col class="col-status"   style="width:10%;"><!-- Статус -->
+                        <col class="col-function" style="width:11%;"><!-- Функція — ховається при звуженні -->
+                        <col class="col-actions"  style="width:5%;" ><!-- Дії -->
+                    </colgroup>
                     <thead>
                         <tr>
-                            <th class="${sortClass('title')}" onclick="sortTasksBy('title')">${t('task')}${sortIcon('title')}<div class="col-resize-handle"></div></th>
+                            <th class="${sortClass('title')}"    onclick="sortTasksBy('title')"   >${t('task')}${sortIcon('title')}<div class="col-resize-handle"></div></th>
                             <th class="${sortClass('assignee')}" onclick="sortTasksBy('assignee')">${t('assignee')}${sortIcon('assignee')}<div class="col-resize-handle"></div></th>
-                            <th class="${sortClass('creator')}" onclick="sortTasksBy('creator')">${t('createdBy')}${sortIcon('creator')}<div class="col-resize-handle"></div></th>
+                            <th class="${sortClass('creator')}  col-hide-md" onclick="sortTasksBy('creator')">${t('createdBy')}${sortIcon('creator')}<div class="col-resize-handle"></div></th>
                             <th class="${sortClass('deadline')}" onclick="sortTasksBy('deadline')">${t('deadline')}${sortIcon('deadline')}<div class="col-resize-handle"></div></th>
-                            <th class="${sortClass('status')}" onclick="sortTasksBy('status')">${t('status')}${sortIcon('status')}<div class="col-resize-handle"></div></th>
-                            <th class="${sortClass('function')}" onclick="sortTasksBy('function')">${t('type')}${sortIcon('function')}<div class="col-resize-handle"></div></th>
+                            <th class="${sortClass('status')}"   onclick="sortTasksBy('status')"  >${t('status')}${sortIcon('status')}<div class="col-resize-handle"></div></th>
+                            <th class="${sortClass('function')}  col-hide-sm" onclick="sortTasksBy('function')">${t('type')}${sortIcon('function')}<div class="col-resize-handle"></div></th>
                             <th>${t('actions')}</th>
                         </tr>
                     </thead>
@@ -249,10 +258,10 @@
                             <span class="task-title-text ${task.pinned ? 'pinned' : ''}" onclick="openTaskModal('${escId(task.id)}')">${task.pinned ? '<i data-lucide="pin" class="icon icon-sm" style="color:#e74c3c"></i> ' : ''}${processIndicator}${esc(task.title)}</span>
                         </td>
                         <td>${esc(task.assigneeName) || '-'}</td>
-                        <td>${esc(task.creatorName) || '-'}</td>
+                        <td class="col-hide-md">${esc(task.creatorName) || '-'}</td>
                         <td class="deadline-text ${deadlineClass}" onclick="inlineEditDeadline(event, '${escId(task.id)}', '${task.deadlineDate || ''}')" style="cursor:pointer;" title="${t('clickToChangeDate')}">${taskDeadline ? formatDateShort(taskDeadline) : '-'}${task.timeEnd ? ' ' + task.timeEnd : ''}</td>
                         <td><span class="status-badge status-${task.status}" style="cursor:pointer;" onclick="cycleTaskStatus('${escId(task.id)}',event)">${st[task.status] || task.status}</span></td>
-                        <td>${esc(task.function) || '-'}</td>
+                        <td class="col-hide-sm">${esc(task.function) || '-'}</td>
                         <td>
                             <div class="action-btns">
                                 ${task.status === 'review' && task.creatorId === currentUser?.uid && task.assigneeId !== currentUser?.uid ? `

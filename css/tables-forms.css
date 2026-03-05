@@ -540,3 +540,55 @@
                 line-height: 1.2;
             }
         }
+
+        /* ===== GOOGLE SHEETS STYLE — FLEXIBLE COLUMNS ===== */
+
+        /* Таблиця завжди на всю ширину контейнера */
+        .tasks-table {
+            table-layout: auto !important;
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+
+        /* Назва завдання — розтягується щоб заповнити вільний простір */
+        .tasks-table .task-title-cell {
+            max-width: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .tasks-table .task-title-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            max-width: 100%;
+        }
+
+        /* Всі TD/TH не переносяться */
+        .tasks-table th,
+        .tasks-table td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* При звуженні < 1100px — ховаємо "Автор" */
+        @media (max-width: 1100px) {
+            .tasks-table .col-hide-md { display: none; }
+            .tasks-table col.col-creator { display: none; }
+        }
+
+        /* При звуженні < 800px — ховаємо ще "Функція" */
+        @media (max-width: 800px) {
+            .tasks-table .col-hide-sm { display: none; }
+            .tasks-table col.col-function { display: none; }
+        }
+
+        /* table-container на десктопі — без горизонтального скролу */
+        @media (min-width: 600px) {
+            #tasksTab .table-container,
+            #regularTab .table-container {
+                overflow-x: hidden;
+            }
+        }

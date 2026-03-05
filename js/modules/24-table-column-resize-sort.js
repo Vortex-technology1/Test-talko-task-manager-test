@@ -26,6 +26,13 @@
         }
         
         function initTableColumnResize() {
+            const table = document.querySelector('.tasks-table');
+            if (!table) return;
+
+            // Знімаємо фіксований layout — таблиця тепер flexible
+            table.style.tableLayout = 'auto';
+            table.style.width = '100%';
+
             const handles = document.querySelectorAll('.col-resize-handle');
             handles.forEach(handle => {
                 handle.addEventListener('mousedown', (e) => {
@@ -34,21 +41,11 @@
                     const startX = e.clientX;
                     const startWidth = th.offsetWidth;
                     handle.classList.add('resizing');
-                    
+
                     const onMove = (e2) => {
                         const newWidth = Math.max(60, startWidth + (e2.clientX - startX));
                         th.style.width = newWidth + 'px';
                         th.style.minWidth = newWidth + 'px';
-                        // Синхронізуємо TD цієї колонки
-                        const colIndex = Array.from(th.parentElement.children).indexOf(th);
-                        const rows = th.closest('table').querySelectorAll('tbody tr');
-                        rows.forEach(row => {
-                            const td = row.children[colIndex];
-                            if (td) {
-                                td.style.width = newWidth + 'px';
-                                td.style.minWidth = newWidth + 'px';
-                            }
-                        });
                     };
                     const onUp = () => {
                         handle.classList.remove('resizing');
@@ -64,8 +61,13 @@
         
         function saveColumnWidths() {
             const ths = document.querySelectorAll('.tasks-table th');
-            if (!ths.length) return;
-            const widths = Array.from(ths).map(th => th.offsetWidth);
+            const table = document.querySelector('.tasks-table');
+            if (!ths.length || !table) return;
+            const tableWidth = table.offsetWidth;
+            // Зберігаємо у % від ширини таблиці
+            const widths = Array.from(ths).map(th => 
+                parseFloat(((th.offsetWidth / tableWidth) * 100).toFixed(2))
+            );
             localStorage.setItem('taskColumnWidths', JSON.stringify(widths));
         }
         
@@ -75,23 +77,13 @@
             try {
                 const widths = JSON.parse(saved);
                 const ths = document.querySelectorAll('.tasks-table th');
-                const table = document.querySelector('.tasks-table');
-                if (!ths.length || !table) return;
+                if (!ths.length) return;
                 ths.forEach((th, i) => {
                     if (widths[i]) {
-                        th.style.width = widths[i] + 'px';
-                        th.style.minWidth = widths[i] + 'px';
+                        // Відновлюємо у % — таблиця масштабується разом з вікном
+                        th.style.width = widths[i] + '%';
+                        th.style.minWidth = '';
                     }
-                });
-                // Також TD
-                const rows = table.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    Array.from(row.children).forEach((td, i) => {
-                        if (widths[i]) {
-                            td.style.width = widths[i] + 'px';
-                            td.style.minWidth = widths[i] + 'px';
-                        }
-                    });
                 });
             } catch(e) {}
         }
