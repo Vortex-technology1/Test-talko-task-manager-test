@@ -47,39 +47,56 @@ document.addEventListener('click', function(e) {
     });
     if (!inside) closeNavDropdowns();
 });
-// Закриваємо при будь-якому скролі (включно зі скролом всередині контейнерів)
-// Закриваємо при будь-якому скролі — вішаємо на всі можливі targets
+// Закриваємо при будь-якому скролі — rAF відстежує зміну scrollY незалежно від джерела скролу
 (function() {
     function closeAll() { closeNavDropdowns(); }
-    // Всі варіанти скролу
-    window.addEventListener('scroll', closeAll, true);
-    document.addEventListener('scroll', closeAll, true);
-    document.documentElement.addEventListener('scroll', closeAll, { passive: true });
+    var lastScrollY = 0, lastScrollX = 0, menuOpen = false;
+
+    // Перехоплюємо toggleNavDropdown щоб знати коли меню відкрите
+    var _origToggle = window.toggleNavDropdown;
+    window.toggleNavDropdown = function(menuId, wrapperId, e) {
+        _origToggle && _origToggle(menuId, wrapperId, e);
+        var m = document.getElementById(menuId);
+        menuOpen = !!(m && m.style.display === 'block');
+        lastScrollY = window.scrollY;
+        lastScrollX = window.scrollX;
+    };
+
+    // rAF tick — закриваємо якщо scrollY/X змінився поки меню відкрите
+    function tick() {
+        if (menuOpen) {
+            var dy = Math.abs(window.scrollY - lastScrollY);
+            var dx = Math.abs(window.scrollX - lastScrollX);
+            if (dy > 2 || dx > 2) {
+                closeAll();
+                menuOpen = false;
+            }
+        } else {
+            menuOpen = ['tasksTabMenu','analyticsTabMenu','sysTabMenu'].some(function(id) {
+                var el = document.getElementById(id);
+                return el && el.style.display === 'block';
+            });
+            if (menuOpen) { lastScrollY = window.scrollY; lastScrollX = window.scrollX; }
+        }
+        requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    // Backup scroll listeners
+    window.addEventListener('scroll', closeAll, { passive: true, capture: true });
     document.addEventListener('wheel', closeAll, { passive: true, capture: true });
     document.addEventListener('touchmove', closeAll, { passive: true, capture: true });
     window.addEventListener('resize', closeAll);
-    // Закриваємо при pointerdown поза меню (найнадійніше для кліків)
+
+    // pointerdown поза меню
     document.addEventListener('pointerdown', function(e) {
-        var menuIds = ['tasksTabMenu','analyticsTabMenu','sysTabMenu'];
-        var btnIds  = ['tasksTabBtn','analyticsTabBtn','sysTabBtn'];
-        var allIds  = menuIds.concat(btnIds);
-        var inside  = allIds.some(function(id) {
+        var allIds = ['tasksTabMenu','analyticsTabMenu','sysTabMenu','tasksTabBtn','analyticsTabBtn','sysTabBtn'];
+        var inside = allIds.some(function(id) {
             var el = document.getElementById(id);
             return el && el.contains(e.target);
         });
-        if (!inside) closeAll();
+        if (!inside) { closeAll(); menuOpen = false; }
     }, true);
-    // Закриваємо при switchTab — на випадок якщо меню лишилось відкритим
-    document.addEventListener('DOMContentLoaded', function() {
-        // Вішаємо scroll на всі дочірні контейнери що можуть скролитись
-        document.querySelectorAll('*').forEach(function(el) {
-            var style = window.getComputedStyle(el);
-            if (style.overflowY === 'auto' || style.overflowY === 'scroll' ||
-                style.overflow === 'auto' || style.overflow === 'scroll') {
-                el.addEventListener('scroll', closeAll, { passive: true });
-            }
-        });
-    });
 })();
 // Закриваємо при натисканні кнопки миші поза dropdown
 document.addEventListener('mousedown', function(e) {
@@ -140,7 +157,10 @@ document.addEventListener('mousedown', function(e) {
         document.querySelectorAll('.hdr-dropdown-menu').forEach(function(m) { m.classList.remove('show'); });
         if (!wasOpen) {
             menu.classList.add('show');
-            setTimeout(function() { document.addEventListener('click', closeAllHdrDropdowns, { once: true }); }, 10);
+            // Затримка 50ms — гарантовано після завершення поточного click event
+            setTimeout(function() {
+                document.addEventListener('click', closeAllHdrDropdowns, { once: true });
+            }, 50);
         }
     }
     function closeAllHdrDropdowns() {

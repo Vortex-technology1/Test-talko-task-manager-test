@@ -154,9 +154,8 @@
         .mobile-logout-btn { display: none; }
         
         /* ===== LAYOUT ===== */
-        html {
-            overflow-x: clip; /* clip не створює stacking context — не ламає position:fixed */
-        }
+        /* Горизонтальний скрол блокується на рівні контейнера, не html/body — 
+           overflow на html/body ламає position:fixed для dropdown меню */
 
 
 
