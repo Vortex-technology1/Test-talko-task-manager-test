@@ -57,6 +57,44 @@
             return d.toLocaleDateString(getLocale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
+        // More tabs dropdown
+        // Nav dropdowns (Робота / Система)
+        function toggleNavDropdown(menuId, wrapperId, e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById(menuId);
+            const btn = document.getElementById(wrapperId)?.querySelector('button');
+            if (!menu) return;
+            const isOpen = menu.style.display === 'block';
+            closeNavDropdowns();
+            if (isOpen) return;
+            if (btn) {
+                const rect = btn.getBoundingClientRect();
+                menu.style.top = (rect.bottom + 4) + 'px';
+                menu.style.left = rect.left + 'px';
+            }
+            menu.style.display = 'block';
+        }
+        function closeNavDropdowns() {
+            ['workTabMenu','sysTabMenu'].forEach(function(id) {
+                const m = document.getElementById(id);
+                if (m) m.style.display = 'none';
+            });
+        }
+        // Закриваємо при кліку поза меню
+        document.addEventListener('click', function(e) {
+            const inWork = document.getElementById('workTabDropdown')?.contains(e.target);
+            const inSys = document.getElementById('sysTabDropdown')?.contains(e.target);
+            if (!inWork && !inSys) closeNavDropdowns();
+        });
+        window.toggleNavDropdown = toggleNavDropdown;
+        window.closeNavDropdowns = closeNavDropdowns;
+
+        // Зворотна сумісність (старі виклики)
+        function toggleMoreTabs(e) { }
+        function closeMoreTabs() { closeNavDropdowns(); }
+        window.toggleMoreTabs = toggleMoreTabs;
+        window.closeMoreTabs = closeMoreTabs;
+
         function switchTab(tabName) {
             // Reset project detail when leaving projects tab
             if (tabName !== 'projects' && openProjectId) {
@@ -66,12 +104,36 @@
             document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
             var tabEl = document.getElementById(tabName + 'Tab'); if (tabEl) tabEl.classList.add('active');
-            document.querySelector(`[onclick="switchTab('${tabName}')"]`)?.classList.add('active');
+            // Find matching tab button (including inside dropdown)
+            // Find matching tab button — нормалізуємо пробіли в onclick для надійності
+            var matchBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+            if (!matchBtn) {
+                // Шукаємо серед всіх tab-btn з closeMoreTabs (dropdown)
+                document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                    var oc = (btn.getAttribute('onclick') || '').replace(/\s/g, '');
+                    if (oc === `switchTab('${tabName}');closeMoreTabs();` || oc === `switchTab('${tabName}');closeMoreTabs()`) {
+                        matchBtn = btn;
+                    }
+                });
+            }
+            if (matchBtn) matchBtn.classList.add('active');
+            // Highlight "Ще" if secondary tab is active
+            // Підсвічуємо кнопку групи якщо активна її вкладка
+            var workTabs = ['projects','processes','regular','users'];
+            var sysTabs = ['functions','bizstructure','analytics','admin'];
+            var workBtn = document.getElementById('workTabBtn');
+            var sysBtn = document.getElementById('sysTabBtn');
+            if (workBtn) workBtn.classList.toggle('active', workTabs.includes(tabName));
+            if (sysBtn) sysBtn.classList.toggle('active', sysTabs.includes(tabName));
             
             // Update bottom nav
             document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.tab === tabName) btn.classList.add('active');
+                // Підсвічуємо "Ще" якщо активна secondary вкладка
+                if (btn.dataset.tab === 'more' && ['projects','processes','regular','users','functions','bizstructure','analytics','admin'].includes(tabName)) {
+                    btn.classList.add('active');
+                }
             });
             
             // Update FAB
@@ -92,6 +154,7 @@
                 case 'functions': renderFunctions(); if (currentFunctionsView === 'structure') renderFunctionsStructure(); break;
                 case 'users': renderUsers(); break;
                 case 'analytics': renderAnalytics(); break;
+                case 'statistics': renderStatistics(); break;
                 case 'admin': renderAdminPanel(); break;
                 case 'bizstructure': if (typeof showBizStructureTab === 'function') showBizStructureTab(); break;
             }
@@ -156,18 +219,39 @@
             const fab = document.getElementById('fabAdd');
             if (!fab) return;
             
-            if (tabName === 'tasks') {
+            if (tabName === 'tasks' || tabName === 'myday') {
                 fab.style.display = 'flex';
+                fab.setAttribute('aria-label', 'Додати задачу');
+                fab.setAttribute('title', 'Додати задачу');
                 fab.onclick = () => openTaskModal();
             } else if (tabName === 'regular') {
                 fab.style.display = 'flex';
+                fab.setAttribute('aria-label', 'Додати регулярну задачу');
+                fab.setAttribute('title', 'Додати регулярну задачу');
                 fab.onclick = () => openRegularTaskModal();
             } else if (tabName === 'projects') {
                 fab.style.display = 'flex';
+                fab.setAttribute('aria-label', 'Новий проєкт');
+                fab.setAttribute('title', 'Новий проєкт');
                 fab.onclick = () => openProjectModal();
             } else {
                 fab.style.display = 'none';
             }
+        }
+        
+        // Дефолтний FAB обробник при завантаженні (до першого switchTab)
+        (function initFabDefault() {
+            const fab = document.getElementById('fabAdd');
+            if (fab && !fab.onclick) fab.onclick = () => openTaskModal();
+        })();
+
+        function toggleTaskAdvanced() {
+            const panel = document.getElementById('taskAdvancedPanel');
+            const arrow = document.getElementById('taskAdvancedArrow');
+            if (!panel) return;
+            const isOpen = panel.style.display !== 'none';
+            panel.style.display = isOpen ? 'none' : 'contents';
+            if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
         }
         
         function renderAnalytics() {
@@ -414,11 +498,19 @@
             </div>`;
         }
 
+        // Модалки що мають власний editingId/editingUserId — скидаємо тільки їх
+        const PRIMARY_MODALS = ['taskModal', 'userModal', 'regularTaskModal'];
+
         function closeModal(id) {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
-            editingId = null;
-            editingUserId = null;
+            // Скидаємо editing state тільки якщо закривається primary модалка.
+            // Вторинні модалки (materialQuickModal, stageModal, qcModal тощо)
+            // не повинні скидати editingId — інакше відкрита задача губиться.
+            if (PRIMARY_MODALS.includes(id)) {
+                editingId = null;
+                editingUserId = null;
+            }
             checkModalState();
         }
         

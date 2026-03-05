@@ -1,0 +1,348 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // =====================
+    // HELPER FUNCTIONS
+    // =====================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function userId() {
+      return request.auth.uid;
+    }
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+        request.auth.token.email == 'management.talco@gmail.com';
+    }
+    
+    function isCompanyMember(companyId) {
+      return isAuthenticated() && 
+        (isSuperAdmin() || exists(/databases/$(database)/documents/companies/$(companyId)/users/$(userId())));
+    }
+    
+    function isCompanyOwner(companyId) {
+      let company = get(/databases/$(database)/documents/companies/$(companyId));
+      return isAuthenticated() && (isSuperAdmin() || company.data.ownerId == userId());
+    }
+    
+    function isManagerOrOwner(companyId) {
+      return isAuthenticated() && (isSuperAdmin() || (
+        exists(/databases/$(database)/documents/companies/$(companyId)/users/$(userId())) &&
+        get(/databases/$(database)/documents/companies/$(companyId)/users/$(userId())).data.role in ['owner', 'admin', 'manager']
+      ));
+    }
+    
+    function isValidString(field, maxLength) {
+      return field is string && field.size() > 0 && field.size() <= maxLength;
+    }
+    
+    // =====================
+    // COMPANIES
+    // =====================
+    match /companies/{companyId} {
+      allow read: if isAuthenticated() && (isSuperAdmin() || isCompanyMember(companyId));
+      
+      allow create: if isSuperAdmin() || (
+        isAuthenticated() && 
+        request.resource.data.ownerId == userId() &&
+        isValidString(request.resource.data.name, 200)
+      );
+      
+      allow update: if isSuperAdmin() || (
+        isCompanyOwner(companyId) &&
+        request.resource.data.ownerId == resource.data.ownerId
+      );
+      
+      allow delete: if isCompanyOwner(companyId);
+      
+      // USERS
+      match /users/{memberId} {
+        allow read: if isCompanyMember(companyId);
+        
+        allow create: if isManagerOrOwner(companyId) || 
+          (isAuthenticated() && memberId == userId());
+        
+        allow update: if isManagerOrOwner(companyId) || 
+          (isAuthenticated() && memberId == userId() && 
+           request.resource.data.role == resource.data.role);
+        
+        allow delete: if isManagerOrOwner(companyId) && 
+          resource.data.role != 'owner';
+      }
+      
+      // TASKS
+      match /tasks/{taskId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId) && 
+          isValidString(request.resource.data.title, 500);
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId) || 
+          (isCompanyMember(companyId) && resource.data.creatorId == userId());
+        
+        match /comments/{commentId} {
+          allow read: if isCompanyMember(companyId);
+          allow create: if isCompanyMember(companyId);
+          allow update, delete: if isManagerOrOwner(companyId);
+        }
+        
+        match /history/{historyId} {
+          allow read: if isCompanyMember(companyId);
+          allow create: if isCompanyMember(companyId);
+        }
+      }
+      
+      // TASKS ARCHIVE
+      match /tasksArchive/{taskId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, delete: if isCompanyMember(companyId);
+      }
+      
+      // REGULAR TASKS
+      match /regularTasks/{taskId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isManagerOrOwner(companyId) &&
+          isValidString(request.resource.data.title, 500);
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      // FUNCTIONS
+      match /functions/{functionId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isManagerOrOwner(companyId) &&
+          isValidString(request.resource.data.name, 200);
+        allow update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      // FUNCTION CONNECTIONS
+      match /functionConnections/{connectionId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, update, delete: if isManagerOrOwner(companyId);
+      }
+      
+      // PROCESS TEMPLATES
+      match /processTemplates/{templateId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isManagerOrOwner(companyId) &&
+          isValidString(request.resource.data.name, 200);
+        allow update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      // PROCESSES
+      match /processes/{processId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId) &&
+          isValidString(request.resource.data.name, 500);
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      // PROJECTS
+      match /projects/{projectId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isManagerOrOwner(companyId) &&
+          isValidString(request.resource.data.name, 200);
+        allow update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      // COMPLETED TASKS
+      match /completedTasks/{taskId} {
+        allow read: if isCompanyMember(companyId);
+        allow write: if isCompanyMember(companyId);
+      }
+      
+      // TASK TEMPLATES
+      match /taskTemplates/{templateId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isManagerOrOwner(companyId) &&
+          isValidString(request.resource.data.title, 500);
+        allow update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      // INCIDENTS
+      match /incidents/{incidentId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isManagerOrOwner(companyId) &&
+          isValidString(request.resource.data.title, 500);
+        allow update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      // DAILY SNAPSHOTS
+      match /snapshots/{snapshotId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, update: if isManagerOrOwner(companyId);
+      }
+      
+      // DECISION LOG
+      match /decisions/{decisionId} {
+        allow read: if isManagerOrOwner(companyId);
+        allow create: if isCompanyMember(companyId);
+      }
+      
+      // BUSINESS STRUCTURE
+      // FIX: було isAuthenticated() без companyId — будь-який юзер міг читати/писати чужі дані
+      match /bizStructure/{document=**} {
+        allow read: if isCompanyMember(companyId);
+        allow write: if isManagerOrOwner(companyId);
+      }
+      
+      match /bizStructureBackups/{document=**} {
+        allow read: if isCompanyMember(companyId);
+        allow write: if isManagerOrOwner(companyId);
+      }
+      
+      match /bizStructureTest/{document=**} {
+        allow read: if isCompanyMember(companyId);
+        allow write: if isManagerOrOwner(companyId);
+      }
+      
+      // =====================
+      // PROJECT TEMPLATES, STANDARDS, QC, EVENTS
+      // =====================
+      
+      match /projectTemplates/{templateId} {
+        allow read: if isCompanyMember(companyId);
+        allow write: if isManagerOrOwner(companyId);
+      }
+      
+      match /workStandards/{standardId} {
+        allow read: if isCompanyMember(companyId);
+        allow write: if isManagerOrOwner(companyId);
+      }
+      
+      match /qualityChecks/{qcId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId) &&
+          isValidString(request.resource.data.projectId, 200);
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      match /events/{eventId} {
+        allow read: if isCompanyMember(companyId);
+        // Тільки create — events immutable, delete/update заборонені
+        allow create: if isCompanyMember(companyId) &&
+          isValidString(request.resource.data.type, 100);
+        // Явна заборона зміни та видалення подій (audit trail)
+        allow update, delete: if isSuperAdmin();
+      }
+      
+      // =====================
+      // PROJECT STAGES & MATERIALS
+      // FIX: додані валідації полів
+      // =====================
+      
+      match /projectStages/{stageId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isManagerOrOwner(companyId) &&
+          isValidString(request.resource.data.name, 200) &&
+          isValidString(request.resource.data.projectId, 200);
+        // update — member може змінювати статус (виконавець звітує)
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      match /projectMaterials/{materialId} {
+        allow read: if isCompanyMember(companyId);
+        // create — member може додавати матеріали (виконавець на місці)
+        allow create: if isCompanyMember(companyId) &&
+          isValidString(request.resource.data.name, 200) &&
+          isValidString(request.resource.data.projectId, 200);
+        // update — member може міняти статус (доставлено, використано)
+        allow update: if isCompanyMember(companyId);
+        // delete — тільки manager (щоб виконавець не видаляв записи)
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      // =====================
+      // STATISTICS / METRICS
+      // =====================
+      
+      match /metrics/{metricId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, update, delete: if isManagerOrOwner(companyId);
+      }
+      
+      match /metricEntries/{entryId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId);
+        allow update: if isCompanyMember(companyId) &&
+          (resource.data.createdBy == userId() || isManagerOrOwner(companyId));
+        allow delete: if isManagerOrOwner(companyId);
+      }
+      
+      match /metricTargets/{targetId} {
+        allow read: if isCompanyMember(companyId);
+        allow write: if isManagerOrOwner(companyId);
+      }
+      
+      match /metricAggregates/{aggId} {
+        allow read: if isCompanyMember(companyId);
+        // write — тільки Cloud Functions (через Admin SDK, rules не блокують)
+      }
+      
+      match /metricInsights/{insightId} {
+        allow read: if isManagerOrOwner(companyId);
+      }
+      
+      match /metricAuditLog/{logId} {
+        allow read: if isManagerOrOwner(companyId);
+      }
+    }
+    
+    // =====================
+    // INVITES
+    // =====================
+    match /invites/{inviteId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isSuperAdmin() || (
+        isAuthenticated() && 
+        isManagerOrOwner(request.resource.data.companyId) &&
+        isValidString(request.resource.data.email, 255)
+      );
+      
+      allow update: if isAuthenticated() && (
+        isSuperAdmin() || (
+          request.resource.data.accepted == true &&
+          request.auth.token.email == resource.data.email
+        )
+      );
+      
+      allow delete: if isSuperAdmin() || (
+        isAuthenticated() && 
+        isManagerOrOwner(resource.data.companyId)
+      );
+    }
+    
+    // =====================
+    // USERS (глобальна — профіль, Google Calendar токени)
+    // =====================
+    match /users/{docUserId} {
+      allow read: if isAuthenticated() && (docUserId == userId() || isSuperAdmin());
+      allow write: if isAuthenticated() && (docUserId == userId() || isSuperAdmin());
+    }
+    
+    // =====================
+    // SETTINGS (AI assistants, global config)
+    // =====================
+    match /settings/{doc} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+    
+    match /settings/{doc}/{sub=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+  }
+}

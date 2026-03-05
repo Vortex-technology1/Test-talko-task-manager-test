@@ -12,7 +12,10 @@
             return false;
         }
         
-        function showToast(message, type = 'success') {
+        function showToast(message, type = 'success', duration = 4000) {
+            // WCAG: анонс для скрін-рідерів через aria-live region
+            const liveRegion = document.getElementById(type === 'error' ? 'ariaAlertRegion' : 'ariaLiveRegion');
+            if (liveRegion) { liveRegion.textContent = ''; setTimeout(() => { liveRegion.textContent = message; }, 50); }
             const existing = document.getElementById('simpleToast');
             if (existing) existing.remove();
             
@@ -41,8 +44,36 @@
                     toast.style.animation = 'slideInRight 0.3s reverse';
                     setTimeout(() => toast.remove(), 300);
                 }
-            }, 4000);
+            }, duration);
         }
+        
+        // Замінник showAlertModal() — не блокує UI
+        function showAlertModal(message, type = 'info') {
+            showToast(message, type, 6000);
+        }
+        
+        // Замінник confirm() — повертає Promise<boolean>
+        function showConfirmModal(message, { danger = false } = {}) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10050;display:flex;align-items:center;justify-content:center;padding:1rem;';
+                overlay.innerHTML = `
+                    <div style="background:white;border-radius:16px;padding:1.5rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                        <p style="margin:0 0 1.25rem;font-size:0.95rem;color:#374151;white-space:pre-line;line-height:1.5;">${message.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+                        <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+                            <button id="_confirmNo" style="padding:0.5rem 1.1rem;border:1px solid #e5e7eb;border-radius:8px;background:white;cursor:pointer;font-size:0.9rem;color:#6b7280;">Скасувати</button>
+                            <button id="_confirmYes" style="padding:0.5rem 1.25rem;border:none;border-radius:8px;background:${danger?'#ef4444':'#22c55e'};color:white;cursor:pointer;font-size:0.9rem;font-weight:600;">Підтвердити</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(overlay);
+                const cleanup = (result) => { overlay.remove(); resolve(result); };
+                overlay.querySelector('#_confirmYes').onclick = () => cleanup(true);
+                overlay.querySelector('#_confirmNo').onclick = () => cleanup(false);
+                overlay.onclick = (e) => { if (e.target === overlay) cleanup(false); };
+            });
+        }
+        window.showAlertModal = showAlertModal;
+        window.showConfirmModal = showConfirmModal;
         
         // Listener для завдань на перевірці (сповіщення постановнику)
         let reviewTasksUnsubscribe = null;
@@ -302,7 +333,7 @@
                     renderMyDay();
                     refreshCurrentView();
                 }
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             } finally {
                 completingTaskIds.delete(id);
             }
@@ -350,6 +381,6 @@
                     renderMyDay();
                     refreshCurrentView();
                 }
-                alert(t('error') + ': ' + e.message);
+                showAlertModal(t('error') + ': ' + e.message);
             }
         }

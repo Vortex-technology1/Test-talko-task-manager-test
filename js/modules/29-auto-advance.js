@@ -96,7 +96,7 @@
                     const func = functions.find(f => f.name === nextStep.function);
                     if (func?.assigneeIds?.length) {
                         // Smart assign: least loaded person OR head
-                        const assigneeId = nextStep.smartAssign !== false
+                        const assigneeId = nextStep.smartAssign !== false && typeof getSmartAssignee === 'function'
                             ? getSmartAssignee(func)
                             : (func.headId || func.assigneeIds[0]);
                         const assignee = users.find(u => u.id === assigneeId);
@@ -201,7 +201,7 @@
             
             const template = processTemplates.find(t => t.id === process.templateId);
             if (!template?.steps?.length) {
-                alert(t('templateNotFound'));
+                showAlertModal(t('templateNotFound'));
                 return;
             }
             
@@ -231,7 +231,7 @@
                 t.status !== 'done' && t.status !== 'review'
             );
             if (pendingAutoTask) {
-                const skip = confirm(t('skipStepConfirm').replace('{title}', pendingAutoTask.title));
+                const skip = await showConfirmModal(t('skipStepConfirm').replace('{title}', pendingAutoTask.title));
                 if (!skip) return;
             }
             
@@ -241,7 +241,7 @@
                 // Дозволяємо також власникам/менеджерам
                 const userRole = currentUserData?.role;
                 if (userRole !== 'owner' && userRole !== 'manager') {
-                    alert(t('onlyFunctionMembers'));
+                    showAlertModal(t('onlyFunctionMembers'));
                     return;
                 }
             }
@@ -250,26 +250,41 @@
             const nextStep = template.steps[nextStepIndex];
             
             try {
-                // Оновлюємо процес
-                const historyEntry = {
-                    step: currentStepIndex,
-                    stepTitle: currentStep.title || currentStep.function,
-                    completedAt: new Date().toISOString(),
-                    completedBy: currentUser.uid
-                };
+                const processRef = db.collection('companies').doc(currentCompany).collection('processes').doc(processId);
                 
-                const updateData = {
-                    currentStep: nextStepIndex,
-                    history: firebase.firestore.FieldValue.arrayUnion(historyEntry)
-                };
+                // runTransaction — race protection: два менеджери не просунуть крок двічі
+                const raceDetected = await db.runTransaction(async (tx) => {
+                    const freshDoc = await tx.get(processRef);
+                    if (!freshDoc.exists) return true;
+                    const serverStep = freshDoc.data().currentStep || 0;
+                    if (serverStep !== currentStepIndex) {
+                        // Хтось вже просунув цей крок
+                        return true;
+                    }
+                    const historyEntry = {
+                        step: currentStepIndex,
+                        stepTitle: currentStep.title || currentStep.function,
+                        completedAt: new Date().toISOString(),
+                        completedBy: currentUser.uid
+                    };
+                    const updateData = {
+                        currentStep: nextStepIndex,
+                        history: firebase.firestore.FieldValue.arrayUnion(historyEntry)
+                    };
+                    if (!nextStep) {
+                        updateData.status = 'completed';
+                        updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
+                    }
+                    tx.update(processRef, updateData);
+                    return false;
+                });
                 
-                // Якщо це останній етап - завершуємо процес
-                if (!nextStep) {
-                    updateData.status = 'completed';
-                    updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
+                if (raceDetected) {
+                    showToast(t('processStepAlreadyCompleted') || 'Крок вже виконано іншим користувачем', 'info');
+                    await loadProcessData();
+                    renderProcessBoard();
+                    return;
                 }
-                
-                await db.collection('companies').doc(currentCompany).collection('processes').doc(processId).update(updateData);
                 
                 // Якщо є наступний етап - створюємо завдання
                 if (nextStep) {
@@ -288,7 +303,7 @@
                             stepDeadlineDate = stepDeadline > tomorrow ? getLocalDateStr(stepDeadline) : getLocalDateStr(tomorrow);
                         }
                         
-                        await db.collection('companies').doc(currentCompany).collection('tasks').add({
+                        const newTaskData = {
                             title: `[${process.name}] ${nextStep.title || nextStep.function}`,
                             function: nextStep.function,
                             assigneeId: headId,
@@ -307,21 +322,26 @@
                             deadline: stepDeadlineDate + 'T18:00',
                             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                             creatorName: t('systemUser')
-                        });
+                        };
+                        const docRef = await db.collection('companies').doc(currentCompany).collection('tasks').add(newTaskData);
+                        // Локально додаємо задачу — без повного loadAllData()
+                        tasks.unshift({ id: docRef.id, ...newTaskData, createdAt: new Date(), updatedAt: new Date() });
                     } else {
                         // Попередження якщо функція не має виконавців
-                        alert(t('functionNoExecutorsWarning').replace('{name}', nextStep.function));
+                        showAlertModal(t('functionNoExecutorsWarning').replace('{name}', nextStep.function));
                     }
                 }
                 
                 closeModal('viewProcessModal');
                 await loadProcessData();
-                await loadAllData();
+                // Замість loadAllData() — tasks[] вже оновлено локально, рендеримо точково
                 renderProcessBoard();
-                alert(nextStep ? t('stepCompleted') : t('processCompleted'));
+                if (typeof renderMyDay === 'function') renderMyDay();
+                refreshCurrentView();
+                showAlertModal(nextStep ? t('stepCompleted') : t('processCompleted'));
                 
             } catch (error) {
                 console.error('completeProcessStep error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             }
         }

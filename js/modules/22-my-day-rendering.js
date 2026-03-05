@@ -288,6 +288,21 @@
                 reviewBadge = `<span style="font-size:0.7rem;padding:2px 6px;border-radius:4px;background:#f3e8ff;color:#7c3aed;font-weight:500;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> ${t('reviewLabel')}</span>`;
             }
             
+            // Project/stage context
+            let projectBadge = '';
+            const ot = task.originalTask || {};
+            if (ot.projectId) {
+                const proj = projects.find(p => p.id === ot.projectId);
+                if (proj) {
+                    let badge = esc(proj.name);
+                    if (ot.stageId && typeof window.projectStages !== 'undefined') {
+                        const st = window.projectStages.find(s => s.id === ot.stageId);
+                        if (st) badge += ' → ' + esc(st.name);
+                    }
+                    projectBadge = `<span style="font-size:0.65rem;padding:1px 5px;border-radius:4px;background:#eff6ff;color:#3b82f6;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${badge}</span>`;
+                }
+            }
+            
             return `
                 <div class="myday-item ${itemClass}" onclick="openMyDayTask('${escId(task.id)}', '${escId(task.type)}', '${escId(task.generatedTaskId || '')}')">
                     <div class="myday-checkbox ${checkClass}" ${!task.review ? `onclick="event.stopPropagation(); toggleMyDayTask(event, '${escId(task.id)}', '${escId(task.type)}', '${escId(task.generatedTaskId || '')}', ${task.done || task.review})"` : ''} ${task.review ? 'style="background:#8b5cf6;border-color:#8b5cf6;"' : ''}>
@@ -301,6 +316,7 @@
                             ${task.function ? `<span>${esc(task.function)}</span>` : ''}
                             <span class="myday-item-tag ${tagClass}">${tagText}</span>
                             ${reviewBadge}
+                            ${projectBadge}
                             ${!task.done ? getAiHelpButton(task.title, task.originalTask?.description || task.originalTask?.instruction || '', task.function, 'small') : ''}
                         </div>
                         ${reviewActionsHtml}
@@ -463,7 +479,7 @@
                 renderMyDay();
             } catch (error) {
                 console.error('Error toggling task:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
                 // Відновлюємо UI при помилці
                 if (checkbox && !currentDone) {
                     checkbox.classList.remove('checked');

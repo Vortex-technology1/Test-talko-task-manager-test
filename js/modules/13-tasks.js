@@ -6,6 +6,12 @@
             updateSelects();
             updateProjectSelects();
             
+            // Accordion: закриваємо при новій задачі, розкриваємо при редагуванні
+            const advPanel = document.getElementById('taskAdvancedPanel');
+            const advArrow = document.getElementById('taskAdvancedArrow');
+            if (advPanel) advPanel.style.display = id ? 'contents' : 'none';
+            if (advArrow) advArrow.style.transform = id ? 'rotate(180deg)' : '';
+            
             // Initialize comments section
             initTaskComments(id);
             
@@ -23,6 +29,8 @@
                     document.getElementById('taskFunction').value = task.function || '';
                     updateProjectSelects(task.projectId);
                     document.getElementById('taskProject').value = task.projectId || '';
+                    // Load stages for this project
+                    updateTaskStageSelect(task.projectId, task.stageId);
                     document.getElementById('taskAssignee').value = task.assigneeId || '';
                     // Розбиваємо deadline на дату і час
                     const dl = parseDeadline(task);

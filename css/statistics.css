@@ -1,0 +1,482 @@
+/* =============================================
+   STATISTICS MODULE — css/statistics.css
+   v2.3 — Production dashboard design
+   ============================================= */
+
+/* ---- Layout ---- */
+.stats-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 0;
+}
+.stats-header-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+.stats-header-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+
+/* ---- Pill Buttons ---- */
+.stats-pill {
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--gray);
+    white-space: nowrap;
+}
+.stats-pill:hover { border-color: var(--primary); color: var(--primary); }
+.stats-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+.stats-pill.accent { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; }
+.stats-pill.accent:hover { opacity: 0.9; }
+.stats-pill svg { width: 14px; height: 14px; }
+
+/* ---- Scope & Period Bar ---- */
+.stats-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    flex-wrap: wrap;
+}
+.stats-bar-sep {
+    width: 1px;
+    height: 24px;
+    background: #e5e7eb;
+    margin: 0 0.25rem;
+}
+.stats-period-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    background: #f3f4f6;
+    border-radius: 10px;
+    padding: 2px;
+}
+.stats-period-nav button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--gray);
+    transition: all 0.15s;
+}
+.stats-period-nav button:hover { background: white; color: var(--dark); }
+.stats-period-nav span {
+    font-weight: 600;
+    font-size: 0.85rem;
+    min-width: 140px;
+    text-align: center;
+    color: var(--dark);
+}
+.stats-period-select {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    background: white;
+    color: var(--dark);
+    cursor: pointer;
+}
+.stats-func-select {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    background: #f0fdf4;
+    color: #16a34a;
+    cursor: pointer;
+}
+
+/* ---- KPI Debt Banner ---- */
+.stats-debt-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    padding: 0.65rem 1rem;
+    margin-bottom: 0.75rem;
+}
+.stats-debt-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #fbbf24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.stats-debt-icon svg { width: 18px; height: 18px; color: white; }
+.stats-debt-text { flex: 1; }
+.stats-debt-text strong { font-size: 0.85rem; color: #92400e; }
+.stats-debt-text span { font-size: 0.75rem; color: #b45309; display: block; margin-top: 2px; }
+
+/* ---- Table View (main) ---- */
+.stats-table-wrap {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    overflow-x: auto;
+    overflow-y: visible;
+    margin-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+}
+.stats-table {
+    width: 100%;
+    min-width: max-content;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.82rem;
+    table-layout: auto;
+}
+.stats-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f0f2f5;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #374151;
+    padding: 0.7rem 0.75rem 0.5rem;
+    text-align: center;
+    border-bottom: 2px solid #e5e7eb;
+    white-space: nowrap;
+}
+.stats-table thead th:first-child {
+    text-align: left;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #f0f2f5;
+    min-width: 120px;
+}
+.stats-table tbody tr:hover td:first-child { background: #f0fdf4; }
+.stats-table thead th:not(:first-child) { min-width: 160px; }
+.stats-table tbody tr {
+    transition: background 0.12s;
+}
+.stats-table tbody tr:hover { background: #f0fdf4; }
+.stats-table tbody tr:hover .stats-entry-del { opacity: 1 !important; }
+.stats-table tbody td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    text-align: center;
+    vertical-align: middle;
+}
+.stats-table tbody td:first-child {
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+/* ---- Metric Name Cell ---- */
+.stats-metric-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.stats-metric-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.stats-metric-label { line-height: 1.3; }
+.stats-metric-sub {
+    font-size: 0.68rem;
+    font-weight: 400;
+    color: #9ca3af;
+    display: block;
+}
+
+/* ---- Value Cell ---- */
+.stats-val {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--dark);
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 2px 6px;
+    transition: background 0.12s;
+}
+.stats-val:hover { background: #f0fdf4; }
+.stats-val-empty {
+    color: #d1d5db;
+    font-weight: 400;
+    font-style: normal;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1px dashed transparent;
+    transition: all 0.15s;
+}
+.stats-val-empty:hover {
+    color: #22c55e;
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+.stats-val-empty::after {
+    content: '';
+}
+
+/* ---- Progress Bar (inline) ---- */
+.stats-prog-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.stats-prog-bar {
+    flex: 1;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 99px;
+    overflow: hidden;
+    min-width: 56px;
+}
+.stats-prog-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+.stats-prog-pct {
+    font-size: 0.72rem;
+    font-weight: 700;
+    min-width: 36px;
+    text-align: right;
+}
+
+/* ---- Status Badges ---- */
+.stats-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+.stats-badge-green { background: #dcfce7; color: #16a34a; }
+.stats-badge-red { background: #fee2e2; color: #dc2626; }
+.stats-badge-yellow { background: #fef3c7; color: #d97706; }
+.stats-badge-blue { background: #dbeafe; color: #2563eb; }
+.stats-badge-purple { background: #f3e8ff; color: #7c3aed; }
+.stats-badge-gray { background: #f3f4f6; color: #6b7280; }
+
+/* ---- Target Cell ---- */
+.stats-target {
+    font-size: 0.78rem;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background 0.12s;
+}
+.stats-target:hover { background: #eff6ff; color: var(--info); }
+.stats-target-set { color: #6b7280; }
+.stats-target-empty { color: #d1d5db; font-style: italic; }
+
+/* ---- Inline Edit Input ---- */
+.stats-inline-input {
+    width: 80px;
+    padding: 4px 8px;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    background: #f0fdf4;
+}
+.stats-inline-input:focus { box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15); }
+
+/* ---- Comment Cell ---- */
+.stats-comment-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #d1d5db;
+    transition: all 0.12s;
+}
+.stats-comment-btn:hover { background: #f3f4f6; color: var(--info); opacity: 1 !important; }
+.stats-table thead th:hover .stats-comment-btn { opacity: 1 !important; }
+.stats-comment-btn.has-comment { color: var(--info); }
+
+/* ---- Period Row Header ---- */
+.stats-period-row td {
+    background: #f8fafc;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #374151;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+.stats-period-row td span.stats-period-current {
+    background: var(--primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+}
+
+/* ---- Metric Detail Modal ---- */
+.stats-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 1rem;
+}
+.stats-detail-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.stats-detail-icon svg { width: 24px; height: 24px; }
+.stats-detail-title { font-size: 1.1rem; font-weight: 700; color: var(--dark); }
+.stats-detail-sub { font-size: 0.8rem; color: #9ca3af; margin-top: 2px; }
+
+.stats-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.stats-detail-card {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 0.75rem;
+    text-align: center;
+}
+.stats-detail-card-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #9ca3af;
+    margin-bottom: 0.25rem;
+}
+.stats-detail-card-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+/* ---- Comment Input Area ---- */
+.stats-comment-area {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.82rem;
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+    transition: border-color 0.15s;
+}
+.stats-comment-area:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+/* ---- Empty State ---- */
+.stats-empty {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    color: #9ca3af;
+}
+.stats-empty-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    opacity: 0.25;
+    color: #9ca3af;
+}
+.stats-empty h3 { font-size: 1rem; color: #6b7280; margin-bottom: 0.25rem; }
+.stats-empty p { font-size: 0.82rem; }
+
+/* ---- Section Headers ---- */
+.stats-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0 0.5rem;
+}
+.stats-section-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.stats-section-icon svg { width: 14px; height: 14px; color: white; }
+.stats-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+.stats-section-count {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .stats-header { flex-direction: column; align-items: flex-start; }
+    .stats-header-actions { margin-left: 0; width: 100%; overflow-x: auto; }
+    .stats-bar { flex-direction: column; align-items: flex-start; }
+    .stats-bar-sep { display: none; }
+    .stats-detail-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---- Trends Chart ---- */
+#trendsChartSvg svg { display: block; }
+#trendsChartSvg text { pointer-events: none; }
+.stats-comment-btn[title="Видалити"]:hover { background: #fee2e2 !important; color: #dc2626 !important; }
+.stats-comment-btn[title="Графік тренду"]:hover { background: #dbeafe !important; color: #3b82f6 !important; }
+
+/* Show delete button on row hover */
+.stats-table tbody tr:hover .stats-comment-btn[title="Видалити запис"] { opacity: 1 !important; }
+.stats-table tbody tr:hover .stats-comment-btn[title="Видалити запис"]:hover { color: #ef4444 !important; background: #fee2e2 !important; }

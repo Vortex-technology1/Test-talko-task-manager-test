@@ -1510,3 +1510,164 @@ exports.eveningDigest = functions
         }
         return null;
     });
+
+
+// ============================================================
+// STATISTICS: Aggregates + Audit Log
+// ============================================================
+
+// Trigger: when metricEntry is created or updated → update aggregate
+exports.onMetricEntryWrite = functions
+    .region(REGION)
+    .firestore.document('companies/{companyId}/metricEntries/{entryId}')
+    .onWrite(async (change, context) => {
+        const { companyId, entryId } = context.params;
+        const after = change.after.exists ? change.after.data() : null;
+        const before = change.before.exists ? change.before.data() : null;
+
+        if (!after && !before) return null;
+
+        const entry = after || before;
+        const { metricId, periodKey, scope, scopeId } = entry;
+        if (!metricId || !periodKey) return null;
+
+        // 1) AUDIT LOG: track value changes
+        if (before && after && before.value !== after.value) {
+            await db.collection('companies').doc(companyId)
+                .collection('metricAuditLog').add({
+                    metricId,
+                    entryId,
+                    periodKey,
+                    scope: scope || 'user',
+                    scopeId: scopeId || '',
+                    oldValue: before.value,
+                    newValue: after.value,
+                    changedBy: after.createdBy || '',
+                    changedAt: admin.firestore.FieldValue.serverTimestamp(),
+                    reason: 'value_update'
+                });
+        }
+
+        // 2) AGGREGATE: recalculate for this metric+period+scope
+        await recalcAggregate(companyId, metricId, periodKey);
+
+        return null;
+    });
+
+// Recalculate aggregate for a metric+period across all scopes
+async function recalcAggregate(companyId, metricId, periodKey) {
+    const entriesSnap = await db.collection('companies').doc(companyId)
+        .collection('metricEntries')
+        .where('metricId', '==', metricId)
+        .where('periodKey', '==', periodKey)
+        .get();
+
+    const entries = entriesSnap.docs.map(d => d.data());
+
+    // Group by scope+scopeId
+    const groups = {};
+    // Also track company-wide totals
+    let companySum = 0;
+    let companyCount = 0;
+
+    for (const e of entries) {
+        const key = `${e.scope || 'user'}:${e.scopeId || e.createdBy || ''}`;
+        if (!groups[key]) groups[key] = { scope: e.scope || 'user', scopeId: e.scopeId || e.createdBy || '', sum: 0, count: 0, values: [] };
+        groups[key].sum += (e.value || 0);
+        groups[key].count++;
+        groups[key].values.push(e.value || 0);
+        companySum += (e.value || 0);
+        companyCount++;
+    }
+
+    const batch = db.batch();
+    const aggRef = db.collection('companies').doc(companyId).collection('metricAggregates');
+
+    // Write per-scope aggregates
+    for (const g of Object.values(groups)) {
+        const aggId = `${metricId}_${periodKey}_${g.scope}_${g.scopeId}`;
+        const values = g.values;
+        batch.set(aggRef.doc(aggId), {
+            metricId,
+            periodKey,
+            scope: g.scope,
+            scopeId: g.scopeId,
+            sum: g.sum,
+            avg: values.length > 0 ? Math.round((g.sum / values.length) * 100) / 100 : 0,
+            count: g.count,
+            min: values.length > 0 ? Math.min(...values) : 0,
+            max: values.length > 0 ? Math.max(...values) : 0,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    }
+
+    // Write company-wide aggregate
+    const compAggId = `${metricId}_${periodKey}_company_${companyId}`;
+    batch.set(aggRef.doc(compAggId), {
+        metricId,
+        periodKey,
+        scope: 'company',
+        scopeId: companyId,
+        sum: companySum,
+        avg: companyCount > 0 ? Math.round((companySum / companyCount) * 100) / 100 : 0,
+        count: companyCount,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    await batch.commit();
+}
+
+// Trigger: when metricEntry is deleted → update aggregate + log
+exports.onMetricEntryDelete = functions
+    .region(REGION)
+    .firestore.document('companies/{companyId}/metricEntries/{entryId}')
+    .onDelete(async (snap, context) => {
+        const { companyId } = context.params;
+        const data = snap.data();
+        if (!data.metricId || !data.periodKey) return null;
+
+        // Audit log
+        await db.collection('companies').doc(companyId)
+            .collection('metricAuditLog').add({
+                metricId: data.metricId,
+                entryId: context.params.entryId,
+                periodKey: data.periodKey,
+                oldValue: data.value,
+                newValue: null,
+                changedBy: data.createdBy || '',
+                changedAt: admin.firestore.FieldValue.serverTimestamp(),
+                reason: 'entry_deleted'
+            });
+
+        // Recalc
+        await recalcAggregate(companyId, data.metricId, data.periodKey);
+        return null;
+    });
+
+// Metric limit check: max 50 metrics per company
+exports.onMetricCreate = functions
+    .region(REGION)
+    .firestore.document('companies/{companyId}/metrics/{metricId}')
+    .onCreate(async (snap, context) => {
+        const { companyId, metricId } = context.params;
+        const metricsSnap = await db.collection('companies').doc(companyId)
+            .collection('metrics').get();
+
+        if (metricsSnap.size > 50) {
+            console.warn(`[STATS] Company ${companyId} exceeded 50 metrics limit. Deleting ${metricId}`);
+            await snap.ref.delete();
+            return null;
+        }
+
+        // Log creation
+        await db.collection('companies').doc(companyId)
+            .collection('metricAuditLog').add({
+                metricId,
+                action: 'metric_created',
+                name: snap.data().name || '',
+                createdBy: snap.data().createdBy || '',
+                createdAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+
+        return null;
+    });

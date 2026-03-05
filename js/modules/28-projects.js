@@ -11,6 +11,10 @@
             document.getElementById('projectStartDate').value = project?.startDate || getLocalDateStr();
             document.getElementById('projectDeadline').value = project?.deadline || '';
             document.getElementById('projectDescription').value = project?.description || '';
+            document.getElementById('projectPlannedRevenue').value = project?.plannedRevenue || '';
+            document.getElementById('projectPlannedMaterialCost').value = project?.plannedMaterialCost || '';
+            document.getElementById('projectPlannedLaborCost').value = project?.plannedLaborCost || '';
+            document.getElementById('projectClientName').value = project?.clientName || '';
             
             const color = project?.color || '#22c55e';
             // Reset all, then set matching
@@ -37,7 +41,11 @@
                 startDate: document.getElementById('projectStartDate').value,
                 deadline: document.getElementById('projectDeadline').value,
                 description: document.getElementById('projectDescription').value.trim(),
-                color: document.querySelector('input[name="projectColor"]:checked')?.value || '#22c55e'
+                color: document.querySelector('input[name="projectColor"]:checked')?.value || '#22c55e',
+                plannedRevenue: parseFloat(document.getElementById('projectPlannedRevenue')?.value) || 0,
+                plannedMaterialCost: parseFloat(document.getElementById('projectPlannedMaterialCost')?.value) || 0,
+                plannedLaborCost: parseFloat(document.getElementById('projectPlannedLaborCost')?.value) || 0,
+                clientName: document.getElementById('projectClientName')?.value?.trim() || '',
             };
             if (!data.name) { isSavingProject = false; if (submitBtn) submitBtn.disabled = false; return; }
             
@@ -71,32 +79,53 @@
         async function deleteProject(projectId) {
             if (currentUserData?.role === 'employee') { showToast(t('noPermissionTask'), 'error'); return; }
             const s = getProjectStats(projectId);
-            const msg = s.total > 0 
+            const stageCount = (typeof window.projectStages !== 'undefined' ? window.projectStages : []).filter(st => st.projectId === projectId).length;
+            let msg = s.total > 0 
                 ? (t('deleteProjectWithTasks')).replace('{total}', s.total).replace('{undone}', s.total - s.done)
                 : (t('deleteEmptyProject'));
-            if (!confirm(msg)) return;
+            if (stageCount > 0) msg += `\n\nТакож буде видалено ${stageCount} етапів та пов'язані матеріали.`;
+            if (!await showConfirmModal(msg, { danger: true })) return;
             try {
-                await db.collection('companies').doc(currentCompany).collection('projects').doc(projectId).delete();
-                projects = projects.filter(p => p.id !== projectId);
-                // Знімаємо projectId з задач (batch для атомарності)
+                const base = db.collection('companies').doc(currentCompany);
                 const orphaned = tasks.filter(t => t.projectId === projectId);
-                if (orphaned.length > 0) {
-                    const cleanBatch = db.batch();
-                    orphaned.forEach(t => {
-                        cleanBatch.update(
-                            db.collection('companies').doc(currentCompany).collection('tasks').doc(t.id),
-                            { projectId: '' }
-                        );
-                        t.projectId = '';
+                const pStages = (typeof window.projectStages !== 'undefined' ? window.projectStages : []).filter(st => st.projectId === projectId);
+                const pMats = (typeof window.projectMaterials !== 'undefined' ? window.projectMaterials : []).filter(m => m.projectId === projectId);
+                
+                // Збираємо всі ops: delete project + unlink tasks + delete stages + delete materials
+                const ops = [];
+                ops.push({ type: 'delete', ref: base.collection('projects').doc(projectId) });
+                orphaned.forEach(t => ops.push({ type: 'update', ref: base.collection('tasks').doc(t.id), data: { projectId: '', stageId: '' } }));
+                pStages.forEach(st => ops.push({ type: 'delete', ref: base.collection('projectStages').doc(st.id) }));
+                pMats.forEach(m => ops.push({ type: 'delete', ref: base.collection('projectMaterials').doc(m.id) }));
+                
+                // Chunked commit — Firestore limit 500 ops/batch
+                const CHUNK = 450;
+                for (let i = 0; i < ops.length; i += CHUNK) {
+                    const chunk = ops.slice(i, i + CHUNK);
+                    const batch = db.batch();
+                    chunk.forEach(op => {
+                        if (op.type === 'delete') batch.delete(op.ref);
+                        else batch.update(op.ref, op.data);
                     });
-                    await cleanBatch.commit();
+                    await batch.commit();
                 }
+                
+                // Оновлюємо локальний стан
+                orphaned.forEach(t => { t.projectId = ''; t.stageId = ''; });
+                projects = projects.filter(p => p.id !== projectId);
+                if (typeof window.projectStages !== 'undefined') window.projectStages = window.projectStages.filter(s => s.projectId !== projectId);
+                if (typeof window.projectMaterials !== 'undefined') window.projectMaterials = window.projectMaterials.filter(m => m.projectId !== projectId);
+                
                 if (openProjectId === projectId) closeProjectDetail();
                 renderProjects();
                 updateProjectSelects();
-                if (orphaned.length > 0) showToast(t('tasksUnlinked').replace('{n}', orphaned.length), 'info');
+                let msg2 = '';
+                if (orphaned.length > 0) msg2 += orphaned.length + ' задач відв\'язано. ';
+                if (pStages.length > 0) msg2 += pStages.length + ' етапів видалено. ';
+                if (msg2) showToast(msg2, 'info');
             } catch (err) {
                 console.error('[Projects] Delete error:', err);
+                showToast('Помилка видалення: ' + err.message, 'error');
             }
         }
         
@@ -220,6 +249,15 @@
             if (filtered.length === 0) {
                 container.style.display = 'none';
                 emptyState.style.display = 'block';
+                // Show different message if projects exist but filter hides them
+                if (projects.length > 0 && statusFilter) {
+                    emptyState.innerHTML = `<div style="text-align:center;padding:2rem;">
+                        <div style="margin-bottom:0.5rem;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+                        <div style="font-weight:600;">Немає проєктів зі статусом "${statusFilter === 'active' ? 'Активний' : statusFilter === 'completed' ? 'Завершений' : 'Пауза'}"</div>
+                        <div style="color:#9ca3af;font-size:0.85rem;margin:0.5rem 0;">Всього проєктів: ${projects.length}</div>
+                        <button class="btn btn-small" onclick="document.getElementById('projectStatusFilter').value='';renderProjects();" style="margin-top:0.5rem;">Показати всі</button>
+                    </div>`;
+                }
                 return;
             }
             
@@ -344,6 +382,7 @@
             container.innerHTML = `
                 <div class="project-timeline" style="overflow-x:auto;">
                     <div style="min-width:800px;">
+                        <div class="hide-desktop" style="text-align:center;font-size:0.7rem;color:#9ca3af;padding:4px;">← Прокрутіть вправо →</div>
                         <div class="timeline-header">${headerHTML}</div>
                         <div style="position:relative;">
                             <div style="position:absolute;left:calc(180px + (100% - 180px) * ${todayPctNum / 100});top:0;bottom:0;width:2px;background:#ef4444;opacity:0.5;z-index:1;"></div>
@@ -366,15 +405,27 @@
         
         function openTaskForProject(projectId) {
             openTaskModal();
-            // After modal opens and form resets, set projectId
             requestAnimationFrame(() => {
                 setTimeout(() => {
                     updateProjectSelects(projectId);
                     const sel = document.getElementById('taskProject');
                     if (sel) sel.value = projectId;
+                    updateTaskStageSelect(projectId, '');
                 }, 0);
             });
         }
+        
+        window.openTaskForProjectStage = function(projectId, stageId) {
+            openTaskModal();
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    updateProjectSelects(projectId);
+                    const sel = document.getElementById('taskProject');
+                    if (sel) sel.value = projectId;
+                    updateTaskStageSelect(projectId, stageId);
+                }, 50);
+            });
+        };
         
         function closeProjectDetail() {
             openProjectId = null;
@@ -387,6 +438,21 @@
         function renderProjectDetail(projectId) {
             const project = projects.find(p => p.id === projectId);
             if (!project) { closeProjectDetail(); return; }
+            
+            // Load stages and materials async
+            if (typeof window.loadProjectStages === 'function') {
+                Promise.all([
+                    window.loadProjectStages(projectId),
+                    window.loadProjectMaterials(projectId),
+                    typeof window.loadQualityChecks === 'function' ? window.loadQualityChecks(projectId) : Promise.resolve([]),
+                ]).then(() => {
+                    // Re-render stages section
+                    const sv = document.getElementById('projectStagesView');
+                    if (sv && typeof window.renderStagesList === 'function') {
+                        sv.innerHTML = window.renderStagesList(projectId);
+                    }
+                });
+            }
             
             const s = getProjectStats(projectId);
             const container = document.getElementById('projectDetailContent');
@@ -436,10 +502,11 @@
                         ${esc(project.name)}
                     </div>
                     <div style="display:flex;align-items:center;gap:0.5rem;">
-                        <button class="btn btn-success btn-small" onclick="openTaskForProject('${escId(projectId)}')"><i data-lucide="plus" class="icon icon-sm"></i> Завдання</button>
-                        <select class="filter-select" onchange="updateProjectStatus('${escId(projectId)}', this.value)" style="font-size:0.8rem;padding:0.3rem;">${statusOptions}</select>
-                        <button class="btn btn-small" onclick="openProjectModal('${escId(projectId)}')"><i data-lucide="pencil" class="icon icon-sm"></i></button>
-                        <button class="btn btn-small btn-danger" onclick="deleteProject('${escId(projectId)}')"><i data-lucide="trash-2" class="icon icon-sm"></i></button>
+                        <button class="btn btn-success btn-small" onclick="openTaskForProject('${escId(projectId)}')" style="min-height:36px;"><i data-lucide="plus" class="icon icon-sm"></i> ${t('addTask') || 'Завдання'}</button>
+                        <select class="filter-select" onchange="updateProjectStatus('${escId(projectId)}', this.value)" style="font-size:0.8rem;padding:0.3rem;min-height:36px;">${statusOptions}</select>
+                        <button class="btn btn-small" onclick="openProjectModal('${escId(projectId)}')" style="min-height:36px;" title="${t('edit') || 'Редагувати'}" aria-label="${t('edit') || 'Редагувати'}"><i data-lucide="pencil" class="icon icon-sm"></i></button>
+                        <div style="width:1px;height:24px;background:#e5e7eb;margin:0 12px;"></div>
+                        <button class="btn btn-small" onclick="deleteProject('${escId(projectId)}')" title="${t('deleteProject') || 'Видалити проєкт'} — незворотна дія" aria-label="${t('deleteProject') || 'Видалити проєкт'} — незворотна дія" style="background:#fee2e2;color:#dc2626;border-color:#fecaca;min-height:36px;margin-left:auto;"><i data-lucide="trash-2" class="icon icon-sm"></i></button>
                     </div>
                 </div>
                 
@@ -459,6 +526,15 @@
                     ${s.overdue > 0 ? `<div style="background:#fef2f2;border-radius:10px;padding:0.75rem 1.25rem;border:1px solid #fecaca;flex:1;min-width:120px;">
                         <div style="font-size:0.75rem;color:var(--danger);">${t('overdueLabel2')}</div>
                         <div style="font-size:1.5rem;font-weight:700;color:var(--danger);">${s.overdue}</div>
+                    </div>` : ''}
+                    ${project.plannedRevenue ? `<div style="background:white;border-radius:10px;padding:0.75rem 1.25rem;border:1px solid #e5e7eb;flex:1;min-width:120px;">
+                        <div style="font-size:0.75rem;color:var(--gray);">Бюджет</div>
+                        <div style="font-size:1.1rem;font-weight:700;">${Number(project.plannedRevenue).toLocaleString()} ₴</div>
+                        ${project.plannedMaterialCost || project.plannedLaborCost ? `<div style="font-size:0.68rem;color:#9ca3af;">Мат: ${Number(project.plannedMaterialCost || 0).toLocaleString()} | Робота: ${Number(project.plannedLaborCost || 0).toLocaleString()}</div>` : ''}
+                    </div>` : ''}
+                    ${project.clientName ? `<div style="background:white;border-radius:10px;padding:0.75rem 1.25rem;border:1px solid #e5e7eb;flex:1;min-width:120px;">
+                        <div style="font-size:0.75rem;color:var(--gray);">Клієнт</div>
+                        <div style="font-size:0.95rem;font-weight:600;">${esc(project.clientName)}</div>
                     </div>` : ''}
                 </div>
                 
@@ -486,14 +562,24 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                         Kanban
                     </button>
+                    <button class="calendar-view-btn" onclick="switchProjectView('stages', this)" style="padding:0.4rem 0.8rem;font-size:0.8rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                        Етапи
+                    </button>
                     <button class="calendar-view-btn" onclick="switchProjectView('gantt', this)" style="padding:0.4rem 0.8rem;font-size:0.8rem;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>
                         Gantt
                     </button>
+                    <button class="calendar-view-btn" onclick="switchProjectView('standards', this)" style="padding:0.4rem 0.8rem;font-size:0.8rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Стандарти
+                    </button>
                 </div>
                 
                 <div id="projectBoardView" class="project-board-columns">${boardHTML}</div>
+                <div id="projectStagesView" style="display:none;">${typeof renderStagesList === 'function' ? renderStagesList(projectId) : '<div>Loading stages...</div>'}</div>
                 <div id="projectGanttView" style="display:none;">${renderProjectGantt(s.tasks, project)}</div>
+                <div id="projectStandardsView" style="display:none;"><div id="standardsListContainer"></div></div>
             `;
             
             refreshIcons();
@@ -501,7 +587,18 @@
         
         function switchProjectView(view, btn) {
             document.getElementById('projectBoardView').style.display = view === 'board' ? '' : 'none';
+            const stagesView = document.getElementById('projectStagesView');
+            if (stagesView) stagesView.style.display = view === 'stages' ? '' : 'none';
             document.getElementById('projectGanttView').style.display = view === 'gantt' ? '' : 'none';
+            const stdView = document.getElementById('projectStandardsView');
+            if (stdView) {
+                stdView.style.display = view === 'standards' ? '' : 'none';
+                if (view === 'standards' && typeof window.loadWorkStandards === 'function') {
+                    window.loadWorkStandards().then(() => {
+                        if (typeof window.renderStandardsList === 'function') window.renderStandardsList();
+                    });
+                }
+            }
             btn.parentElement.querySelectorAll('.calendar-view-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         }
@@ -615,7 +712,7 @@
                 const assignee = task.assigneeName ? esc(task.assigneeName).split(' ')[0] : '';
                 return `<div style="height:36px;display:flex;align-items:center;border-bottom:1px solid #f3f4f6;padding:0 8px;gap:6px;">
                     <div style="width:6px;height:6px;border-radius:50%;background:${color.border};flex-shrink:0;"></div>
-                    <span style="font-size:0.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;color:#374151;" title="${esc(task.title)}">${esc(task.title)}</span>
+                    <span style="font-size:0.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;color:#374151;" title="${esc(task.title)}">${esc(task.title)}</span>
                     ${assignee ? `<span style="font-size:0.6rem;color:#9ca3af;">${assignee}</span>` : ''}
                 </div>`;
             }).join('');
@@ -650,7 +747,7 @@
             if (status === 'completed') {
                 const s = getProjectStats(projectId);
                 const undone = s.total - s.done;
-                if (undone > 0 && !confirm(t('confirmProjectComplete').replace('{n}', undone))) {
+                if (undone > 0 && !await showConfirmModal(t('confirmProjectComplete').replace('{n}', undone), { danger: false })) {
                     // Повернути select назад
                     renderProjectDetail(projectId);
                     return;
@@ -670,7 +767,6 @@
             const sel = document.getElementById('taskProject');
             if (!sel) return;
             const current = forceIncludeId || sel.value;
-            // Показуємо active + поточний проєкт задачі (навіть якщо completed/paused)
             const activeProjects = projects.filter(p => p.status === 'active');
             const currentProject = current ? projects.find(p => p.id === current) : null;
             const showProjects = [...activeProjects];
@@ -684,6 +780,34 @@
                 }).join('');
             sel.value = current;
         }
+        
+        // Stage select — loads stages for selected project
+        function updateTaskStageSelect(projectId, selectedStageId) {
+            const sel = document.getElementById('taskStage');
+            if (!sel) return;
+            if (!projectId) {
+                sel.innerHTML = '<option value="">Без етапу</option>';
+                sel.disabled = true;
+                return;
+            }
+            sel.disabled = false;
+            // Load stages async
+            if (typeof window.loadProjectStages === 'function') {
+                window.loadProjectStages(projectId).then(stages => {
+                    sel.innerHTML = '<option value="">Без етапу</option>' +
+                        stages.sort((a,b) => (a.order||0)-(b.order||0)).map(s => {
+                            const statusIcon = s.status === 'done' ? '&check;' : s.status === 'blocked' ? '!' : s.status === 'in_progress' ? '&rsaquo;' : '&circ;';
+                            return `<option value="${s.id}" ${s.id === selectedStageId ? 'selected' : ''}>${statusIcon} ${s.order}. ${esc(s.name)}</option>`;
+                        }).join('');
+                    if (selectedStageId) sel.value = selectedStageId;
+                });
+            }
+        }
+        
+        window.onTaskProjectChange = function() {
+            const projectId = document.getElementById('taskProject')?.value || '';
+            updateTaskStageSelect(projectId, '');
+        };
         
         // Sanitize color for style attribute — only allow hex colors
         function safeColor(color, fallback = '#22c55e') {
@@ -895,12 +1019,12 @@
             const steps = getTemplateStepsFromEditor();
             
             if (!name) {
-                alert(t('templateName'));
+                showAlertModal(t('templateName'));
                 return;
             }
             
             if (steps.length < 2) {
-                alert(t('minTwoSteps'));
+                showAlertModal(t('minTwoSteps'));
                 return;
             }
             
@@ -908,7 +1032,7 @@
             const activeFunctions = functions.filter(f => f.status !== 'archived');
             const missingFunctions = steps.filter(s => !activeFunctions.find(f => f.name === s.function));
             if (missingFunctions.length > 0) {
-                alert(t('functionsNotFound') + ': ' + missingFunctions.map(s => s.function).join(', '));
+                showAlertModal(t('functionsNotFound') + ': ' + missingFunctions.map(s => s.function).join(', '));
                 return;
             }
             
@@ -931,16 +1055,16 @@
                 closeModal('editProcessTemplateModal');
                 await loadProcessData();
                 renderProcessBoard();
-                alert(t('templateSaved'));
+                showAlertModal(t('templateSaved'));
                 
             } catch (error) {
                 console.error('saveProcessTemplate error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             }
         }
         
         async function deleteProcessTemplate(templateId) {
-            if (!confirm(t('deleteTemplateConfirm'))) {
+            if (!await showConfirmModal(t('deleteTemplateConfirm'), { danger: true })) {
                 return;
             }
             
@@ -951,7 +1075,7 @@
                 renderProcessBoard();
             } catch (error) {
                 console.error('deleteProcessTemplate error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             }
         }
         
@@ -1037,12 +1161,12 @@
             const firstFunc = functions.find(f => f.name === firstStep.function);
             
             if (!firstFunc) {
-                alert(t('functionNotExists').replace('{name}', firstStep.function));
+                showAlertModal(t('functionNotExists').replace('{name}', firstStep.function));
                 return;
             }
             
             if (!firstFunc.assigneeIds?.length) {
-                alert(t('functionNoExecutors').replace('{name}', firstStep.function));
+                showAlertModal(t('functionNoExecutors').replace('{name}', firstStep.function));
                 return;
             }
             
@@ -1130,7 +1254,7 @@
                 
             } catch (error) {
                 console.error('startProcess error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             }
         }
         
@@ -1249,7 +1373,7 @@
         }
         
         async function deleteProcess(processId) {
-            if (!confirm(t('deleteProcessConfirm'))) return;
+            if (!await showConfirmModal(t('deleteProcessConfirm'), { danger: true })) return;
             
             try {
                 await db.collection('companies').doc(currentCompany).collection('processes').doc(processId).delete();
@@ -1268,6 +1392,6 @@
                 renderProcessBoard();
             } catch (error) {
                 console.error('deleteProcess error:', error);
-                alert(t('error') + ': ' + error.message);
+                showAlertModal(t('error') + ': ' + error.message);
             }
         }

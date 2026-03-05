@@ -195,7 +195,18 @@
             document.getElementById('totalTimeInfo').innerHTML = totalTimeStr ? `<span class="total-time-badge">${totalTimeStr} (${f.filter(x=>x.status!=='done').length} ${t('tasks')})</span>` : '';
             
             if (f.length === 0) {
-                c.innerHTML = `<div class="empty-table"><h3>${t('noTasksFound')}</h3><p>${t('changeFilters')}</p></div>`;
+                const hasFilters = selectedStatuses.length > 0 || ff || af || df || tf || (document.getElementById('taskSearchInput')?.value || '').trim();
+                const isEmptyAll = tasks.filter(t => isTaskVisibleToUser(t)).length === 0;
+                if (isEmptyAll) {
+                    c.innerHTML = `<div class="empty-table" style="text-align:center;padding:3rem 1rem;">
+                        <div style="margin-bottom:0.75rem;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div>
+                        <h3 style="margin-bottom:0.5rem;">${t('noTasks') || 'Задач ще немає'}</h3>
+                        <p style="color:#6b7280;margin-bottom:1rem;">${t('createFirstTask') || 'Створіть першу задачу для команди'}</p>
+                        <button class="btn btn-success" onclick="openTaskModal()">+ ${t('newTask') || 'Нова задача'}</button>
+                    </div>`;
+                } else {
+                    c.innerHTML = `<div class="empty-table"><h3>${t('noTasksFound') || 'Нічого не знайдено'}</h3><p>${t('changeFilters') || 'Спробуйте змінити фільтри'}</p></div>`;
+                }
                 return;
             }
             
@@ -419,7 +430,7 @@
                                 <button class="mobile-action-btn edit" onclick="openTaskModal('${escId(task.id)}')">
                                     <i data-lucide="pencil" class="icon icon-sm"></i>
                                 </button>
-                                <button class="mobile-action-btn delete" onclick="if(confirm(t('deleteConfirm')))deleteTask('${escId(task.id)}')">
+                                <button class="mobile-action-btn delete" onclick="showConfirmModal(t('deleteConfirm'),{danger:true}).then(ok=>ok&&deleteTask('${escId(task.id)}'))">
                                     <i data-lucide="trash-2" class="icon icon-sm"></i>
                                 </button>
                             </div>

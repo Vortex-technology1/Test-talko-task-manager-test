@@ -112,6 +112,9 @@
                 // Render My Day (головний екран)
                 renderMyDay();
                 
+                // Show Statistics tab if allowed (after users loaded)
+                if (typeof showStatsTabIfAllowed === 'function') showStatsTabIfAllowed();
+                
                 // Render based on current view
                 if (currentCalendarView === 'list') {
                     renderTasks();
@@ -165,6 +168,17 @@
                     checkEscalations();
                     // Load manual incidents for journal
                     loadManualIncidents().catch(() => {});
+                    // Load project-driven data (stages, materials, QC) for owner dashboard
+                    if (currentUserData?.role !== 'employee') {
+                        Promise.all([
+                            typeof window.loadProjectStages === 'function' ? window.loadProjectStages() : Promise.resolve([]),
+                            typeof window.loadProjectMaterials === 'function' ? window.loadProjectMaterials() : Promise.resolve([]),
+                            typeof window.loadQualityChecks === 'function' ? window.loadQualityChecks() : Promise.resolve([]),
+                            typeof window.loadWorkStandards === 'function' ? window.loadWorkStandards() : Promise.resolve([]),
+                        ]).then(() => {
+                            if (typeof window.renderOwnerProjectDashboard === 'function') window.renderOwnerProjectDashboard();
+                        }).catch(e => console.warn('[loadAllData] project extras:', e));
+                    }
                     // Show morning start modal (once per day)
                     setTimeout(() => { checkMorningStart(); startOnboarding(); saveDailySnapshot(); }, 1500);
                 }

@@ -219,7 +219,7 @@
                     break;
                 case '?':
                     // Показати shortcuts help
-                    alert(`Гарячі клавіші:
+                    showAlertModal(`Гарячі клавіші:
                     
 Escape - закрити модалку
 Ctrl+N - нове завдання

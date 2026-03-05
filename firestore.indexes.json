@@ -1,0 +1,71 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "metricEntries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "periodKey", "order": "ASCENDING" },
+        { "fieldPath": "scope", "order": "ASCENDING" },
+        { "fieldPath": "scopeId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "metricEntries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "periodKey", "order": "ASCENDING" },
+        { "fieldPath": "createdBy", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "metricEntries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "periodKey", "order": "ASCENDING" },
+        { "fieldPath": "scope", "order": "ASCENDING" },
+        { "fieldPath": "scopeId", "order": "ASCENDING" },
+        { "fieldPath": "createdBy", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "metricEntries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "metricId", "order": "ASCENDING" },
+        { "fieldPath": "periodKey", "order": "ASCENDING" },
+        { "fieldPath": "scope", "order": "ASCENDING" },
+        { "fieldPath": "scopeId", "order": "ASCENDING" },
+        { "fieldPath": "createdBy", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "metricTargets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "metricId", "order": "ASCENDING" },
+        { "fieldPath": "periodKey", "order": "ASCENDING" },
+        { "fieldPath": "scope", "order": "ASCENDING" },
+        { "fieldPath": "scopeId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "metricAggregates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "metricId", "order": "ASCENDING" },
+        { "fieldPath": "periodKey", "order": "ASCENDING" },
+        { "fieldPath": "scope", "order": "ASCENDING" },
+        { "fieldPath": "scopeId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "projectStages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "projectId", "order": "ASCENDING" },
+        { "fieldPath": "order", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

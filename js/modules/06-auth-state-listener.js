@@ -91,6 +91,9 @@
                 initRegularView();
                 initGoogleCalendar();
                 loadAllData();
+                // Синхронізуємо обидва stats tab buttons (desktop + mobile) одразу після login
+                if (typeof showStatsTabIfAllowed === 'function') showStatsTabIfAllowed();
+                if (typeof initStatistics === 'function') initStatistics();
                 
                 // Show FAB (було окремим onAuthStateChanged — об'єднано)
                 const fab = document.getElementById('fabAdd');
