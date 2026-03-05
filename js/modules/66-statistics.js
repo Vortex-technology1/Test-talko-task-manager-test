@@ -973,7 +973,7 @@
         <div class="stats-table-wrap">
             <table class="stats-table">
                 <thead><tr>
-                    <th style="min-width:150px;">${freq === 'daily' ? 'День' : freq === 'weekly' ? 'Тиждень' : 'Місяць'}</th>`;
+                    <th style="min-width:110px;"><div class="th-inner" style="writing-mode:horizontal-tb;transform:none;">${freq === 'daily' ? 'День' : freq === 'weekly' ? 'Тиждень' : 'Місяць'}</div></th>`;
 
         // Column headers = metric names with actions
         const impColors = { critical: '#ef4444', high: '#f97316', medium: '#f59e0b', low: '#22c55e' };
@@ -991,18 +991,15 @@
             }
             const role = getUserRole();
             const canEdit = role === 'owner' || role === 'manager' || role === 'admin';
-            html += `<th>
-                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
-                    <span style="display:flex;align-items:center;gap:4px;font-size:0.78rem;">
-                        <span style="width:8px;height:8px;border-radius:50%;background:${impColor};flex-shrink:0;"></span>
-                        ${esc(m.name)}${unit}${privacy}${inverse}
-                    </span>
-                    ${respName ? `<span style="font-size:0.62rem;font-weight:400;color:${color};">● ${respName}</span>` : ''}
-                    <div style="display:flex;gap:4px;margin-top:2px;">
-                        ${canEdit ? `<button class="stats-comment-btn" onclick="openMetricModal('${m.id}')" title="Редагувати" style="opacity:0.6;padding:3px 6px;">${SVG.settings}</button>` : ''}
-                        ${canEdit ? `<button class="stats-comment-btn" onclick="deleteMetric('${m.id}')" title="Видалити" style="color:#ef4444;opacity:0.6;padding:3px 6px;">${SVG.trash}</button>` : ''}
-                        <button class="stats-comment-btn" onclick="openTrendsChart('${m.id}')" title="Графік" style="opacity:0.6;padding:3px 6px;">${SVG.barChart}</button>
-                    </div>
+            html += `<th title="${esc(m.name)}${respName ? ' · ' + respName : ''}">
+                <div class="th-inner">
+                    <span style="color:${impColor};">▸</span> ${esc(m.name)}${unit}${inverse}${privacy}
+                    ${respName ? ` <span style="font-weight:400;opacity:0.6;">· ${respName}</span>` : ''}
+                </div>
+                <div style="display:flex;justify-content:center;gap:2px;margin-top:3px;">
+                    ${canEdit ? `<button class="stats-comment-btn" onclick="openMetricModal('${m.id}')" title="Редагувати" style="opacity:0.5;padding:2px 4px;width:22px;height:22px;">${SVG.settings}</button>` : ''}
+                    ${canEdit ? `<button class="stats-comment-btn" onclick="deleteMetric('${m.id}')" title="Видалити" style="color:#ef4444;opacity:0.5;padding:2px 4px;width:22px;height:22px;">${SVG.trash}</button>` : ''}
+                    <button class="stats-comment-btn" onclick="openTrendsChart('${m.id}')" title="Графік" style="opacity:0.5;padding:2px 4px;width:22px;height:22px;">${SVG.barChart}</button>
                 </div>
             </th>`;
         });
@@ -1034,13 +1031,15 @@
                             ? (pct <= 100 ? '#22c55e' : pct <= 130 ? '#f59e0b' : '#ef4444')
                             : (pct >= 90 ? '#22c55e' : pct >= 70 ? '#f59e0b' : '#ef4444');
                         cellHtml = `
-                        <div style="display:flex;align-items:center;gap:6px;justify-content:center;">
-                            <span class="stats-val" onclick="openMetricDetail('${m.id}','${pk}')">${formatted}</span>
-                            <div class="stats-prog-wrap" style="min-width:60px;">
-                                <div class="stats-prog-bar"><div class="stats-prog-fill" style="width:${Math.min(pct, 100)}%;background:${pctColor};"></div></div>
-                                <span class="stats-prog-pct" style="color:${pctColor};">${pct}%</span>
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:1px 0;" onclick="openMetricDetail('${m.id}','${pk}')">
+                            <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:center;">
+                                <span class="stats-val" style="font-size:0.78rem;font-weight:700;padding:0;cursor:pointer;">${formatted}</span>
+                                <span style="font-size:0.65rem;font-weight:700;color:${pctColor};">${pct}%</span>
+                                ${entryId ? `<button class="stats-comment-btn stats-entry-del" onclick="event.stopPropagation();deleteEntry('${entryId}')" title="Видалити" style="color:#d1d5db;opacity:0;transition:opacity 0.15s;width:14px;height:14px;padding:0;">${SVG.trash}</button>` : ''}
                             </div>
-                            ${entryId ? `<button class="stats-comment-btn stats-entry-del" onclick="deleteEntry('${entryId}')" title="Видалити запис" style="color:#d1d5db;opacity:0;transition:opacity 0.15s;">${SVG.trash}</button>` : ''}
+                            <div style="width:100%;height:3px;background:#f0f0f0;border-radius:99px;overflow:hidden;">
+                                <div style="height:100%;width:${Math.min(pct,100)}%;background:${pctColor};border-radius:99px;transition:width 0.3s;"></div>
+                            </div>
                         </div>`;
                     } else {
                         cellHtml = `<div style="display:flex;align-items:center;gap:4px;justify-content:center;">
