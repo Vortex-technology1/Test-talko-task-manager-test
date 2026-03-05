@@ -331,7 +331,7 @@
                     <i data-lucide="clock" style="width:14px;height:14px;color:#9ca3af;flex-shrink:0;"></i>
                     ${h.replace(/</g,'&lt;')}
                 </div>`).join('')}`;
-        if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [container] });
+        if (typeof lucide !== 'undefined') refreshIcons();
     }
     window.clearSearchHistory = function(containerId) {
         try { sessionStorage.removeItem(SEARCH_HISTORY_KEY); } catch {}

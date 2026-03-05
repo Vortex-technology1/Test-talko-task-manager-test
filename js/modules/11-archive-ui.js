@@ -62,6 +62,7 @@
                 const snap = await query.get();
                 
                 if (snap.empty && archiveTasks.length === 0) {
+                    if (!listEl) return;
                     listEl.innerHTML = `
                         <div style="text-align:center;padding:3rem;color:#9ca3af;">
                             <i data-lucide="archive" class="icon icon-xl" style="color:#d1d5db;margin-bottom:0.5rem;"></i>
@@ -194,7 +195,12 @@
                 const batch = db.batch();
                 batch.set(base.collection('tasks').doc(taskId), data);
                 batch.delete(base.collection('tasksArchive').doc(taskId));
+                try {
                 await batch.commit();
+                } catch(err) {
+                    console.error('[Batch] commit failed:', err);
+                    showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                }
                 
                 // Update local arrays
                 archiveTasks = archiveTasks.filter(t => t.id !== taskId);

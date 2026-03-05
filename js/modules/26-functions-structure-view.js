@@ -348,7 +348,12 @@
                         
                         // Firebase batch limit = 500
                         if (batchCount >= 450) {
+                            try {
                             await batch.commit();
+                            } catch(err) {
+                                console.error('[Batch] commit failed:', err);
+                                showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                            }
                             batch = db.batch();
                             batchCount = 0;
                         }
@@ -365,7 +370,12 @@
                         batchCount++;
                         
                         if (batchCount >= 450) {
+                            try {
                             await batch.commit();
+                            } catch(err) {
+                                console.error('[Batch] commit failed:', err);
+                                showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                            }
                             batch = db.batch();
                             batchCount = 0;
                         }
@@ -383,7 +393,12 @@
                 }
                 
                 if (batchCount > 0) {
+                    try {
                     await batch.commit();
+                    } catch(err) {
+                        console.error('[Batch] commit failed:', err);
+                        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                    }
                 }
                 
                 closeModal('mergeFunctionsModal');

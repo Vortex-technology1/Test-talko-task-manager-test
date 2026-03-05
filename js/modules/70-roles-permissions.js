@@ -204,7 +204,12 @@ async function saveAllRolePermissions() {
             .collection('rolePermissions').doc(role);
         batch.set(ref, perms);
     });
+    try {
     await batch.commit();
+    } catch(err) {
+        console.error('[Batch] commit failed:', err);
+        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+    }
 }
 
 async function saveRolePermission(role, key, value) {

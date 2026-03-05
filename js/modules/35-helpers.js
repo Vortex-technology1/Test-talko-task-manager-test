@@ -627,7 +627,7 @@
             setLanguage(currentLang);
             // Ініціалізуємо Lucide іконки
             if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+                refreshIcons();
             }
         });
         
@@ -638,19 +638,40 @@
             if (_refreshIconsTimer) return;
             _refreshIconsTimer = requestAnimationFrame(() => {
                 _refreshIconsTimer = null;
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
+                try {
+                    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                        lucide.createIcons();
+                    }
+                } catch(e) {}
             });
         }
         
         // Примусовий refresh (для модалок які потребують іконок зразу)
         function refreshIconsNow() {
             if (_refreshIconsTimer) {
-                clearTimeout(_refreshIconsTimer);
+                cancelAnimationFrame(_refreshIconsTimer);
                 _refreshIconsTimer = null;
             }
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+            try {
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+            } catch(e) {}
+        // =====================
+        // AUTH SAFETY HELPERS
+        // =====================
+        // Безпечний доступ до currentUser.uid — null якщо не авторизований
+        window.getCurrentUid = function() {
+            return (typeof currentUser !== 'undefined' && currentUser) ? currentUser.uid : null;
+        };
+        
+        // Guard для функцій що потребують auth — повертає true якщо можна виконувати
+        window.requireAuth = function(silent) {
+            if (!currentUser || !currentCompany) {
+                if (!silent) console.warn('[AUTH] Action blocked: user not authenticated');
+                return false;
             }
+            return true;
+        };
+
         }

@@ -511,7 +511,12 @@
             }
 
             // Atomic commit — all or nothing
+            try {
             await batch.commit();
+            } catch(err) {
+                console.error('[Batch] commit failed:', err);
+                showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+            }
 
             projects.unshift({ id: projectId, name: projectName, status: 'active', startDate: getLocalDateStr(), color: '#22c55e' });
             showToast('Проєкт "' + projectName + '" створено з ' + (tpl.stages || []).length + ' етапами', 'success');

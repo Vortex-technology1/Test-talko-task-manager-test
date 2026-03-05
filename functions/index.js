@@ -357,7 +357,7 @@ exports.telegramWebhook = functions
                 if (parts.length > 1) {
                     const registrationCode = parts[1];
 
-                    const companiesSnap = await db.collection('companies').get();
+                    const companiesSnap = await db.collection('companies').limit(500).get(); // safety cap
 
                     for (const companyDoc of companiesSnap.docs) {
                         const usersSnap = await companyDoc.ref.collection('users')
@@ -390,7 +390,7 @@ exports.telegramWebhook = functions
                 }
             } else if (text === '/today' || text === '/overdue') {
                 // Знаходимо юзера по chatId
-                const companiesSnap = await db.collection('companies').get();
+                const companiesSnap = await db.collection('companies').limit(500).get(); // safety cap
                 for (const companyDoc of companiesSnap.docs) {
                     const companyId = companyDoc.id;
                     const uSnap = await companyDoc.ref.collection('users')
@@ -943,7 +943,7 @@ exports.checkScheduledTasks = functions
     .timeZone('Europe/Kyiv')
     .onRun(async (context) => {
         const now = new Date();
-        const companiesSnap = await db.collection('companies').get();
+        const companiesSnap = await db.collection('companies').limit(500).get(); // safety cap
         for (const companyDoc of companiesSnap.docs) {
             const scheduledSnap = await companyDoc.ref
                 .collection('scheduledTasks')
@@ -1063,7 +1063,7 @@ exports.dailyReport = functions
         const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-        const companiesSnap = await db.collection('companies').get();
+        const companiesSnap = await db.collection('companies').limit(500).get(); // safety cap
 
         for (const companyDoc of companiesSnap.docs) {
             const companyId = companyDoc.id;
@@ -1144,7 +1144,7 @@ exports.personalDailyTasks = functions
         const day = now.getDay();
         if (day === 0 || day === 6) return null;
 
-        const companiesSnap = await db.collection('companies').get();
+        const companiesSnap = await db.collection('companies').limit(500).get(); // safety cap
         for (const companyDoc of companiesSnap.docs) {
             const companyId = companyDoc.id;
             if (companyDoc.data().personalDailyEnabled === false) continue;
@@ -1213,7 +1213,7 @@ exports.weeklyReport = functions
         const now = new Date();
         const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
 
-        const companiesSnap = await db.collection('companies').get();
+        const companiesSnap = await db.collection('companies').limit(500).get(); // safety cap
         for (const companyDoc of companiesSnap.docs) {
             const companyId = companyDoc.id;
             if (companyDoc.data().weeklyReportEnabled === false) continue;
@@ -1402,7 +1402,7 @@ exports.eveningDigest = functions
         const tmrw = new Date(now); tmrw.setDate(tmrw.getDate() + 1);
         const tmrwStr = tmrw.toISOString().split('T')[0];
 
-        const companiesSnap = await db.collection('companies').get();
+        const companiesSnap = await db.collection('companies').limit(500).get(); // safety cap
 
         for (const companyDoc of companiesSnap.docs) {
             const companyId = companyDoc.id;

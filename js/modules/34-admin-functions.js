@@ -16,6 +16,7 @@
                 const companiesSnap = await db.collection('companies').orderBy('createdAt', 'desc').get();
                 
                 if (companiesSnap.empty) {
+                    if (!container) return;
                     container.innerHTML = '<p style="color:var(--gray);text-align:center;padding:2rem;">Компаній ще немає</p>';
                     return;
                 }
@@ -171,7 +172,7 @@
                 
                 // Видаляємо invite якщо є
                 const invitesSnap = await db.collection('invites').where('companyId', '==', companyId).get();
-                invitesSnap.forEach(async doc => await doc.ref.delete());
+                await Promise.all(invitesSnap.docs.map(doc => doc.ref.delete()));
                 
                 // Видаляємо рядок з таблиці
                 if (row) row.remove();

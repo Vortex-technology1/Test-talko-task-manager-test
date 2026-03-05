@@ -1,4 +1,4 @@
-const CACHE_VERSION = '2026-03-05-v6.0';
+const CACHE_VERSION = '2026-03-05-v6.1';
 const CACHE_NAME = `talko-tasks-${CACHE_VERSION}`;
 
 // Static assets to precache
@@ -29,6 +29,11 @@ const PRECACHE_URLS = [
   'js/modules/07-data-loading.js',
   'js/modules/08-notifications-sound-badge-title.js',
   'js/modules/09-auto-generate-regular-tasks.js',
+    'js/modules/70-roles-permissions.js',
+    'js/modules/71-owner-dashboard.js',
+    'js/modules/72-global-search.js',
+    'js/modules/73-subtasks.js',
+    'js/modules/74-bulk-duplicate.js',
   'js/modules/10-auto-archive-done-tasks-30-days.js',
   'js/modules/11-archive-ui.js',
   'js/modules/12-my-day-popup.js',

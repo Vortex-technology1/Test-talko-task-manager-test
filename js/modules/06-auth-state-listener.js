@@ -57,7 +57,7 @@
                 }
                 
                 document.getElementById('currentUserName').textContent = currentUserData.name || user.displayName || user.email;
-                document.getElementById('currentUserRole').textContent = `(${getRoleText(currentUserData.role)})`;
+                document.getElementById('currentUserRole').textContent = currentUserData ? `(${getRoleText(currentUserData.role)})` : '';
                 document.getElementById('companyBadge').textContent = companyData?.name || '';
                 document.getElementById('companyBadge').style.display = 'inline';
                 
@@ -81,7 +81,7 @@
                 }
                 
                 // AI buttons: Generator + Import = owner only, AI config = admin/superadmin only
-                const isOwnerRole = currentUserData.role === 'owner';
+                const isOwnerRole = currentUserData?.role === 'owner';
                 document.getElementById('ownerAiButtons').style.display = (isOwnerRole || isSuperAdmin) ? 'grid' : 'none';
                 document.getElementById('aiAssistantsBtnMenu').style.display = isSuperAdmin ? 'flex' : 'none';
                 document.getElementById('aiStructureBtnDesktop').style.display = 'none'; // temporarily disabled

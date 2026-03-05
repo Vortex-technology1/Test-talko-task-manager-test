@@ -459,7 +459,12 @@
                 });
             });
             
+            try {
             await batch.commit();
+            } catch(err) {
+                console.error('[Batch] commit failed:', err);
+                showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+            }
             
             // Локальне оновлення з реальними ID
             generatedRefs.forEach(({ ref, assigneeId }) => {

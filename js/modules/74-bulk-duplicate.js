@@ -21,7 +21,7 @@
             btn.innerHTML = bulkModeActive
                 ? '<i data-lucide="x" class="icon icon-sm"></i>'
                 : '<i data-lucide="check-square" class="icon icon-sm"></i>';
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (typeof lucide !== 'undefined') refreshIcons();
         }
         refreshCurrentView();
     };
@@ -286,7 +286,7 @@
                 </button>`;
             document.body.appendChild(bar);
         }
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        if (typeof lucide !== 'undefined') refreshIcons();
     };
 
     // Ініціалізуємо після DOMContentLoaded

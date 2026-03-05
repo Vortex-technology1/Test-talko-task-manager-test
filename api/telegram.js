@@ -1294,6 +1294,17 @@ const _processedUpdates = new Set();
 module.exports = async function handler(req, res) {
     if (req.method === 'GET') return res.status(200).json({ ok: true, bot: 'TALKO' });
 
+    // Перевірка Telegram webhook secret token
+    // Встановлюється через setWebhook з параметром secret_token
+    const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
+    if (WEBHOOK_SECRET) {
+        const incomingSecret = req.headers['x-telegram-bot-api-secret-token'];
+        if (incomingSecret !== WEBHOOK_SECRET) {
+            console.warn('[TG] Webhook secret mismatch — rejected');
+            return res.status(403).json({ ok: false });
+        }
+    }
+
     if (req.query?.action === 'notify') {
         try {
             const { type, userId, userIds, companyId, ...data } = req.body;

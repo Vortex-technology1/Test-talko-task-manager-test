@@ -107,7 +107,12 @@
                         if (op.type === 'delete') batch.delete(op.ref);
                         else batch.update(op.ref, op.data);
                     });
+                    try {
                     await batch.commit();
+                    } catch(err) {
+                        console.error('[Batch] commit failed:', err);
+                        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                    }
                 }
                 
                 // Оновлюємо локальний стан

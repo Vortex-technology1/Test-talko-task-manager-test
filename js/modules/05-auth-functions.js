@@ -69,7 +69,12 @@
                     role: 'owner'
                 });
                 
+                try {
                 await batch.commit();
+                } catch(err) {
+                    console.error('[Batch] commit failed:', err);
+                    showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                }
                 
                 // Reload — onAuthStateChanged знайде companyId і зайде
                 window.location.reload();
@@ -203,10 +208,10 @@
                 
                 // КРОК 1: Спочатку створюємо Auth акаунт
                 // (потрібен для доступу до Firestore — invites вимагають авторизацію)
-                console.log('[Register] Creating auth account for:', email);
+                console.log('[Register] Creating auth account...');
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
-                console.log('[Register] Auth account created, UID:', user.uid);
+                console.log('[Register] Auth account created.');
                 
                 // КРОК 2: Тепер авторизовані — шукаємо invite
                 // (onAuthStateChanged спрацює автоматично і викличе findUserCompany,
@@ -359,7 +364,12 @@
                     });
                     
                     // Один запит — все атомарно
+                    try {
                     await batch.commit();
+                    } catch(err) {
+                        console.error('[Batch] commit failed:', err);
+                        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                    }
                     console.log('[findUserCompany] Batch commit success, role:', inviteData.role);
                     
                     return companyId;
@@ -426,6 +436,7 @@
         }
         
         function logout() {
+            if (window._cleanupNotifications) window._cleanupNotifications();
             cleanupAllListeners();
             
             // Очищаємо стан

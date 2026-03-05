@@ -73,6 +73,7 @@
     }
     
     async function saveIncident() {
+            if (!requireAuth()) return;
         const title = document.getElementById('incidentTitle').value.trim();
         if (!title) { showAlertModal(t('enterName')); return; }
         

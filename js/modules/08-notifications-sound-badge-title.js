@@ -349,6 +349,13 @@
         // Оновлюємо title при зміні завдань
         let _pageTitleInterval = setInterval(updatePageTitle, 30000);
         
+        // Cleanup при logout — зупиняємо interval
+        window._cleanupNotifications = function() {
+            if (_pageTitleInterval) { clearInterval(_pageTitleInterval); _pageTitleInterval = null; }
+            if (completedTasksUnsubscribe) { completedTasksUnsubscribe(); completedTasksUnsubscribe = null; }
+            if (newTasksUnsubscribe) { newTasksUnsubscribe(); newTasksUnsubscribe = null; }
+        };
+        
         // Multi-tab sync: reload data when tab becomes visible after being hidden
         let _lastVisibleTime = Date.now();
         document.addEventListener('visibilitychange', () => {

@@ -1011,7 +1011,7 @@
         }
 
         c.innerHTML = html;
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        if (typeof lucide !== 'undefined') refreshIcons();
     }
 
     // ========================
@@ -1684,6 +1684,7 @@
         const niche = await new Promise(resolve => {
             const ov = document.createElement('div');
             ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10060;display:flex;align-items:center;justify-content:center;padding:1rem;';
+            if (!ov) return;
             ov.innerHTML = `<div style="background:white;border-radius:20px;padding:1.5rem;max-width:340px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
                 <div style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#111;">Оберіть нішу для демо</div>
                 ${[['1','Меблевий бізнес','#f59e0b'],['2','Будівництво та ремонти','#3b82f6'],['3','Медична клініка','#22c55e']].map(([k,n,c])=>`
@@ -1858,7 +1859,12 @@
                         targetValue, setBy: uid,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     });
+                    try {
                     await batch.commit();
+                    } catch(err) {
+                        console.error('[Batch] commit failed:', err);
+                        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                    }
                 }
             }
             showToast('"' + nicheData.name + '" — ' + nicheData.metrics.length + ' метрик готово!', 'success');

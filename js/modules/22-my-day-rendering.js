@@ -170,7 +170,7 @@
                         <h3>${t('noTasksForToday')}</h3>
                         <p style="color:var(--gray);margin-top:0.5rem;">${t('timeToRest')}</p>
                     </div>`;
-                lucide.createIcons();
+                refreshIcons();
                 return;
             }
             
@@ -189,7 +189,7 @@
                         </div>
                         ${myTasks.map(t => renderMyDayItem(t)).join('')}
                     </div>`;
-                lucide.createIcons();
+                refreshIcons();
                 return;
             }
             
@@ -250,7 +250,7 @@
             }
             
             container.innerHTML = html;
-            lucide.createIcons();
+            refreshIcons();
             updateOverdueBadge();
             renderMyAnalytics();
         }
@@ -338,7 +338,7 @@
             if (checkbox && !currentDone) {
                 checkbox.classList.add('checked');
                 checkbox.innerHTML = '<i data-lucide="check" class="icon icon-sm"></i>';
-                lucide.createIcons();
+                refreshIcons();
             }
             if (item && !currentDone) {
                 item.style.transform = 'scale(0.98)';

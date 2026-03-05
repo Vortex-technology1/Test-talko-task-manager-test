@@ -106,6 +106,14 @@ document.addEventListener('mousedown', function(e) {
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
     <script src="https://unpkg.com/lucide@0.263.1"></script>
+    <script>
+        // Резервний CDN якщо unpkg недоступний
+        if (typeof lucide === 'undefined') {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js';
+            document.head.appendChild(s);
+        }
+    </script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <script src="https://apis.google.com/js/api.js"></script>
 
@@ -3310,5 +3318,39 @@ document.addEventListener('mousedown', function(e) {
             <div id="userPermissionsModalBody" class="modal-body"></div>
         </div>
     </div>
+    <script>
+
+        window.exportCompanyData = async function() {
+            if (!requireAuth()) return;
+            try {
+                const base = db.collection('companies').doc(currentCompany);
+                const [tasksSnap, usersSnap, funcsSnap] = await Promise.all([
+                    base.collection('tasks').limit(1000).get(),
+                    base.collection('users').get(),
+                    base.collection('functions').get()
+                ]);
+                const data = {
+                    exportedAt: new Date().toISOString(),
+                    company: currentCompany,
+                    tasks: tasksSnap.docs.map(d => ({ id: d.id, ...d.data() })),
+                    users: usersSnap.docs.map(d => ({ id: d.id, ...d.data() })),
+                    functions: funcsSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `talko-export-${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast && showToast('Дані експортовано', 'success');
+            } catch(e) {
+                console.error('Export error:', e);
+                showToast && showToast('Помилка експорту: ' + e.message, 'error');
+            }
+        };
+
+
+    </script>
 </body>
 </html>

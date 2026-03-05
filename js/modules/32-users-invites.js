@@ -101,7 +101,12 @@
                         if (op.type === 'delete') batch.delete(op.ref);
                         else batch.update(op.ref, op.data);
                     });
+                    try {
                     await batch.commit();
+                    } catch(err) {
+                        console.error('[Batch] commit failed:', err);
+                        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                    }
                 }
             } catch (e) {
                 console.error('[deleteUser] cascade failed:', e);
@@ -129,7 +134,7 @@
                         <i data-lucide="user-plus" class="icon"></i> ${t('invite') || 'Запросити'}
                     </button>
                 </div>`;
-                if (typeof lucide !== 'undefined') lucide.createIcons();
+                if (typeof lucide !== 'undefined') refreshIcons();
                 return;
             }
             
@@ -504,7 +509,7 @@
             if (title) title.textContent = `Дозволи: ${u.name || u.email}`;
             if (body) body.innerHTML = html;
             if (modal) { modal.style.display = 'flex'; }
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (typeof lucide !== 'undefined') refreshIcons();
         };
 
         window.updateUserPermOverride = async function(userId, key, value) {
