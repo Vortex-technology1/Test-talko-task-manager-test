@@ -290,7 +290,7 @@
                     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
                         <div style="flex:1;">
                             <div class="user-name" style="margin-bottom:2px;">${esc(u.name || u.email)}</div>
-                            <div style="font-size:0.75rem;color:#6b7280;">${canViewEmails ? esc(u.email) : '●●●@●●●●●●'}${u.position ? \` · ${esc(u.position)}\` : ''}</div>
+                            <div style="font-size:0.75rem;color:#6b7280;">${canViewEmails ? esc(u.email) : '●●●@●●●●●●'}${u.position ? ' · ' + esc(u.position) : ''}</div>
                         </div>
                         <span class="role-badge ${u.role}" style="flex-shrink:0;">${getRoleText(u.role)}</span>
                     </div>
