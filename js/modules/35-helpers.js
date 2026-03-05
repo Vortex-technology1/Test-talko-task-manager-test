@@ -71,13 +71,17 @@
             if (menu.parentElement !== document.body) {
                 document.body.appendChild(menu);
             }
+            menu.style.display = 'block';
             if (btn) {
                 const rect = btn.getBoundingClientRect();
+                const menuW = menu.offsetWidth || 180;
+                let left = rect.left;
+                if (left + menuW > window.innerWidth - 8) left = window.innerWidth - menuW - 8;
+                if (left < 8) left = 8;
                 menu.style.position = 'fixed';
                 menu.style.top = (rect.bottom + 4) + 'px';
-                menu.style.left = rect.left + 'px';
+                menu.style.left = left + 'px';
             }
-            menu.style.display = 'block';
         }
         function closeNavDropdowns() {
             ['tasksTabMenu','sysTabMenu','analyticsTabMenu'].forEach(function(id) {

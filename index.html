@@ -18,17 +18,25 @@ function toggleNavDropdown(menuId, wrapperId, e) {
     var isOpen = menu.style.display === 'block';
     closeNavDropdowns();
     if (!isOpen) {
-        // Переміщаємо меню в body якщо ще не там — щоб position:fixed рахувалось від viewport правильно
+        // Переміщаємо меню в body — щоб position:fixed рахувалось від viewport
         if (menu.parentElement !== document.body) {
             document.body.appendChild(menu);
         }
+        menu.style.display = 'block';
         if (btn) {
             var rect = btn.getBoundingClientRect();
+            var menuW = menu.offsetWidth || 180;
+            var left = rect.left;
+            // Не виходимо за правий край viewport
+            if (left + menuW > window.innerWidth - 8) {
+                left = window.innerWidth - menuW - 8;
+            }
+            // Не виходимо за лівий край
+            if (left < 8) left = 8;
             menu.style.position = 'fixed';
             menu.style.top = (rect.bottom + 4) + 'px';
-            menu.style.left = rect.left + 'px';
+            menu.style.left = left + 'px';
         }
-        menu.style.display = 'block';
     }
 }
 function closeNavDropdowns() {
