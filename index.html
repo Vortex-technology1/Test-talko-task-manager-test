@@ -105,78 +105,26 @@ document.addEventListener('mousedown', function(e) {
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
-    <!-- Lucide icons — надійне завантаження з localStorage кешем -->
+    <!-- Lucide icons — пряме підключення з cdnjs -->
     <script>
-    (function() {
-        var VER = '0.263.1';
-        var CACHE_KEY = 'lucide_js_' + VER;
-        var CDNS = [
-            'https://unpkg.com/lucide@' + VER + '/dist/umd/lucide.min.js',
-            'https://cdn.jsdelivr.net/npm/lucide@' + VER + '/dist/umd/lucide.min.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/lucide/' + VER + '/umd/lucide.min.js'
-        ];
-
-        // Глобальна функція ініціалізації іконок
         window._initLucide = function() {
             if (typeof lucide !== 'undefined' && lucide.createIcons) {
                 try { lucide.createIcons(); } catch(e) {}
                 window._lucideReady = true;
             }
         };
-
-        function execAndInit(src) {
-            try {
-                var s = document.createElement('script');
-                s.textContent = src;
-                document.head.appendChild(s);
-                window._initLucide();
-            } catch(e) {}
-        }
-
-        // 1. Спробуємо з localStorage кешу (миттєво, без мережі)
-        try {
-            var cached = localStorage.getItem(CACHE_KEY);
-            if (cached && cached.length > 1000) {
-                execAndInit(cached);
-                // Навіть якщо з кешу — перевіряємо після DOMContentLoaded
-                document.addEventListener('DOMContentLoaded', window._initLucide);
-                window.addEventListener('load', window._initLucide);
-                return;
-            }
-        } catch(e) {}
-
-        // 2. Завантажуємо з CDN з fallback
-        var idx = 0;
-        function tryNext() {
-            if (idx >= CDNS.length) return;
-            var s = document.createElement('script');
-            s.src = CDNS[idx++];
-            s.onload = function() {
-                window._initLucide();
-                // Кешуємо в localStorage для наступного відкриття
-                try {
-                    fetch(s.src).then(function(r){ return r.text(); }).then(function(txt){
-                        try { localStorage.setItem(CACHE_KEY, txt); } catch(e) {}
-                    }).catch(function(){});
-                } catch(e) {}
-            };
-            s.onerror = function() { tryNext(); };
-            document.head.appendChild(s);
-        }
-        tryNext();
-
-        // 3. Retry після завантаження DOM і всіх defer скриптів
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(window._initLucide, 100);
         });
         window.addEventListener('load', function() {
             window._initLucide();
-            // Ще один retry через 500ms — для задач що рендеряться після Firebase
             setTimeout(window._initLucide, 500);
             setTimeout(window._initLucide, 1500);
         });
-    })();
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"
+            onload="window._initLucide && window._initLucide()"
+            onerror="console.error('Lucide CDN failed')"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <script src="https://apis.google.com/js/api.js"></script>
 
