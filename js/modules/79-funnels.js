@@ -36,17 +36,17 @@
                     <!-- Header -->
                     <div style="padding:1rem 1.25rem;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;background:white;flex-shrink:0;">
                         <div>
-                            <div style="font-weight:700;font-size:1rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>️ ${escHtml(funnelEditorData.name)}</div>
+                            <div style="font-weight:700;font-size:1rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span>️ ${escHtml(funnelEditorData.name)}</div>
                             <div style="font-size:0.78rem;color:#6b7280;">${funnelSteps.length} кроків</div>
                         </div>
                         <div style="display:flex;gap:0.5rem;align-items:center;">
                             <button onclick="testFunnelPreview()" style="padding:0.45rem 0.75rem;background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">
-                                <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span> Тест
+                                👁 Тест
                             </button>
                             <button onclick="saveFunnelSteps()" style="padding:0.45rem 0.75rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">
-                                <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span> Зберегти
+                                💾 Зберегти
                             </button>
-                            <button onclick="closeFunnelEditor()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;padding:0 4px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                            <button onclick="closeFunnelEditor()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;padding:0 4px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                         </div>
                     </div>
 
@@ -61,14 +61,14 @@
                                 <div style="font-size:0.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;">ДОДАТИ КРОК</div>
                                 <div style="display:flex;flex-direction:column;gap:0.35rem;">
                                     ${[
-                                        ['message','Повідомлення','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>'],
-                                        ['buttons','Кнопки вибору','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></span>'],
-                                        ['text_input','Текстове поле','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>️'],
-                                        ['phone','Телефон','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l.93-.93a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>'],
-                                        ['email','Email','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>'],
-                                        ['ai_response','AI відповідь','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span>'],
-                                        ['calendly','Calendly','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>'],
-                                        ['end','Завершення','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>'],
+                                        ['message','Повідомлення','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>'],
+                                        ['buttons','Кнопки вибору','🔘'],
+                                        ['text_input','Текстове поле','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span>️'],
+                                        ['phone','Телефон','📞'],
+                                        ['email','Email','📧'],
+                                        ['ai_response','AI відповідь','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>'],
+                                        ['calendly','Calendly','📅'],
+                                        ['end','Завершення','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>'],
                                     ].map(([type, label, icon]) => `
                                         <button onclick="addFunnelStep('${type}')"
                                             style="text-align:left;padding:0.45rem 0.6rem;background:white;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;gap:0.4rem;transition:background 0.15s;"
@@ -82,7 +82,7 @@
                         <!-- Step editor (right) -->
                         <div style="flex:1;overflow-y:auto;padding:1rem;" id="funnelStepEditor">
                             <div style="text-align:center;padding:2rem;color:#9ca3af;">
-                                <div style="font-size:2rem;margin-bottom:0.5rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span></div>
+                                <div style="font-size:2rem;margin-bottom:0.5rem;">👆</div>
                                 Виберіть крок або додайте новий
                             </div>
                         </div>
@@ -90,7 +90,7 @@
 
                     <!-- Calendly URL bar -->
                     <div style="padding:0.75rem 1.25rem;border-top:1px solid #f0f0f0;background:#f9fafb;flex-shrink:0;display:flex;align-items:center;gap:0.75rem;">
-                        <span style="font-size:0.8rem;color:#6b7280;white-space:nowrap;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Calendly URL:</span>
+                        <span style="font-size:0.8rem;color:#6b7280;white-space:nowrap;">📅 Calendly URL:</span>
                         <input id="funnelCalendlyUrl" value="${escHtml(funnelEditorData.calendlyUrl || '')}"
                             placeholder="https://calendly.com/..."
                             style="flex:1;padding:0.4rem 0.6rem;border:1px solid #e5e7eb;border-radius:6px;font-size:0.82rem;">
@@ -122,12 +122,12 @@
             return;
         }
 
-        const stepLabels = { message: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', buttons: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></span>', text_input: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>️', phone: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l.93-.93a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>', email: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>', ai_response: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span>', calendly: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>', end: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>' };
+        const stepLabels = { message: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', buttons: '🔘', text_input: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span>️', phone: '📞', email: '📧', ai_response: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>', calendly: '📅', end: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>' };
 
         container.innerHTML = funnelSteps.map((step, i) => `
             <div onclick="selectFunnelStep('${step.id}')" data-step-id="${step.id}"
                 style="padding:0.5rem 0.6rem;border-radius:8px;cursor:pointer;margin-bottom:0.3rem;background:${selectedStepId === step.id ? '#f0fdf4' : 'white'};border:1px solid ${selectedStepId === step.id ? '#22c55e' : '#e5e7eb'};transition:all 0.15s;display:flex;align-items:center;gap:0.5rem;">
-                <span style="font-size:0.85rem;">${stepLabels[step.type] || '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>'}</span>
+                <span style="font-size:0.85rem;">${stepLabels[step.type] || '📋'}</span>
                 <div style="flex:1;min-width:0;">
                     <div style="font-size:0.8rem;font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(step.name || step.type)}</div>
                     <div style="font-size:0.7rem;color:#9ca3af;">${step.type}</div>
@@ -136,7 +136,7 @@
                     ${i > 0 ? `<button onclick="event.stopPropagation();moveStep('${step.id}',-1)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:0.7rem;line-height:1;padding:1px;">▲</button>` : ''}
                     ${i < funnelSteps.length-1 ? `<button onclick="event.stopPropagation();moveStep('${step.id}',1)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:0.7rem;line-height:1;padding:1px;">▼</button>` : ''}
                 </div>
-                <button onclick="event.stopPropagation();deleteFunnelStep('${step.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.75rem;padding:2px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                <button onclick="event.stopPropagation();deleteFunnelStep('${step.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.75rem;padding:2px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
             </div>`).join('');
     }
 
@@ -215,7 +215,7 @@
                                     <option value="">наступний</option>
                                     ${funnelSteps.filter(s=>s.id!==stepId).map(s=>`<option value="${s.id}" ${opt.nextStep===s.id?'selected':''}>${escHtml(s.name||s.type)}</option>`).join('')}
                                 </select>
-                                <button onclick="removeOption('${stepId}',${i})" style="background:#fee2e2;border:none;color:#ef4444;border-radius:6px;cursor:pointer;padding:4px 6px;font-size:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                                <button onclick="removeOption('${stepId}',${i})" style="background:#fee2e2;border:none;color:#ef4444;border-radius:6px;cursor:pointer;padding:4px 6px;font-size:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                             </div>`).join('')}
                     </div>
                     <button onclick="addOption('${stepId}')" style="width:100%;padding:0.4rem;background:#f0fdf4;color:#16a34a;border:1px dashed #bbf7d0;border-radius:6px;cursor:pointer;font-size:0.82rem;">+ Додати кнопку</button>
@@ -257,10 +257,10 @@
             typeSpecific = `
                 <div>
                     <label style="${lbl()}">ТЕКСТ ПЕРЕД ЗАПИСОМ</label>
-                    <textarea onblur="updateStep('${stepId}','message',this.value)" style="width:100%;min-height:80px;padding:0.6rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;resize:vertical;font-family:inherit;box-sizing:border-box;" placeholder="Чудово! Оберіть зручний час для консультації <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></span>">${escHtml(step.message || '')}</textarea>
+                    <textarea onblur="updateStep('${stepId}','message',this.value)" style="width:100%;min-height:80px;padding:0.6rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;resize:vertical;font-family:inherit;box-sizing:border-box;" placeholder="Чудово! Оберіть зручний час для консультації 👇">${escHtml(step.message || '')}</textarea>
                 </div>
                 <div style="background:#f0fdf4;border-radius:8px;padding:0.6rem;font-size:0.78rem;color:#16a34a;">
-                    <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Посилання Calendly береться з налаштувань воронки (нижня панель)
+                    📅 Посилання Calendly береться з налаштувань воронки (нижня панель)
                 </div>`;
         }
 
@@ -334,7 +334,7 @@
                     calendlyUrl: document.getElementById('funnelCalendlyUrl')?.value.trim() || null,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-            if (typeof showToast === 'function') showToast('Воронку збережено <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span>', 'success');
+            if (typeof showToast === 'function') showToast('Воронку збережено ✓', 'success');
         } catch (err) {
             alert('Помилка збереження: ' + err.message);
         }
@@ -362,9 +362,9 @@
                     <div style="background:linear-gradient(135deg,#16a34a,#22c55e);color:white;padding:1rem;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
                         <div>
                             <div style="font-weight:700;font-size:0.95rem;">${escHtml(funnelData.name || 'Консультант')}</div>
-                            <div style="font-size:0.75rem;opacity:0.85;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#22c55e" stroke="none"><circle cx="12" cy="12" r="10"/></svg></span> Онлайн</div>
+                            <div style="font-size:0.75rem;opacity:0.85;">🟢 Онлайн</div>
                         </div>
-                        <button onclick="closeChatWidget()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                        <button onclick="closeChatWidget()" style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                     </div>
                     <!-- Messages -->
                     <div id="talkoChatMessages" style="flex:1;overflow-y:auto;padding:0.75rem;display:flex;flex-direction:column;gap:0.6rem;min-height:200px;max-height:320px;background:#f9fafb;"></div>
@@ -373,7 +373,7 @@
                 </div>
                 <!-- Bubble -->
                 <div id="talkoChatBubble" style="display:none;width:56px;height:56px;background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:50%;cursor:pointer;box-shadow:0 4px 20px rgba(34,197,94,0.4);display:flex;align-items:center;justify-content:center;margin-left:auto;" onclick="reopenChatWindow()">
-                    <span style="font-size:1.5rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span></span>
+                    <span style="font-size:1.5rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span></span>
                 </div>
             </div>
             <style>
@@ -498,7 +498,7 @@
                 await addBotMessage(step.message || 'Оберіть зручний час:');
                 const url = funnelData.calendlyUrl;
                 if (url) {
-                    setInputArea(`<div style="text-align:center;padding:4px 0;"><a href="${escHtml(url)}" target="_blank" style="display:inline-block;background:#22c55e;color:white;padding:0.6rem 1.25rem;border-radius:20px;text-decoration:none;font-weight:700;font-size:0.88rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Записатися</a></div>`);
+                    setInputArea(`<div style="text-align:center;padding:4px 0;"><a href="${escHtml(url)}" target="_blank" style="display:inline-block;background:#22c55e;color:white;padding:0.6rem 1.25rem;border-radius:20px;text-decoration:none;font-weight:700;font-size:0.88rem;">📅 Записатися</a></div>`);
                 } else {
                     setInputArea(`<div style="text-align:center;"><button class="chat-btn" onclick="chatNextStep()">Продовжити →</button></div>`);
                 }
@@ -506,7 +506,7 @@
             }
 
             else if (step.type === 'end') {
-                await addBotMessage(step.message || 'Дякуємо! Наш менеджер зв\'яжеться з вами найближчим часом. <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span>');
+                await addBotMessage(step.message || 'Дякуємо! Наш менеджер зв\'яжеться з вами найближчим часом. 🙏');
                 setInputArea('');
                 await saveLead();
             }

@@ -168,7 +168,7 @@
                     ? ids.map(id=>{const u=users.find(u=>u.id===id);return u?(u.name||u.email).split(' ')[0]:null;}).filter(Boolean).join(', ')
                     : '';
                 results.push({
-                    category:'Функції', categoryIcon:'⚙️',
+                    category:'Функції', categoryIcon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>️',
                     title: f.name, subtitle: names||'Без відповідального',
                     badge:'Функція', badgeColor:'#8b5cf6',
                     // FIX БАГ E: scroll до функції після switchTab
@@ -323,7 +323,7 @@
         container.innerHTML = `
             <div style="padding:0.5rem 0.75rem;font-size:0.72rem;color:#9ca3af;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;">
                 <span>Останні запити</span>
-                <button onclick="clearSearchHistory('${containerId}')" style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:0.72rem;padding:0;">✕ очистити</button>
+                <button onclick="clearSearchHistory('${containerId}')" style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:0.72rem;padding:0;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span> очистити</button>
             </div>
             ${history.map(h => `
                 <div class="gsearch-item" onclick="fillSearchQuery(${JSON.stringify(h)})" 

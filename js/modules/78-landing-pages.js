@@ -91,7 +91,7 @@
 
             ${lpPages.length === 0 ? `
                 <div style="text-align:center;padding:3rem;background:white;border-radius:12px;box-shadow:var(--shadow);">
-                    <div style="font-size:2.5rem;margin-bottom:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span></div>
+                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">🚀</div>
                     <div style="font-weight:600;color:#1a1a1a;margin-bottom:0.4rem;">Ще немає лендінгів</div>
                     <div style="font-size:0.85rem;color:#6b7280;margin-bottom:1rem;">Створіть перший лендінг і підключіть AI воронку</div>
                     <button onclick="openCreatePageModal()" style="padding:0.6rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">+ Створити лендінг</button>
@@ -118,7 +118,7 @@
                             <span style="font-size:0.7rem;background:${statusColor}22;color:${statusColor};padding:0.15rem 0.5rem;border-radius:20px;font-weight:600;">${statusLabel}</span>
                         </div>
                         <div style="font-size:0.78rem;color:#6b7280;margin-bottom:0.4rem;">
-                            /${escHtml(page.slug)} ${funnel ? `· <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span> ${escHtml(funnel.name)}` : '· без воронки'}
+                            /${escHtml(page.slug)} ${funnel ? `· <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span> ${escHtml(funnel.name)}` : '· без воронки'}
                         </div>
                         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
                             <span style="font-size:0.78rem;color:#3b82f6;background:#eff6ff;padding:0.15rem 0.5rem;border-radius:6px;">
@@ -200,7 +200,7 @@
                 <div style="background:white;border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.2);margin:auto;">
                     <div style="padding:1.25rem;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:white;z-index:1;border-radius:16px 16px 0 0;">
                         <div style="font-weight:700;font-size:1rem;">${isEdit ? 'Редагувати лендінг' : 'Новий лендінг'}</div>
-                        <button onclick="closeLPPageModal()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                        <button onclick="closeLPPageModal()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                     </div>
                     <div style="padding:1.25rem;display:flex;flex-direction:column;gap:1rem;">
 
@@ -233,7 +233,7 @@
                         <div>
                             <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">HTML КОД ЛЕНДІНГУ</label>
                             <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:0.5rem;margin-bottom:0.4rem;">
-                                <div style="font-size:0.75rem;color:#6b7280;margin-bottom:0.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></span> Підказка: додайте кнопку з <code style="background:#f0fdf4;padding:1px 4px;border-radius:3px;">data-talko-funnel="open"</code> щоб відкривати чат</div>
+                                <div style="font-size:0.75rem;color:#6b7280;margin-bottom:0.3rem;">💡 Підказка: додайте кнопку з <code style="background:#f0fdf4;padding:1px 4px;border-radius:3px;">data-talko-funnel="open"</code> щоб відкривати чат</div>
                                 <div style="font-size:0.75rem;color:#6b7280;">Приклад: <code style="background:#f0fdf4;padding:1px 4px;border-radius:3px;">&lt;button data-talko-funnel="open"&gt;Записатися&lt;/button&gt;</code></div>
                             </div>
                             <textarea id="lpPageHtml" placeholder="&lt;!DOCTYPE html&gt;&#10;&lt;html&gt;...&lt;/html&gt;"
@@ -252,8 +252,8 @@
                     </div>
                     <div style="padding:1rem 1.25rem;border-top:1px solid #f0f0f0;display:flex;gap:0.5rem;justify-content:flex-end;position:sticky;bottom:0;background:white;border-radius:0 0 16px 16px;">
                         <button onclick="closeLPPageModal()" style="padding:0.55rem 1rem;background:#f9fafb;color:#525252;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;">Скасувати</button>
-                        <button onclick="previewLPHtml()" style="padding:0.55rem 1rem;background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;border-radius:8px;cursor:pointer;font-weight:600;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span> Прев'ю</button>
-                        <button onclick="saveLandingPage('${page?.id || ''}')" style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span> Зберегти</button>
+                        <button onclick="previewLPHtml()" style="padding:0.55rem 1rem;background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;border-radius:8px;cursor:pointer;font-weight:600;">👁 Прев'ю</button>
+                        <button onclick="saveLandingPage('${page?.id || ''}')" style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">✓ Зберегти</button>
                     </div>
                 </div>
             </div>`;
@@ -311,7 +311,7 @@
             // Check slug uniqueness (exclude current page)
             const slugCheck = await base.collection('landingPages').where('slug', '==', slug).get();
             const conflict = slugCheck.docs.find(d => d.id !== existingId);
-            if (conflict) { alert('Такий slug вже зайнятий'); if (btn) { btn.textContent = '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span> Зберегти'; btn.disabled = false; } return; }
+            if (conflict) { alert('Такий slug вже зайнятий'); if (btn) { btn.textContent = '✓ Зберегти'; btn.disabled = false; } return; }
 
             // Save HTML to Firebase Storage
             let storageRef = null;
@@ -338,11 +338,11 @@
             }
 
             closeLPPageModal();
-            if (typeof showToast === 'function') showToast(existingId ? 'Лендінг оновлено <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span>' : 'Лендінг створено <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span>', 'success');
+            if (typeof showToast === 'function') showToast(existingId ? 'Лендінг оновлено ✓' : 'Лендінг створено ✓', 'success');
         } catch (err) {
             console.error('saveLandingPage error:', err);
             alert('Помилка: ' + err.message);
-            if (btn) { btn.textContent = '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span> Зберегти'; btn.disabled = false; }
+            if (btn) { btn.textContent = '✓ Зберегти'; btn.disabled = false; }
         }
     };
 
@@ -392,7 +392,7 @@
 
             ${lpFunnels.length === 0 ? `
                 <div style="text-align:center;padding:3rem;background:white;border-radius:12px;box-shadow:var(--shadow);">
-                    <div style="font-size:2.5rem;margin-bottom:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span></div>
+                    <div style="font-size:2.5rem;margin-bottom:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span></div>
                     <div style="font-weight:600;color:#1a1a1a;margin-bottom:0.4rem;">Ще немає воронок</div>
                     <div style="font-size:0.85rem;color:#6b7280;margin-bottom:1rem;">Створіть AI воронку для збору лідів</div>
                     <button onclick="openCreateFunnelModal()" style="padding:0.6rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">+ Створити воронку</button>
@@ -417,14 +417,14 @@
                     </div>
                     <div style="display:flex;gap:0.4rem;">
                         <button onclick="openFunnelEditor('${funnel.id}')" style="padding:0.4rem 0.75rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">
-                            <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>️ Редагувати
+                            <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span>️ Редагувати
                         </button>
                         <button onclick="confirmDeleteFunnel('${funnel.id}')" style="padding:0.4rem 0.5rem;background:#fee2e2;color:#ef4444;border:none;border-radius:8px;cursor:pointer;">
                             <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
                         </button>
                     </div>
                 </div>
-                ${funnel.calendlyUrl ? `<div style="margin-top:0.5rem;font-size:0.75rem;color:#6b7280;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Calendly: ${escHtml(funnel.calendlyUrl)}</div>` : ''}
+                ${funnel.calendlyUrl ? `<div style="margin-top:0.5rem;font-size:0.75rem;color:#6b7280;">📅 Calendly: ${escHtml(funnel.calendlyUrl)}</div>` : ''}
             </div>`;
     }
 
@@ -447,7 +447,7 @@
                 <div style="background:white;border-radius:16px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.2);">
                     <div style="padding:1.25rem;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
                         <div style="font-weight:700;">Нова воронка</div>
-                        <button onclick="document.getElementById('lpCreateFunnelOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                        <button onclick="document.getElementById('lpCreateFunnelOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                     </div>
                     <div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;">
                         <div>
@@ -463,7 +463,7 @@
                     </div>
                     <div style="padding:1rem 1.25rem;border-top:1px solid #f0f0f0;display:flex;gap:0.5rem;justify-content:flex-end;">
                         <button onclick="document.getElementById('lpCreateFunnelOverlay').remove()" style="padding:0.55rem 1rem;background:#f9fafb;color:#525252;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;">Скасувати</button>
-                        <button onclick="saveNewFunnel()" style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span> Створити</button>
+                        <button onclick="saveNewFunnel()" style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">✓ Створити</button>
                     </div>
                 </div>
             </div>`;
@@ -488,7 +488,7 @@
             const newFunnel = { id: ref.id, name, steps: [], leadsCount: 0 };
             lpFunnels.unshift(newFunnel);
             openFunnelEditor(ref.id);
-            if (typeof showToast === 'function') showToast('Воронку створено <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span>', 'success');
+            if (typeof showToast === 'function') showToast('Воронку створено ✓', 'success');
         } catch (err) {
             alert('Помилка: ' + err.message);
         }

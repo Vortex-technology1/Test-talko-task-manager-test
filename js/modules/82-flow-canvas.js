@@ -27,18 +27,18 @@ const W = 220; // node width
 
 // ── Node config ────────────────────────────────────────────
 const NODES = {
-    start:      {label:'Старт',       color:'#22c55e', border:'#16a34a', icon:'▶',  outputs:['out']},
-    message:    {label:'Повідомлення',color:'#6366f1', border:'#4f46e5', icon:'💬', outputs:['out','btn']},
-    action:     {label:'Дія',         color:'#f59e0b', border:'#d97706', icon:'⚡', outputs:['out']},
-    filter:     {label:'Фільтр',      color:'#f97316', border:'#ea580c', icon:'⟨⟩', outputs:['yes','no']},
+    start:      {label:'Старт',       color:'#22c55e', border:'#16a34a', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg></span>',  outputs:['out']},
+    message:    {label:'Повідомлення',color:'#6366f1', border:'#4f46e5', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', outputs:['out','btn']},
+    action:     {label:'Дія',         color:'#f59e0b', border:'#d97706', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>', outputs:['out']},
+    filter:     {label:'Фільтр',      color:'#f97316', border:'#ea580c', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18-6-6 6-6"/><path d="m15 6 6 6-6 6"/></svg></span>', outputs:['yes','no']},
     pause:      {label:'Пауза',       color:'#64748b', border:'#475569', icon:'⏸',  outputs:['out']},
-    ai:         {label:'ШІ Агент',    color:'#8b5cf6', border:'#7c3aed', icon:'🤖', outputs:['out','err']},
-    api:        {label:'Запит API',   color:'#0ea5e9', border:'#0284c7', icon:'⟳',  outputs:['ok','err']},
-    sheets:     {label:'Google Sheets',color:'#10b981',border:'#059669', icon:'📊', outputs:['out']},
-    random:     {label:'Випадково',   color:'#ec4899', border:'#db2777', icon:'⁇',  outputs:['a','b']},
-    repeat:     {label:'Повтор',      color:'#14b8a6', border:'#0d9488', icon:'↺',  outputs:['out','end']},
-    crm:        {label:'Угода CRM',   color:'#22c55e', border:'#16a34a', icon:'💼', outputs:['out']},
-    end:        {label:'Кінець',      color:'#94a3b8', border:'#64748b', icon:'■',  outputs:[]},
+    ai:         {label:'ШІ Агент',    color:'#8b5cf6', border:'#7c3aed', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>', outputs:['out','err']},
+    api:        {label:'Запит API',   color:'#0ea5e9', border:'#0284c7', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></span>',  outputs:['ok','err']},
+    sheets:     {label:'Google Sheets',color:'#10b981',border:'#059669', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>', outputs:['out']},
+    random:     {label:'Випадково',   color:'#ec4899', border:'#db2777', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>',  outputs:['a','b']},
+    repeat:     {label:'Повтор',      color:'#14b8a6', border:'#0d9488', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></span>',  outputs:['out','end']},
+    crm:        {label:'Угода CRM',   color:'#22c55e', border:'#16a34a', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>', outputs:['out']},
+    end:        {label:'Кінець',      color:'#94a3b8', border:'#64748b', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>',  outputs:[]},
 };
 
 const PORT_LABELS = {
@@ -122,7 +122,7 @@ function mountCanvas() {
         <button id="fcBtnBack" title="Назад до списку"
             style="padding:6px 12px;background:#334155;border:none;border-radius:8px;color:white;
             cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;">
-            ← Назад
+            <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></span> Назад
         </button>
 
         <div style="width:1px;height:28px;background:#334155;"></div>
@@ -137,10 +137,10 @@ function mountCanvas() {
         <!-- Undo/Redo -->
         <button id="fcBtnUndo" title="Скасувати (Ctrl+Z)"
             style="padding:6px 10px;background:#334155;border:none;border-radius:7px;
-            color:#94a3b8;cursor:pointer;font-size:14px;">↩</button>
+            color:#94a3b8;cursor:pointer;font-size:14px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span></button>
         <button id="fcBtnRedo" title="Повторити (Ctrl+Y)"
             style="padding:6px 10px;background:#334155;border:none;border-radius:7px;
-            color:#94a3b8;cursor:pointer;font-size:14px;">↪</button>
+            color:#94a3b8;cursor:pointer;font-size:14px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5V17"/></svg></span></button>
 
         <div style="width:1px;height:28px;background:#334155;"></div>
 
@@ -162,7 +162,7 @@ function mountCanvas() {
         </button>
         <button id="fcBtnClose" title="Закрити"
             style="padding:6px 10px;background:#334155;border:none;border-radius:7px;
-            color:#94a3b8;cursor:pointer;font-size:18px;line-height:1;">✕</button>
+            color:#94a3b8;cursor:pointer;font-size:18px;line-height:1;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
     </div>
 
     <!-- BODY -->
@@ -208,7 +208,7 @@ function mountCanvas() {
             overflow-y:auto;flex-shrink:0;z-index:5;">
             <div id="fcPropPanel" style="padding:16px;">
                 <div style="text-align:center;padding:48px 16px;color:#475569;">
-                    <div style="font-size:32px;margin-bottom:8px;">⬆</div>
+                    <div style="font-size:32px;margin-bottom:8px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19V5"/><path d="m5 12 7-7 7 7"/></svg></span></div>
                     <div style="font-size:13px;">Клікніть на вузол<br>для редагування</div>
                 </div>
             </div>
@@ -260,17 +260,17 @@ function buildSidebar() {
     const sb = document.getElementById('fcSidebar');
     if (!sb) return;
     const items = [
-        ['message','💬','Повідом.'],
-        ['action','⚡','Дія'],
-        ['filter','⟨⟩','Фільтр'],
+        ['message','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>','Повідом.'],
+        ['action','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>','Дія'],
+        ['filter','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18-6-6 6-6"/><path d="m15 6 6 6-6 6"/></svg></span>','Фільтр'],
         ['pause','⏸','Пауза'],
-        ['ai','🤖','ШІ Агент'],
-        ['api','⟳','API'],
-        ['sheets','📊','Sheets'],
-        ['random','⁇','Випадк.'],
-        ['repeat','↺','Повтор'],
-        ['crm','💼','CRM'],
-        ['end','■','Кінець'],
+        ['ai','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>','ШІ Агент'],
+        ['api','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></span>','API'],
+        ['sheets','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>','Sheets'],
+        ['random','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>','Випадк.'],
+        ['repeat','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></span>','Повтор'],
+        ['crm','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>','CRM'],
+        ['end','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>','Кінець'],
     ];
     sb.innerHTML = items.map(([type, icon, label]) => {
         const cfg = NODES[type];
@@ -286,7 +286,7 @@ function buildSidebar() {
         </div>`;
     }).join('');
 
-    // Drag from sidebar → canvas
+    // Drag from sidebar <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> canvas
     sb.querySelectorAll('[data-sbtype]').forEach(el => {
         el.addEventListener('dragstart', e => {
             e.dataTransfer.setData('nodeType', el.dataset.sbtype);
@@ -396,7 +396,7 @@ function buildNodeEl(node) {
                 display:flex;align-items:center;justify-content:center;cursor:pointer;
                 font-size:11px;color:white;flex-shrink:0;"
                 onmouseenter="this.style.background='rgba(239,68,68,0.8)'"
-                onmouseleave="this.style.background='rgba(0,0,0,0.25)'">✕</div>
+                onmouseleave="this.style.background='rgba(0,0,0,0.25)'"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></div>
             ` : ''}
         </div>
         <!-- BODY -->
@@ -761,7 +761,7 @@ function onWrapWheel(e) {
 }
 
 function onWrapDblClick(e) {
-    // Dblclick empty canvas → add message node
+    // Dblclick empty canvas <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> add message node
     if (e.target.closest('[data-nid]')) return;
     const wrap = document.getElementById('fcCanvasWrap');
     const rect = wrap.getBoundingClientRect();
@@ -796,7 +796,7 @@ function renderPropPanel() {
 
     if (!fc.selected) {
         panel.innerHTML = `<div style="text-align:center;padding:48px 16px;color:#475569;">
-            <div style="font-size:32px;margin-bottom:8px;">⬆</div>
+            <div style="font-size:32px;margin-bottom:8px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19V5"/><path d="m5 12 7-7 7 7"/></svg></span></div>
             <div style="font-size:13px;">Клікніть на вузол<br>для редагування</div>
         </div>`;
         return;
@@ -858,8 +858,8 @@ function renderPropPanel() {
                      ['>','> Більше'],['<','< Менше']], d.condOp||'='))
                 + fld('Значення', inp('condVal', d.condVal, ''))
                 + `<div style="font-size:10px;color:#64748b;margin-top:4px;">
-                    ● Вихід "Так" → умова виконується<br>
-                    ● Вихід "Ні" → умова не виконується</div>`;
+                    <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/></svg></span> Вихід "Так" <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> умова виконується<br>
+                    <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/></svg></span> Вихід "Ні" <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> умова не виконується</div>`;
             break;
         case 'pause':
             fields = fld('Затримка', `<div style="display:flex;gap:6px;">
@@ -940,7 +940,7 @@ function renderPropPanel() {
             <button onclick="fcApplyNodeData('${node.id}')"
                 style="width:100%;padding:10px;background:#22c55e;border:none;border-radius:8px;
                 color:white;cursor:pointer;font-weight:700;font-size:13px;margin-top:4px;">
-                ✓ Застосувати
+                <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Застосувати
             </button>
             ${node.type !== 'start' ? `
             <button onclick="fcDeleteNode('${node.id}')"
@@ -1025,7 +1025,7 @@ window.fcApplyNodeData = function(nodeId) {
 
     renderAll();
     renderPropPanel();
-    if (typeof showToast === 'function') showToast('Вузол збережено ✓', 'success');
+    if (typeof showToast === 'function') showToast('Вузол збережено <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>', 'success');
 };
 
 window.fcDeleteNode = function(nodeId) {
@@ -1092,7 +1092,7 @@ async function saveFlow() {
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             });
         if (btn) btn.textContent = 'Зберегти';
-        if (typeof showToast === 'function') showToast('Флоу збережено ✓', 'success');
+        if (typeof showToast === 'function') showToast('Флоу збережено <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>', 'success');
     } catch(e) {
         if (btn) btn.textContent = 'Зберегти';
         alert('Помилка: ' + e.message);

@@ -295,7 +295,7 @@
                 </button>
                 <button onclick="toggleBulkMode()"
                     style="padding:0.35rem 0.7rem;border:1px solid #e5e7eb;background:#f9fafb;border-radius:8px;cursor:pointer;font-size:0.78rem;color:#6b7280;">
-                    ✕ Вийти
+                    <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span> Вийти
                 </button>`;
             document.body.appendChild(bar);
         }

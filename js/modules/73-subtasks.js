@@ -71,7 +71,7 @@
 
         subtasks.forEach(st => {
             const statusColor = st.status==='done'?'#22c55e':st.status==='progress'?'#3b82f6':st.status==='review'?'#f97316':'#9ca3af';
-            const statusIcon = st.status==='done'?'✅':st.status==='progress'?'🔵':st.status==='review'?'🔍':'⬜';
+            const statusIcon = st.status==='done'?'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>':st.status==='progress'?'🔵':st.status==='review'?'🔍':'⬜';
             const isOverdue = st.deadlineDate && st.deadlineDate < (typeof getLocalDateStr==='function'?getLocalDateStr(new Date()):new Date().toISOString().split('T')[0]) && st.status !== 'done';
             const row = document.createElement('div');
             row.style.cssText = 'display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.65rem;background:white;border-radius:8px;border:1px solid #e5e7eb;cursor:pointer;transition:box-shadow 0.15s;';
@@ -90,7 +90,7 @@
                 </div>
                 <button type="button" onclick="event.stopPropagation();deleteSubtask('${st.id}','${parentTaskId}')" 
                     style="background:none;border:none;color:#d1d5db;cursor:pointer;padding:2px 4px;border-radius:4px;font-size:0.9rem;flex-shrink:0;"
-                    onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'">✕</button>`;
+                    onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>`;
             row.onclick = () => {
                 closeModal('taskModal');
                 setTimeout(() => openTaskModal(st.id), 150);
@@ -123,7 +123,7 @@
                         <span style="color:#22c55e;">⊕</span> Нове підзавдання
                     </h3>
                     <button onclick="document.getElementById('subtaskFormOverlay').remove()" 
-                        style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#9ca3af;">✕</button>
+                        style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#9ca3af;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:0.75rem;">
                     <div>

@@ -43,7 +43,7 @@
         monthly:     { label: 'Місячна',             icon: '📆',  color: '#8b5cf6', duration: 90 },
         council_rec: { label: 'Рекомендаційна рада', icon: '🤝',  color: '#06b6d4', duration: 60 },
         council_dir: { label: 'Рада директора',      icon: '🎯',  color: '#16a34a', duration: 60 },
-        council_exe: { label: 'Виконавча рада',      icon: '⚡',  color: '#ef4444', duration: 90 },
+        council_exe: { label: 'Виконавча рада',      icon: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>',  color: '#ef4444', duration: 90 },
         council_own: { label: 'Рада засновників',    icon: '👑',  color: '#d97706', duration: 120 },
         oneoff:      { label: 'Разова',              icon: '🔔',  color: '#6b7280', duration: 45 },
     };
@@ -51,11 +51,11 @@
     const DAYS_UK = ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
 
     const AGENDA_BASE = [
-        { id: 'stats',     icon: '📊', label: 'Статистики учасників' },
-        { id: 'execution', icon: '✅', label: 'Виконання попередніх завдань' },
+        { id: 'stats',     icon: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>', label: 'Статистики учасників' },
+        { id: 'execution', icon: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>', label: 'Виконання попередніх завдань' },
         { id: 'reports',   icon: '🗣', label: 'Звіти учасників' },
         { id: 'questions', icon: '❓', label: 'Питання від учасників' },
-        { id: 'decisions', icon: '⚡', label: 'Рішення' },
+        { id: 'decisions', icon: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>', label: 'Рішення' },
         { id: 'tasks',     icon: '📌', label: 'Нові завдання' },
     ];
 
@@ -280,7 +280,7 @@
             <!-- Header -->
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.75rem;">
               <h2 id="coordModalTitle" style="margin:0;font-size:1.25rem;font-weight:700;color:#1a1a1a;">Нова координація</h2>
-              <button onclick="closeCoordModal()" style="background:#f3f4f6;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:1rem;color:#6b7280;display:flex;align-items:center;justify-content:center;">✕</button>
+              <button onclick="closeCoordModal()" style="background:#f3f4f6;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:1rem;color:#6b7280;display:flex;align-items:center;justify-content:center;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:1.25rem;">
@@ -396,7 +396,7 @@
           <div class="modal-content" style="max-width:480px;max-height:80vh;overflow-y:auto;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem;">
               <h2 id="dynAgendaTitle" style="margin:0;font-size:1rem;"><i data-lucide="list-checks" style="width:12px;height:12px;margin-right:4px;"></i>Порядок денний</h2>
-              <button onclick="closeDynAgenda()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9ca3af;">✕</button>
+              <button onclick="closeDynAgenda()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9ca3af;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
             </div>
             <div style="font-size:.78rem;color:#6b7280;margin-bottom:.65rem;">Учасники додають питання до початку координації</div>
             <div id="dynAgendaList" style="display:flex;flex-direction:column;gap:.35rem;margin-bottom:.65rem;"></div>
@@ -421,7 +421,7 @@
               <div style="display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;">
                 <span id="coordTimer" style="font-size:1.15rem;font-weight:700;color:#16a34a;font-variant-numeric:tabular-nums;background:#f0fdf4;padding:.18rem .55rem;border-radius:8px;">00:00</span>
                 <button onclick="finishCoordSession()" class="btn btn-success" style="padding:.38rem .9rem;font-size:.82rem;"><i data-lucide="check-circle" style="width:14px;height:14px;margin-right:4px;"></i>Завершити</button>
-                <button onclick="closeCoordSession()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9ca3af;" title="Закрити">✕</button>
+                <button onclick="closeCoordSession()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9ca3af;" title="Закрити"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
               </div>
             </div>
             <!-- Body grid -->
@@ -478,10 +478,10 @@
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.1rem;flex-wrap:wrap;gap:.45rem;">
               <h2 style="margin:0;font-size:1rem;">📄 Протокол координації</h2>
               <div style="display:flex;gap:.35rem;flex-wrap:wrap;">
-                <button onclick="sendProtocolToTelegram()" style="padding:.3rem .65rem;font-size:.76rem;background:#2b9ef4;color:#fff;border:none;border-radius:7px;cursor:pointer;">✈️ Telegram</button>
-                <button onclick="exportCoordHistoryExcel()" style="padding:.3rem .65rem;font-size:.76rem;background:#16a34a;color:#fff;border:none;border-radius:7px;cursor:pointer;">📊 Excel</button>
+                <button onclick="sendProtocolToTelegram()" style="padding:.3rem .65rem;font-size:.76rem;background:#2b9ef4;color:#fff;border:none;border-radius:7px;cursor:pointer;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 2c-2-2-4-2-5.5-.5L10 5 1.8 6.2c-.5.1-.9.5-1 1-.1.4.1.9.4 1.2l4 4L4 15l-2 1 1 2 2-1 3.8 1.2 4 4c.3.3.8.5 1.2.4.5-.1.9-.5 1-1z"/></svg></span> Telegram</button>
+                <button onclick="exportCoordHistoryExcel()" style="padding:.3rem .65rem;font-size:.76rem;background:#16a34a;color:#fff;border:none;border-radius:7px;cursor:pointer;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Excel</button>
                 <button onclick="printProtocol()" style="padding:.3rem .65rem;font-size:.76rem;background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:7px;cursor:pointer;">🖨 PDF</button>
-                <button onclick="closeProtocolModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9ca3af;">✕</button>
+                <button onclick="closeProtocolModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9ca3af;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
               </div>
             </div>
             <div id="coordProtocolContent"></div>
@@ -494,8 +494,8 @@
         <div id="coordAnalysisModal" class="modal" role="dialog" style="display:none;z-index:10025;">
           <div class="modal-content" style="max-width:620px;max-height:90vh;overflow-y:auto;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-              <h2 style="margin:0;font-size:1rem;">🤖 AI Аналіз координацій</h2>
-              <button onclick="closeCoordAnalysis()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9ca3af;">✕</button>
+              <h2 style="margin:0;font-size:1rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span> AI Аналіз координацій</h2>
+              <button onclick="closeCoordAnalysis()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9ca3af;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
             </div>
             <div id="coordAnalysisContent" style="min-height:180px;"></div>
             <div style="margin-top:1rem;display:flex;gap:.5rem;">
@@ -623,7 +623,7 @@
                 ${author?`<div style="font-size:.7rem;color:#9ca3af;">${esc(author.name||author.email)}</div>`:''}
                 ${item.escalatedFrom?`<div style="font-size:.68rem;color:#d97706;">↑ Ескальовано</div>`:''}
               </div>
-              ${isManager()?`<button onclick="removeDynItem(${i})" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.82rem;padding:0;">✕</button>`:''}
+              ${isManager()?`<button onclick="removeDynItem(${i})" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.82rem;padding:0;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>`:''}
             </div>`;
         }).join('');
     }
@@ -813,7 +813,7 @@
         <div style="display:flex;align-items:flex-start;gap:.35rem;padding:.3rem .45rem;background:#f0fdf4;border-radius:6px;border:1px solid #d1fae5;">
           <span style="color:#16a34a;font-weight:700;flex-shrink:0;font-size:.8rem;">${i+1}.</span>
           <span style="flex:1;font-size:.8rem;">${esc(d.text)}</span>
-          <button onclick="removeDecision(${i})" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.8rem;padding:0;line-height:1;">✕</button>
+          <button onclick="removeDecision(${i})" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.8rem;padding:0;line-height:1;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
         </div>`).join('');
     }
     window.removeDecision = idx => { sessionDecisions.splice(idx,1); renderDecisions(); };
@@ -831,7 +831,7 @@
         <div style="display:flex;align-items:flex-start;gap:.35rem;padding:.3rem .45rem;background:#fefce8;border-radius:6px;border:1px solid #fde68a;">
           <span style="color:#d97706;font-weight:700;flex-shrink:0;font-size:.8rem;">!</span>
           <span style="flex:1;font-size:.8rem;">${esc(d.text)}</span>
-          <button onclick="removeUnresolved(${i})" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.8rem;padding:0;line-height:1;">✕</button>
+          <button onclick="removeUnresolved(${i})" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.8rem;padding:0;line-height:1;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
         </div>`).join('');
     }
     window.removeUnresolved = idx => { sessionUnresolved.splice(idx,1); renderUnresolved(); };
@@ -1026,7 +1026,7 @@
         const c=coordinations.find(x=>x.id===currentProtocol.coordId);
         if(!c?.telegramChatId){toast('Telegram чат не налаштований','error');return;}
         await sendTelegramProto(currentProtocol,c.telegramChatId);
-        toast('Надіслано в Telegram ✅');
+        toast('Надіслано в Telegram <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>');
     };
 
     // ── History ────────────────────────────────────────────
@@ -1069,7 +1069,7 @@
 
     window.runCoordAI = async function() {
         const el=document.getElementById('coordAnalysisContent'); if(!el) return;
-        el.innerHTML=`<div style="text-align:center;padding:2rem;color:#9ca3af;"><div style="font-size:2rem;margin-bottom:.5rem;">🤖</div>Аналізую...</div>`;
+        el.innerHTML=`<div style="text-align:center;padding:2rem;color:#9ca3af;"><div style="font-size:2rem;margin-bottom:.5rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span></div>Аналізую...</div>`;
         try {
             const snap=await col('coordination_sessions').orderBy('createdAt','desc').limit(30).get();
             const sessions=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -1095,7 +1095,7 @@
 
             el.innerHTML=`
             ${aiText?`<div style="background:linear-gradient(135deg,#7c3aed15,#a855f715);border:1.5px solid #e9d5ff;border-radius:12px;padding:.9rem;margin-bottom:.85rem;">
-              <div style="font-weight:700;color:#7c3aed;margin-bottom:.4rem;font-size:.83rem;">🤖 AI Рекомендації</div>
+              <div style="font-weight:700;color:#7c3aed;margin-bottom:.4rem;font-size:.83rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span> AI Рекомендації</div>
               <div style="font-size:.82rem;color:#374151;white-space:pre-wrap;line-height:1.55;">${esc(aiText)}</div>
             </div>`:''}
             ${renderPatterns(patterns)}`;

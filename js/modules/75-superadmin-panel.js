@@ -108,7 +108,7 @@
                 <td style="padding:0.4rem 0.5rem;">
                     <button onclick="openFeatureFlags('${safeId}', '${safeName}')"
                         style="padding:0.3rem 0.7rem;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;white-space:nowrap;">
-                        ⚙ Модулі
+                        <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span> Модулі
                     </button>
                 </td>
             </tr>`;
@@ -118,7 +118,7 @@
         <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
             <span style="font-size:0.85rem;color:#6b7280;">Компаній: <strong>${companyDocs.length}</strong></span>
             <button onclick="loadSuperadminData()" style="margin-left:auto;padding:0.35rem 0.8rem;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;font-size:0.8rem;">↻ Оновити</button>
-            <button onclick="openGlobalAISettings()" style="padding:0.35rem 0.8rem;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;">🌐 Глобальні налаштування</button>
+            <button onclick="openGlobalAISettings()" style="padding:0.35rem 0.8rem;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> Глобальні налаштування</button>
         </div>
         <div style="overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
@@ -168,12 +168,12 @@
             overlay.innerHTML = `
                 <div style="background:white;border-radius:16px;padding:1.5rem;width:100%;max-width:440px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                        <h3 style="margin:0;font-size:1rem;font-weight:700;">⚙ Модулі: ${companyName}</h3>
-                        <button onclick="document.getElementById('featureFlagsOverlay').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#9ca3af;">✕</button>
+                        <h3 style="margin:0;font-size:1rem;font-weight:700;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span> Модулі: ${companyName}</h3>
+                        <button onclick="document.getElementById('featureFlagsOverlay').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#9ca3af;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                     </div>
                     <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
                         <button onclick="toggleAllFeatures(true)" style="padding:0.3rem 0.7rem;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;border-radius:6px;cursor:pointer;font-size:0.78rem;">✓ Всі</button>
-                        <button onclick="toggleAllFeatures(false)" style="padding:0.3rem 0.7rem;background:#fef2f2;border:1px solid #fecaca;color:#ef4444;border-radius:6px;cursor:pointer;font-size:0.78rem;">✕ Жодного</button>
+                        <button onclick="toggleAllFeatures(false)" style="padding:0.3rem 0.7rem;background:#fef2f2;border:1px solid #fecaca;color:#ef4444;border-radius:6px;cursor:pointer;font-size:0.78rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span> Жодного</button>
                     </div>
                     <div id="featureChecksList">${checks}</div>
                     <div style="display:flex;gap:0.5rem;margin-top:1rem;">
@@ -212,7 +212,7 @@
             overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999999;display:flex;align-items:center;justify-content:center;padding:1rem;';
             overlay.innerHTML = `
                 <div style="background:white;border-radius:16px;padding:1.5rem;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                    <h3 style="margin:0 0 1rem;font-size:1rem;font-weight:700;">🌐 Глобальні AI налаштування</h3>
+                    <h3 style="margin:0 0 1rem;font-size:1rem;font-weight:700;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> Глобальні AI налаштування</h3>
                     <label style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;cursor:pointer;">
                         <input type="checkbox" id="globalAiEnabled" ${s.globalAiEnabled !== false ? 'checked' : ''} style="width:16px;height:16px;accent-color:#22c55e;">
                         <span style="font-weight:600;">AI увімкнено глобально</span>

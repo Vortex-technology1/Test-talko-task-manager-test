@@ -27,15 +27,15 @@
                 <div style="display:flex;gap:0.5rem;margin-bottom:1rem;background:white;border-radius:12px;padding:0.4rem;box-shadow:var(--shadow);">
                     <button onclick="botsSwitchTab('list')" id="botsTabList"
                         style="flex:1;padding:0.5rem;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;background:#22c55e;color:white;transition:all 0.2s;">
-                        🤖 Боти
+                        <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span> Боти
                     </button>
                     <button onclick="botsSwitchTab('sessions')" id="botsTabSessions"
                         style="flex:1;padding:0.5rem;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;background:transparent;color:#525252;transition:all 0.2s;">
-                        💬 Сесії
+                        <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Сесії
                     </button>
                     <button onclick="botsSwitchTab('settings')" id="botsTabSettings"
                         style="flex:1;padding:0.5rem;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;background:transparent;color:#525252;transition:all 0.2s;">
-                        ⚙️ Налаштування
+                        <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>️ Налаштування
                     </button>
                 </div>
                 <div id="botsListView"></div>
@@ -77,7 +77,7 @@
         const container = document.getElementById('botsListView');
         if (!container || botsSubTab !== 'list') return;
 
-        const channelIcons = { telegram: '✈️', instagram: '📸', whatsapp: '💬', web: '🌐' };
+        const channelIcons = { telegram: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 2c-2-2-4-2-5.5-.5L10 5 1.8 6.2c-.5.1-.9.5-1 1-.1.4.1.9.4 1.2l4 4L4 15l-2 1 1 2 2-1 3.8 1.2 4 4c.3.3.8.5 1.2.4.5-.1.9-.5 1-1z"/></svg></span>', instagram: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="15" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6V4h8v2"/></svg></span>', whatsapp: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', web: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>' };
         const statusColors = { active: '#22c55e', draft: '#9ca3af', paused: '#f97316' };
 
         container.innerHTML = `
@@ -93,7 +93,7 @@
 
             ${botsFlows.length === 0 ? `
                 <div style="text-align:center;padding:3rem;background:white;border-radius:12px;box-shadow:var(--shadow);">
-                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">🤖</div>
+                    <div style="font-size:2.5rem;margin-bottom:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span></div>
                     <div style="font-weight:600;margin-bottom:0.4rem;">Ботів поки немає</div>
                     <div style="font-size:0.85rem;color:#6b7280;margin-bottom:1rem;">Створіть першого бота і налаштуйте автоматичні сценарії</div>
                     <button onclick="openCreateFlowModal()" style="padding:0.6rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">+ Створити бота</button>
@@ -104,7 +104,7 @@
                             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
                                 <div>
                                     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
-                                        <span style="font-size:1.1rem;">${channelIcons[flow.channel] || '🤖'}</span>
+                                        <span style="font-size:1.1rem;">${channelIcons[flow.channel] || '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>'}</span>
                                         <span style="font-weight:700;font-size:0.95rem;">${escH(flow.name)}</span>
                                         <span style="font-size:0.7rem;background:${statusColors[flow.status] || '#9ca3af'}22;color:${statusColors[flow.status] || '#9ca3af'};padding:0.15rem 0.5rem;border-radius:20px;font-weight:600;">${flow.status || 'draft'}</span>
                                     </div>
@@ -114,7 +114,7 @@
                                 </div>
                                 <div style="display:flex;gap:0.4rem;">
                                     <button onclick="openFlowEditor('${flow.id}')" style="padding:0.4rem 0.75rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">
-                                        ✏️ Редагувати
+                                        <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span>️ Редагувати
                                     </button>
                                     <button onclick="toggleFlowStatus('${flow.id}','${flow.status}')"
                                         style="padding:0.4rem 0.65rem;background:${flow.status==='active'?'#fee2e2':'#f0fdf4'};color:${flow.status==='active'?'#ef4444':'#16a34a'};border:none;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:600;">
@@ -137,7 +137,7 @@
         await firebase.firestore().collection('companies').doc(window.currentCompanyId)
             .collection('flows').doc(flowId)
             .update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        if (typeof showToast === 'function') showToast(newStatus === 'active' ? '✅ Бота активовано' : '⏸ Бота на паузі', 'success');
+        if (typeof showToast === 'function') showToast(newStatus === 'active' ? '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Бота активовано' : '⏸ Бота на паузі', 'success');
     };
 
     window.confirmDeleteFlow = function (flowId) {
@@ -155,7 +155,7 @@
                 <div style="background:white;border-radius:16px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,0.2);">
                     <div style="padding:1.25rem;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
                         <div style="font-weight:700;">Новий бот</div>
-                        <button onclick="document.getElementById('botsCreateOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;">✕</button>
+                        <button onclick="document.getElementById('botsCreateOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                     </div>
                     <div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;">
                         <div>
@@ -166,10 +166,10 @@
                         <div>
                             <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">КАНАЛ</label>
                             <select id="newFlowChannel" style="width:100%;padding:0.6rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;background:white;">
-                                <option value="telegram">✈️ Telegram</option>
-                                <option value="instagram">📸 Instagram</option>
-                                <option value="whatsapp">💬 WhatsApp</option>
-                                <option value="web">🌐 Web Widget</option>
+                                <option value="telegram"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 2c-2-2-4-2-5.5-.5L10 5 1.8 6.2c-.5.1-.9.5-1 1-.1.4.1.9.4 1.2l4 4L4 15l-2 1 1 2 2-1 3.8 1.2 4 4c.3.3.8.5 1.2.4.5-.1.9-.5 1-1z"/></svg></span> Telegram</option>
+                                <option value="instagram"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="15" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6V4h8v2"/></svg></span> Instagram</option>
+                                <option value="whatsapp"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> WhatsApp</option>
+                                <option value="web"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> Web Widget</option>
                             </select>
                         </div>
                         <div>
@@ -226,14 +226,14 @@
     function renderFlowEditorPanel(flowData) {
         document.getElementById('botsEditorOverlay')?.remove();
         const nodeTypes = [
-            ['message','Повідомлення','💬'],
+            ['message','Повідомлення','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>'],
             ['question','Питання','❓'],
             ['buttons','Кнопки','🔘'],
-            ['condition','Умова','⚡'],
-            ['ai','AI відповідь','🤖'],
+            ['condition','Умова','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>'],
+            ['ai','AI відповідь','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>'],
             ['delay','Затримка','⏳'],
-            ['talko_task','Задача TALKO','✅'],
-            ['talko_deal','Угода CRM','💼'],
+            ['talko_task','Задача TALKO','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>'],
+            ['talko_deal','Угода CRM','<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>'],
             ['tag','Тег контакту','🏷️'],
             ['human','Передати менеджеру','👤'],
             ['end','Завершення','🏁'],
@@ -252,7 +252,7 @@
                         </div>
                         <div style="display:flex;gap:0.5rem;">
                             <button onclick="saveFlowNodes()" style="padding:0.45rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">💾 Зберегти</button>
-                            <button onclick="document.getElementById('botsEditorOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;">✕</button>
+                            <button onclick="document.getElementById('botsEditorOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                         </div>
                     </div>
 
@@ -298,7 +298,7 @@
     function renderBotsNodesList() {
         const container = document.getElementById('botsNodesList');
         if (!container) return;
-        const icons = { message:'💬', question:'❓', buttons:'🔘', condition:'⚡', ai:'🤖', delay:'⏳', talko_task:'✅', talko_deal:'💼', tag:'🏷️', human:'👤', end:'🏁' };
+        const icons = { message:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', question:'❓', buttons:'🔘', condition:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>', ai:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>', delay:'⏳', talko_task:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>', talko_deal:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>', tag:'🏷️', human:'👤', end:'🏁' };
 
         if (botsFlowNodes.length === 0) {
             container.innerHTML = '<div style="text-align:center;padding:1rem;color:#9ca3af;font-size:0.8rem;">Вузлів немає</div>';
@@ -317,7 +317,7 @@
                     ${i>0?`<button onclick="event.stopPropagation();moveNode('${node.id}',-1)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:0.65rem;padding:1px;">▲</button>`:''}
                     ${i<botsFlowNodes.length-1?`<button onclick="event.stopPropagation();moveNode('${node.id}',1)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:0.65rem;padding:1px;">▼</button>`:''}
                 </div>
-                <button onclick="event.stopPropagation();deleteFlowNode('${node.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.72rem;padding:2px;">✕</button>
+                <button onclick="event.stopPropagation();deleteFlowNode('${node.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.72rem;padding:2px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
             </div>`).join('');
     }
 
@@ -388,7 +388,7 @@
                                 <option value="">→ авто</option>
                                 ${allNodes.map(n=>`<option value="${n.id}" ${o.nextNode===n.id?'selected':''}>${escH(n.name||n.type)}</option>`).join('')}
                             </select>
-                            <button onclick="removeNodeOpt('${nodeId}',${i})" style="background:#fee2e2;border:none;color:#ef4444;border-radius:5px;cursor:pointer;padding:3px 6px;font-size:0.72rem;">✕</button>
+                            <button onclick="removeNodeOpt('${nodeId}',${i})" style="background:#fee2e2;border:none;color:#ef4444;border-radius:5px;cursor:pointer;padding:3px 6px;font-size:0.72rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
                         </div>`).join('')}
                 </div>
                 <button onclick="addNodeOpt('${nodeId}')" style="width:100%;padding:0.4rem;background:#f0fdf4;color:#16a34a;border:1px dashed #bbf7d0;border-radius:6px;cursor:pointer;font-size:0.8rem;">+ Додати кнопку</button>
@@ -456,7 +456,7 @@
         }
 
         if (node.type === 'end') {
-            specific = field('ФІНАЛЬНЕ ПОВІДОМЛЕННЯ') + textarea(node.text||'Дякуємо за звернення! До зустрічі. 👋', `updateNode('${nodeId}','text',this.value)`);
+            specific = field('ФІНАЛЬНЕ ПОВІДОМЛЕННЯ') + textarea(node.text||'Дякуємо за звернення! До зустрічі. <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span>', `updateNode('${nodeId}','text',this.value)`);
         }
 
         const showNextNode = !['buttons','condition','end'].includes(node.type);

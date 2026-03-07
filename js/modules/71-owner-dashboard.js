@@ -127,7 +127,7 @@ window.renderOwnerDashboard = function(targetEl) {
         <!-- Навантаження команди -->
         <div style="background:white;border-radius:12px;box-shadow:var(--shadow);overflow:hidden;">
             <div style="padding:0.85rem 1rem;border-bottom:1px solid #f3f4f6;font-weight:600;font-size:0.9rem;">
-                👥 Навантаження команди
+                <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Навантаження команди
             </div>
             <table style="width:100%;border-collapse:collapse;">
                 <thead>
@@ -154,7 +154,7 @@ window.renderOwnerDashboard = function(targetEl) {
 
             <div style="background:white;border-radius:12px;box-shadow:var(--shadow);overflow:hidden;">
                 <div style="padding:0.85rem 1rem;border-bottom:1px solid #f3f4f6;font-weight:600;font-size:0.9rem;color:#16a34a;">
-                    ✅ Виконано за 7 днів (${doneThisWeek.length})
+                    <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Виконано за 7 днів (${doneThisWeek.length})
                 </div>
                 <div style="padding:0.5rem 0.75rem;">
                     ${doneRows || '<div style="padding:0.5rem;color:#9ca3af;font-size:0.85rem;">Немає виконаних завдань</div>'}
