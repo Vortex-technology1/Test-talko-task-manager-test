@@ -365,9 +365,9 @@ function buildNodeEl(node) {
         `top:${node.y}px`,
         `width:${W}px`,
         `border-radius:10px`,
-        `background:white`,
-        `border:2px solid ${isSelected ? cfg.color : '#e2e8f0'}`,
-        `box-shadow:${isSelected ? `0 0 0 3px ${cfg.color}33,` : ''}0 4px 16px rgba(0,0,0,0.12)`,
+        `background:${node.type === 'start' ? '#f0fdf4' : 'white'}`,
+        `border:2px solid ${node.type === 'start' ? cfg.color : (isSelected ? cfg.color : '#e2e8f0')}`,
+        `box-shadow:${(isSelected || node.type === 'start') ? `0 0 0 3px ${cfg.color}33,` : ''}0 4px 16px rgba(0,0,0,0.12)`,
         `cursor:pointer`,
         `transition:border-color 0.15s,box-shadow 0.15s`,
         `overflow:visible`,
@@ -1301,10 +1301,14 @@ async function saveFlow() {
         const saveRef = fc.botId
             ? firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('bots').doc(fc.botId).collection('flows').doc(fc.flowId)
             : firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('flows').doc(fc.flowId);
+
+        // Firestore не приймає undefined — замінюємо на null
+        const sanitize = (obj) => JSON.parse(JSON.stringify(obj, (k, v) => v === undefined ? null : v));
+
         await saveRef.update({
-                canvasData,
-                nodes: ordered,
-                triggerKeyword,
+                canvasData: sanitize(canvasData),
+                nodes: sanitize(ordered),
+                triggerKeyword: triggerKeyword || '/start',
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             });
         if (btn) btn.textContent = 'Зберегти';
