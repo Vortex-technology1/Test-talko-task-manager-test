@@ -1,6 +1,6 @@
 // ============================================================
 // TALKO Bots Platform v2.0
-// Структура: Company <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> Bots <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> Flows (ланцюги)
+// Структура: Company <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Bots <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Flows (ланцюги)
 // Модулі: Ланцюги, Контакти, Чат, Розсилка, Налаштування
 // ============================================================
 (function () {
@@ -41,6 +41,12 @@ function loadBots() {
 }
 
 // ── Shell ──────────────────────────────────────────────────
+function lcIcons(el) {
+    if (window.lucide) {
+        try { lucide.createIcons({ nameAttr: 'data-lucide', attrs: { 'stroke-width': 2 }, nodes: el ? [el] : undefined }); } catch(e) {}
+    }
+}
+
 function renderShell() {
     const container = document.getElementById('botsContainer');
     if (!container) return;
@@ -59,6 +65,7 @@ function renderShell() {
             <div id="bpViewBroadcast" style="display:none;"></div>
             <div id="bpViewSettings" style="display:none;"></div>
         </div>`;
+    lcIcons(container);
 
     renderTabBar(['bots']);
     renderBotsTab();
@@ -68,12 +75,12 @@ function renderTabBar(visibleTabs) {
     const bar = document.getElementById('bpTabBar');
     if (!bar) return;
     const all = [
-        ['bots',      '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>', 'Боти'],
-        ['flows',     '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>',  'Ланцюги'],
-        ['contacts',  '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>', 'Контакти'],
-        ['chat',      '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', 'Чат'],
-        ['broadcast', '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span>', 'Розсилка'],
-        ['settings',  '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>',  'Налаштування'],
+        ['bots',      '<i data-lucide="bot" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>', 'Боти'],
+        ['flows',     '<i data-lucide="link" style="width:15px;height:15px;display:inline-block;vertical-align:middle;"></i>',  'Ланцюги'],
+        ['contacts',  '<i data-lucide="users" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>', 'Контакти'],
+        ['chat',      '<i data-lucide="message-square" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>', 'Чат'],
+        ['broadcast', '<i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>', 'Розсилка'],
+        ['settings',  '<i data-lucide="settings" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>',  'Налаштування'],
     ];
     bar.innerHTML = all.filter(([id]) => visibleTabs.includes(id)).map(([id, icon, label]) => `
         <button id="bpTab_${id}" onclick="bpSwitch('${id}')"
@@ -110,7 +117,7 @@ function renderBotsTab() {
     if (!c) return;
 
     const channelColors = { telegram:'#3b82f6', instagram:'#e1306c', whatsapp:'#25d366', web:'#6366f1' };
-    const channelIcons  = { telegram:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 2c-2-2-4-2-5.5-.5L10 5 1.8 6.2c-.5.1-.9.5-1 1-.1.4.1.9.4 1.2l4 4L4 15l-2 1 1 2 2-1 3.8 1.2 4 4c.3.3.8.5 1.2.4.5-.1.9-.5 1-1z"/></svg></span>', instagram:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="15" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6V4h8v2"/></svg></span>', whatsapp:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', web:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>' };
+    const channelIcons  = { telegram:'<i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>', instagram:'<i data-lucide="camera" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>', whatsapp:'<i data-lucide="message-square" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>', web:'<i data-lucide="globe" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>' };
 
     c.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
@@ -127,7 +134,7 @@ function renderBotsTab() {
 
         ${bp.bots.length === 0 ? `
         <div style="text-align:center;padding:3rem;background:white;border-radius:16px;box-shadow:var(--shadow);">
-            <div style="font-size:3rem;margin-bottom:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span></div>
+            <div style="font-size:3rem;margin-bottom:0.75rem;"><i data-lucide="bot" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i></div>
             <div style="font-weight:700;font-size:1rem;margin-bottom:0.4rem;">Ботів поки немає</div>
             <div style="font-size:0.84rem;color:#6b7280;margin-bottom:1.25rem;">
                 Підключіть Telegram бота або інший канал<br>і створіть перший ланцюг сценарію
@@ -141,7 +148,7 @@ function renderBotsTab() {
         <div style="display:flex;flex-direction:column;gap:0.6rem;">
             ${bp.bots.map(bot => {
                 const color = channelColors[bot.channel] || '#6b7280';
-                const icon = channelIcons[bot.channel] || '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>';
+                const icon = channelIcons[bot.channel] || '<i data-lucide="bot" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>';
                 return `
                 <div style="background:white;border-radius:14px;padding:1rem;
                     box-shadow:var(--shadow);border-left:4px solid ${bot.connected?color:'#e5e7eb'};">
@@ -159,7 +166,7 @@ function renderBotsTab() {
                                 <div style="font-size:0.74rem;color:#6b7280;margin-top:1px;">
                                     ${bot.channel} · @${escH(bot.username||'—')}
                                     · <span style="color:${bot.connected?'#22c55e':'#ef4444'};font-weight:600;">
-                                        ${bot.connected?'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/></svg></span> Підключено':'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg></span> Не підключено'}
+                                        ${bot.connected?'● Підключено':'○ Не підключено'}
                                     </span>
                                 </div>
                                 <div style="font-size:0.72rem;color:#9ca3af;margin-top:2px;">
@@ -171,25 +178,26 @@ function renderBotsTab() {
                             <button onclick="openBot('${bot.id}')"
                                 style="padding:0.45rem 0.8rem;background:#22c55e;color:white;
                                 border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;">
-                                Відкрити <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                                Відкрити <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>
                             </button>
                             <button onclick="openBotSettings('${bot.id}')"
                                 style="padding:0.45rem 0.6rem;background:#f9fafb;border:1px solid #e5e7eb;
                                 border-radius:8px;cursor:pointer;font-size:0.8rem;">
-                                <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                                <i data-lucide="settings" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>
                             </button>
                             <button onclick="confirmDeleteBot('${bot.id}')"
                                 style="padding:0.45rem 0.6rem;background:#fee2e2;color:#ef4444;
                                 border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;">
-                                <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                                <i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i>
                             </button>
                         </div>
                     </div>
-                </div>`; }).join('')}
+                </div>`;
+    lcIcons(c); }).join('')}
         </div>`}`;
 }
 
-// ── Відкрити бота <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> показати його ланцюги ─────────────────
+// ── Відкрити бота <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> показати його ланцюги ─────────────────
 window.openBot = function(botId) {
     bp.activeBotId = botId;
     const bot = bp.bots.find(b=>b.id===botId);
@@ -231,7 +239,7 @@ function renderFlowsTab() {
             background:white;border-radius:10px;padding:0.6rem 0.75rem;box-shadow:var(--shadow);">
             <button onclick="bpSwitch('bots')"
                 style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:0.82rem;padding:0;">
-                <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span> Всі боти
+                <i data-lucide="bot" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Всі боти
             </button>
             <span style="color:#9ca3af;">›</span>
             <span style="font-weight:700;font-size:0.85rem;color:#374151;">
@@ -240,7 +248,7 @@ function renderFlowsTab() {
             <span style="background:${bot?.connected?'#f0fdf4':'#fee2e2'};
                 color:${bot?.connected?'#22c55e':'#ef4444'};
                 font-size:0.68rem;padding:1px 6px;border-radius:10px;font-weight:600;">
-                ${bot?.connected?'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/></svg></span> Online':'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg></span> Offline'}
+                ${bot?.connected?'● Online':'○ Offline'}
             </span>
         </div>
 
@@ -255,7 +263,7 @@ function renderFlowsTab() {
 
         ${bp.flows.length === 0 ? `
         <div style="text-align:center;padding:2.5rem;background:white;border-radius:14px;box-shadow:var(--shadow);">
-            <div style="font-size:2.5rem;margin-bottom:0.6rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span></div>
+            <div style="font-size:2.5rem;margin-bottom:0.6rem;"><i data-lucide="link" style="width:15px;height:15px;display:inline-block;vertical-align:middle;"></i></div>
             <div style="font-weight:600;margin-bottom:0.3rem;">Ланцюгів поки немає</div>
             <div style="font-size:0.82rem;color:#6b7280;margin-bottom:1rem;">
                 Ланцюг — це сценарій діалогу з користувачем
@@ -291,7 +299,7 @@ function renderFlowsTab() {
                                 <div style="font-size:0.7rem;color:#6b7280;flex:1;overflow:hidden;
                                     text-overflow:ellipsis;white-space:nowrap;background:#f9fafb;
                                     border:1px solid #e5e7eb;border-radius:5px;padding:2px 6px;">
-                                    <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> ${deepLink}
+                                    <i data-lucide="link" style="width:15px;height:15px;display:inline-block;vertical-align:middle;"></i> ${deepLink}
                                 </div>
                                 <button onclick="copyLink('${deepLink}')"
                                     style="padding:2px 7px;background:#eff6ff;color:#3b82f6;border:none;
@@ -309,22 +317,23 @@ function renderFlowsTab() {
                             <button onclick="editFlow('${flow.id}')"
                                 style="padding:0.38rem 0.65rem;background:#22c55e;color:white;
                                 border:none;border-radius:7px;cursor:pointer;font-size:0.76rem;font-weight:600;">
-                                <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span> Редагувати
+                                <i data-lucide="pencil" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Редагувати
                             </button>
                             <button onclick="toggleFlowStatus('${flow.id}','${flow.status}')"
                                 style="padding:0.38rem 0.55rem;background:${flow.status==='active'?'#fee2e2':'#f0fdf4'};
                                 color:${flow.status==='active'?'#ef4444':'#16a34a'};border:none;
                                 border-radius:7px;cursor:pointer;font-size:0.73rem;">
-                                ${flow.status==='active'?'⏸':'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg></span>'}
+                                ${flow.status==='active'?'⏸':'▶'}
                             </button>
                             <button onclick="deleteFlow('${flow.id}')"
                                 style="padding:0.38rem 0.5rem;background:#fee2e2;color:#ef4444;
                                 border:none;border-radius:7px;cursor:pointer;font-size:0.73rem;">
-                                <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                                <i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i>
                             </button>
                         </div>
                     </div>
-                </div>`; }).join('')}
+                </div>`;
+    lcIcons(c); }).join('')}
         </div>`}`;
 }
 
@@ -341,7 +350,7 @@ window.openCreateBotModal = function() {
                 <div style="padding:1.25rem;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
                     <div style="font-weight:700;font-size:1rem;">Підключити нового бота</div>
                     <button onclick="document.getElementById('bpCreateBot').remove()"
-                        style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
+                        style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i></button>
                 </div>
                 <div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;">
                     <div>
@@ -349,9 +358,9 @@ window.openCreateBotModal = function() {
                         <select id="bpNewBotChannel"
                             onchange="updateBotTokenHint(this.value)"
                             style="width:100%;padding:0.6rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.88rem;background:white;">
-                            <option value="telegram"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 2c-2-2-4-2-5.5-.5L10 5 1.8 6.2c-.5.1-.9.5-1 1-.1.4.1.9.4 1.2l4 4L4 15l-2 1 1 2 2-1 3.8 1.2 4 4c.3.3.8.5 1.2.4.5-.1.9-.5 1-1z"/></svg></span> Telegram</option>
-                            <option value="instagram"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="15" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6V4h8v2"/></svg></span> Instagram</option>
-                            <option value="whatsapp"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> WhatsApp Business</option>
+                            <option value="telegram"><i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Telegram</option>
+                            <option value="instagram"><i data-lucide="camera" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Instagram</option>
+                            <option value="whatsapp"><i data-lucide="message-square" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> WhatsApp Business</option>
                         </select>
                     </div>
                     <div>
@@ -364,7 +373,7 @@ window.openCreateBotModal = function() {
                         <input id="bpNewBotToken" placeholder="123456789:AAF..."
                             style="width:100%;padding:0.6rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.88rem;box-sizing:border-box;">
                         <div id="bpTokenHint" style="font-size:0.72rem;color:#6b7280;margin-top:0.3rem;">
-                            1. Відкрий @BotFather <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> /newbot <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> скопіюй токен
+                            1. Відкрий @BotFather <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> /newbot <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> скопіюй токен
                         </div>
                     </div>
                 </div>
@@ -373,7 +382,7 @@ window.openCreateBotModal = function() {
                         style="padding:0.55rem 1rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;">Скасувати</button>
                     <button onclick="createAndConnectBot()"
                         style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
-                        <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Підключити
+                        <i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Підключити
                     </button>
                 </div>
             </div>
@@ -386,10 +395,10 @@ window.updateBotTokenHint = function(channel) {
     const hint = document.getElementById('bpTokenHint');
     if (channel === 'telegram') {
         if (label) label.textContent = 'BOT TOKEN (від @BotFather)';
-        if (hint) hint.textContent = '1. Відкрий @BotFather <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> /newbot <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> скопіюй токен';
+        if (hint) hint.textContent = '1. Відкрий @BotFather <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> /newbot <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> скопіюй токен';
     } else if (channel === 'instagram') {
         if (label) label.textContent = 'PAGE ACCESS TOKEN';
-        if (hint) hint.textContent = 'Отримай в Meta Developer Console <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> Instagram <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> Page Access Token';
+        if (hint) hint.textContent = 'Отримай в Meta Developer Console <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Instagram <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Page Access Token';
     }
 };
 
@@ -401,7 +410,7 @@ window.createAndConnectBot = async function() {
     if (!token) { alert('Введіть токен'); return; }
 
     const btn = document.querySelector('[onclick="createAndConnectBot()"]');
-    if (btn) btn.textContent = 'Підключення...';
+    if (btn) { btn.textContent = 'Підключення...'; }
 
     try {
         let username = '';
@@ -450,10 +459,10 @@ window.createAndConnectBot = async function() {
         });
 
         document.getElementById('bpCreateBot')?.remove();
-        if (typeof showToast === 'function') showToast(connected ? `<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Бот @${username} підключено!` : 'Бот створено. Налаштуйте вебхук вручну.', 'success');
+        if (typeof showToast === 'function') showToast(connected ? `<i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;color:#22c55e;"></i> Бот @${username} підключено!` : 'Бот створено. Налаштуйте вебхук вручну.', 'success');
         openBot(botRef.id);
     } catch(e) {
-        if (btn) btn.textContent = '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Підключити';
+        if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Підключити';
         alert('Помилка: ' + e.message);
     }
 };
@@ -484,7 +493,7 @@ window.openCreateFlowModal = function() {
                 <div style="padding:1.25rem;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;">
                     <div style="font-weight:700;">Новий ланцюг</div>
                     <button onclick="document.getElementById('bpCreateFlow').remove()"
-                        style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
+                        style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i></button>
                 </div>
                 <div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.6rem;">
                     <div>
@@ -502,7 +511,7 @@ window.openCreateFlowModal = function() {
                     <button onclick="document.getElementById('bpCreateFlow').remove()"
                         style="padding:0.55rem 1rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;">Скасувати</button>
                     <button onclick="saveNewFlow()"
-                        style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Створити</button>
+                        style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;"><i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Створити</button>
                 </div>
             </div>
         </div>`);
@@ -533,7 +542,7 @@ window.saveNewFlow = async function() {
             .update({ flowCount: firebase.firestore.FieldValue.increment(1) });
 
         document.getElementById('bpCreateFlow')?.remove();
-        if (typeof showToast === 'function') showToast('Ланцюг створено <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>', 'success');
+        if (typeof showToast === 'function') showToast('Ланцюг створено <i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>', 'success');
         editFlow(ref.id);
     } catch(e) { alert('Помилка: ' + e.message); }
 };
@@ -550,7 +559,7 @@ window.toggleFlowStatus = async function(flowId, status) {
         .collection('bots').doc(bp.activeBotId)
         .collection('flows').doc(flowId)
         .update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    if (typeof showToast === 'function') showToast(newStatus==='active'?'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg></span> Активовано':'⏸ Пауза', 'success');
+    if (typeof showToast === 'function') showToast(newStatus==='active'?'▶ Активовано':'⏸ Пауза', 'success');
 };
 
 window.deleteFlow = function(flowId) {
@@ -579,6 +588,8 @@ async function renderContactsTab() {
         renderContactsList(c);
     } catch(e) {
         c.innerHTML = `<div style="color:#ef4444;padding:1rem;">Помилка: ${e.message}</div>`;
+    lcIcons(c);
+    lcIcons(c);
     }
 }
 
@@ -591,7 +602,7 @@ function renderContactsList(c) {
 
     c.innerHTML = `
         <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;">
-            ${[['<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Всього',total,'#3b82f6'],['<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Активних',active,'#22c55e'],['<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span> Заблокували',blocked,'#ef4444']]
+            ${[['<i data-lucide="users" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Всього',total,'#3b82f6'],['<i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;color:#22c55e;"></i> Активних',active,'#22c55e'],['<i data-lucide="ban" style="width:16px;height:16px;display:inline-block;vertical-align:middle;color:#ef4444;"></i> Заблокували',blocked,'#ef4444']]
               .map(([l,v,col])=>`<div style="flex:1;background:white;border-radius:10px;padding:0.6rem;
                 box-shadow:var(--shadow);text-align:center;border-top:2px solid ${col};">
                 <div style="font-size:1.1rem;font-weight:700;color:${col};">${v}</div>
@@ -609,7 +620,7 @@ function renderContactsList(c) {
               : filtered.map(ct=>{
                 const blocked=ct.botStatus==='blocked', unsub=ct.botStatus==='unsubscribed';
                 const col=blocked?'#ef4444':unsub?'#f97316':'#22c55e';
-                const status=blocked?'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span> Заблокував':unsub?'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span> Відписався':'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Активний';
+                const status=blocked?'<i data-lucide="ban" style="width:16px;height:16px;display:inline-block;vertical-align:middle;color:#ef4444;"></i> Заблокував':unsub?'<i data-lucide="hand" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Відписався':'<i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;color:#22c55e;"></i> Активний';
                 return `<div style="background:white;border-radius:9px;padding:0.65rem;box-shadow:var(--shadow);
                     display:flex;align-items:center;gap:0.5rem;${blocked?'border-left:3px solid #ef4444;':''}">
                     <div style="width:32px;height:32px;border-radius:50%;background:${col}18;
@@ -626,8 +637,9 @@ function renderContactsList(c) {
                     <button onclick="bpOpenChat('${ct.id}')" ${blocked?'disabled':''} 
                         style="padding:0.3rem 0.55rem;background:#eff6ff;color:#3b82f6;border:none;
                         border-radius:6px;cursor:pointer;font-size:0.7rem;flex-shrink:0;
-                        ${blocked?'opacity:0.4;pointer-events:none;':''}"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span></button>
-                </div>`; }).join('')}
+                        ${blocked?'opacity:0.4;pointer-events:none;':''}"><i data-lucide="message-square" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i></button>
+                </div>`;
+    lcIcons(c); }).join('')}
         </div>`;
 }
 
@@ -670,7 +682,7 @@ async function renderChatTab() {
                 border-radius:12px;box-shadow:var(--shadow);overflow:hidden;">
                 <div id="bpChatHeader" style="padding:0.7rem 0.85rem;border-bottom:1px solid #f0f0f0;
                     font-size:0.84rem;font-weight:600;color:#374151;flex-shrink:0;">
-                    Оберіть контакт <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></span>
+                    Оберіть контакт <i data-lucide="arrow-left" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>
                 </div>
                 <div id="bpChatMsgs" style="flex:1;overflow-y:auto;padding:0.75rem;
                     display:flex;flex-direction:column;gap:0.4rem;background:#f8fafc;"></div>
@@ -680,10 +692,11 @@ async function renderChatTab() {
                         onkeydown="if(event.key==='Enter')bpSendMsg()">
                     <button onclick="bpSendMsg()"
                         style="padding:0.48rem 0.9rem;background:#22c55e;color:white;border:none;
-                        border-radius:8px;cursor:pointer;font-weight:600;font-size:0.84rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></button>
+                        border-radius:8px;cursor:pointer;font-weight:600;font-size:0.84rem;"><i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i></button>
                 </div>
             </div>
         </div>`;
+    lcIcons(c);
 
     if (bp.activeChatContactId) bpOpenChat(bp.activeChatContactId);
 }
@@ -704,7 +717,7 @@ window.bpOpenChat = async function(contactId) {
                 <div style="font-weight:700;font-size:0.84rem;">${escH(ct.name||'Анонім')}</div>
                 <div style="font-size:0.68rem;color:#6b7280;">${ct.externalId||''} · ${ct.source||'telegram'}</div>
             </div>
-            ${ct.botStatus==='blocked'?'<span style="margin-left:auto;font-size:0.68rem;color:#ef4444;background:#fee2e2;padding:2px 6px;border-radius:4px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span> Заблокував</span>':''}
+            ${ct.botStatus==='blocked'?'<span style="margin-left:auto;font-size:0.68rem;color:#ef4444;background:#fee2e2;padding:2px 6px;border-radius:4px;"><i data-lucide="ban" style="width:16px;height:16px;display:inline-block;vertical-align:middle;color:#ef4444;"></i> Заблокував</span>':''}
         </div>`;
     }
 
@@ -779,7 +792,7 @@ async function renderBroadcastTab() {
 
     c.innerHTML = `
         <div style="background:white;border-radius:12px;padding:1rem;box-shadow:var(--shadow);margin-bottom:0.6rem;">
-            <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span> Нова розсилка</div>
+            <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Нова розсилка</div>
             <div style="display:flex;flex-direction:column;gap:0.55rem;">
                 <div>
                     <label style="font-size:0.72rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.25rem;">АУДИТОРІЯ</label>
@@ -803,7 +816,7 @@ async function renderBroadcastTab() {
                 </div>
                 <button onclick="bpSendBroadcast()"
                     style="padding:0.6rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.84rem;">
-                    <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span> Надіслати
+                    <i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Надіслати
                 </button>
             </div>
         </div>
@@ -816,10 +829,11 @@ async function renderBroadcastTab() {
                     <div style="font-size:0.7rem;color:#6b7280;">${b.audience||'all'} · ${b.createdAt?.toDate?relTime(b.createdAt.toDate()):''}</div>
                 </div>
                 <div style="font-size:0.75rem;text-align:right;">
-                    <div style="color:#22c55e;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> ${b.sent||0}</div>
-                    <div style="color:#ef4444;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span> ${b.failed||0}</div>
+                    <div style="color:#22c55e;"><i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> ${b.sent||0}</div>
+                    <div style="color:#ef4444;"><i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i> ${b.failed||0}</div>
                 </div>
             </div>`).join('')}`;
+    lcIcons(c);
 }
 
 window.bpSendBroadcast = async function() {
@@ -844,7 +858,7 @@ window.bpSendBroadcast = async function() {
                 if (tid) {
                     const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
                         method:'POST', headers:{'Content-Type':'application/json'},
-                        body:JSON.stringify({chat_id:tid, text:text||'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span> Повідомлення від бота'}),
+                        body:JSON.stringify({chat_id:tid, text:text||'<i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Повідомлення від бота'}),
                     });
                     const d = await res.json();
                     if (d.ok) sent++;
@@ -882,12 +896,12 @@ async function renderSettingsTab() {
         <div style="display:flex;flex-direction:column;gap:0.6rem;">
             <div style="background:white;border-radius:12px;padding:1rem;box-shadow:var(--shadow);">
                 <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.75rem;">
-                    ${bot.channel==='telegram'?'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 2c-2-2-4-2-5.5-.5L10 5 1.8 6.2c-.5.1-.9.5-1 1-.1.4.1.9.4 1.2l4 4L4 15l-2 1 1 2 2-1 3.8 1.2 4 4c.3.3.8.5 1.2.4.5-.1.9-.5 1-1z"/></svg></span>':'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="15" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6V4h8v2"/></svg></span>'} ${escH(bot.name)}
+                    ${bot.channel==='telegram'?'<i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>':'<i data-lucide="camera" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>'} ${escH(bot.name)}
                 </div>
                 <div style="font-size:0.78rem;color:#6b7280;margin-bottom:0.75rem;">
                     Username: @${escH(bot.username||'—')}<br>
                     Вебхук: <span style="color:${bot.connected?'#22c55e':'#ef4444'};">
-                        ${bot.connected?'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Підключено':'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span> Не підключено'}
+                        ${bot.connected?'<i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Підключено':'<i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i> Не підключено'}
                     </span>
                 </div>
                 <div>
@@ -910,7 +924,7 @@ async function renderSettingsTab() {
                 </button>
             </div>
             <div style="background:white;border-radius:12px;padding:1rem;box-shadow:var(--shadow);">
-                <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.6rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span> AI Ключ</div>
+                <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.6rem;"><i data-lucide="bot" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> AI Ключ</div>
                 <div style="display:flex;gap:0.4rem;">
                     <input type="password" id="botsOpenAIKey"
                         value="${compData.openaiApiKey?'•••'+compData.openaiApiKey.slice(-4):''}"
@@ -923,6 +937,8 @@ async function renderSettingsTab() {
                 </div>
             </div>
         </div>`;
+    lcIcons(c);
+    lcIcons(c);
 }
 
 window.bpReconnectBot = async function(botId) {
@@ -941,14 +957,14 @@ window.bpReconnectBot = async function(botId) {
         await firebase.firestore().collection('companies').doc(window.currentCompanyId)
             .collection('bots').doc(botId)
             .update({ token, username: meData.result.username, connected: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        if (typeof showToast==='function') showToast('<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Переп. успішно', 'success');
+        if (typeof showToast==='function') showToast('<i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;color:#22c55e;"></i> Переп. успішно', 'success');
         renderSettingsTab();
     } catch(e) { alert('Помилка: '+e.message); }
 };
 
 // ── Helpers ────────────────────────────────────────────────
 window.copyLink = function(link) {
-    navigator.clipboard.writeText(link).then(()=>{ if(typeof showToast==='function') showToast('Скопійовано <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>','success'); });
+    navigator.clipboard.writeText(link).then(()=>{ if(typeof showToast==='function') showToast('Скопійовано <i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>','success'); });
 };
 window.showQR = function(encodedLink) {
     const link = decodeURIComponent(encodedLink);
