@@ -883,22 +883,26 @@ function renderPropPanel() {
         case 'ai': {
             const aiProvider = d.aiProvider || 'openai';
 
-            // Завантажуємо моделі з Firebase (з кешем)
-            let allModels = window._cachedAiModels;
-            if (!allModels) {
-                try {
-                    const snap = await firebase.firestore().collection('settings').doc('aiModels').get();
-                    allModels = snap.exists ? snap.data() : null;
-                    window._cachedAiModels = allModels;
-                } catch(e) { allModels = null; }
-            }
-
+            // Тільки синхронне читання кешу (await заборонено в switch/case)
             const fallbackModels = {
                 openai:    [['gpt-5.4','GPT-5.4'],['gpt-5','GPT-5'],['gpt-5-mini','GPT-5 mini'],['gpt-4.1','GPT-4.1'],['gpt-4.1-mini','GPT-4.1 mini'],['gpt-4o','GPT-4o'],['gpt-4o-mini','GPT-4o mini'],['o4-mini','o4-mini'],['o3','o3']],
                 anthropic: [['claude-opus-4-5','Claude Opus 4.5'],['claude-sonnet-4-5','Claude Sonnet 4.5'],['claude-haiku-4-5-20251001','Claude Haiku 4.5']],
                 google:    [['gemini-2.5-pro','Gemini 2.5 Pro'],['gemini-2.0-flash','Gemini 2.0 Flash'],['gemini-1.5-pro','Gemini 1.5 Pro']],
             };
-            const modelOptions = (allModels?.[aiProvider] || fallbackModels[aiProvider] || fallbackModels.openai);
+            const allModels = window._cachedAiModels || fallbackModels;
+            const modelOptions = allModels[aiProvider] || fallbackModels[aiProvider] || fallbackModels.openai;
+
+            // Якщо кеш порожній — завантажуємо async і перемалюємо
+            if (!window._cachedAiModels) {
+                firebase.firestore().collection('settings').doc('aiModels').get()
+                    .then(snap => {
+                        if (snap.exists) {
+                            window._cachedAiModels = snap.data();
+                            // Перемалюємо панель з новими моделями
+                            if (fc.selected) renderPropPanel();
+                        }
+                    }).catch(() => {});
+            }
 
             // Спробуємо підтягнути збережений ключ компанії
             const savedKey = d.aiApiKey || '';
