@@ -21,7 +21,12 @@
 
     window.openSuperadminPanel = async function() {
         if (!isSuperAdmin) return;
-        openModal('superadminModal');
+        // Відкриваємо модальне вікно напряму (openModal — локальна в statistics.js)
+        const modal = document.getElementById('superadminModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
         await loadSuperadminData();
     };
 

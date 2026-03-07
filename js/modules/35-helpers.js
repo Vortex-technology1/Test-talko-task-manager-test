@@ -546,15 +546,22 @@
         function closeModal(id) {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
-            // Скидаємо editing state тільки якщо закривається primary модалка.
-            // Вторинні модалки (materialQuickModal, stageModal, qcModal тощо)
-            // не повинні скидати editingId — інакше відкрита задача губиться.
             if (PRIMARY_MODALS.includes(id)) {
                 editingId = null;
                 editingUserId = null;
             }
             checkModalState();
         }
+
+        // Глобальні аліаси — потрібні для superadmin та інших зовнішніх модулів
+        window.closeModal = closeModal;
+        window.openModal = function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        };
         
         function checkModalState() {
             const anyOpen = Array.from(document.querySelectorAll('.modal')).some(m => m.style.display === 'block');
