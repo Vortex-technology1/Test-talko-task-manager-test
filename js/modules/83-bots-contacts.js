@@ -459,7 +459,7 @@ window.createAndConnectBot = async function() {
         });
 
         document.getElementById('bpCreateBot')?.remove();
-        if (typeof showToast === 'function') showToast(connected ? `<i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;color:#22c55e;"></i> Бот @${username} підключено!` : 'Бот створено. Налаштуйте вебхук вручну.', 'success');
+        if (typeof showToast === 'function') showToast(connected ? `✅ Бот @${username} підключено!` : 'Бот створено. Налаштуйте вебхук вручну.', 'success');
         openBot(botRef.id);
     } catch(e) {
         if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Підключити';
@@ -542,7 +542,7 @@ window.saveNewFlow = async function() {
             .update({ flowCount: firebase.firestore.FieldValue.increment(1) });
 
         document.getElementById('bpCreateFlow')?.remove();
-        if (typeof showToast === 'function') showToast('Ланцюг створено <i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>', 'success');
+        if (typeof showToast === 'function') showToast('Ланцюг створено ✓', 'success');
         editFlow(ref.id);
     } catch(e) { alert('Помилка: ' + e.message); }
 };
@@ -957,14 +957,14 @@ window.bpReconnectBot = async function(botId) {
         await firebase.firestore().collection('companies').doc(window.currentCompanyId)
             .collection('bots').doc(botId)
             .update({ token, username: meData.result.username, connected: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        if (typeof showToast==='function') showToast('<i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;color:#22c55e;"></i> Переп. успішно', 'success');
+        if (typeof showToast==='function') showToast('✅ Перепідключено успішно', 'success');
         renderSettingsTab();
     } catch(e) { alert('Помилка: '+e.message); }
 };
 
 // ── Helpers ────────────────────────────────────────────────
 window.copyLink = function(link) {
-    navigator.clipboard.writeText(link).then(()=>{ if(typeof showToast==='function') showToast('Скопійовано <i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>','success'); });
+    navigator.clipboard.writeText(link).then(()=>{ if(typeof showToast==='function') showToast('Скопійовано ✓','success'); });
 };
 window.showQR = function(encodedLink) {
     const link = decodeURIComponent(encodedLink);
