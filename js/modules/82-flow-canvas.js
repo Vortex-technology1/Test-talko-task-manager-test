@@ -48,11 +48,13 @@ const PORT_LABELS = {
 };
 
 // ── Open ───────────────────────────────────────────────────
-window.openFlowCanvas = async function(flowId) {
+window.openFlowCanvas = async function(flowId, botId) {
     fc.flowId = flowId;
-    const snap = await firebase.firestore()
-        .collection('companies').doc(window.currentCompanyId)
-        .collection('flows').doc(flowId).get();
+    fc.botId = botId || window._currentBotId || null;
+    const flowRef = fc.botId
+        ? firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('bots').doc(fc.botId).collection('flows').doc(flowId)
+        : firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('flows').doc(flowId);
+    const snap = await flowRef.get();
     if (!snap.exists) return;
     fc.flowData = {id: snap.id, ...snap.data()};
 
@@ -1080,8 +1082,10 @@ async function saveFlow() {
         : runtimeNodes;
 
     try {
-        await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-            .collection('flows').doc(fc.flowId).update({
+        const saveRef = fc.botId
+            ? firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('bots').doc(fc.botId).collection('flows').doc(fc.flowId)
+            : firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('flows').doc(fc.flowId);
+        await saveRef.update({
                 canvasData,
                 nodes: ordered,
                 triggerKeyword,
