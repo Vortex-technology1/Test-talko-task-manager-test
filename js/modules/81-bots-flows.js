@@ -27,15 +27,15 @@
                 <div style="display:flex;gap:0.5rem;margin-bottom:1rem;background:white;border-radius:12px;padding:0.4rem;box-shadow:var(--shadow);">
                     <button onclick="botsSwitchTab('list')" id="botsTabList"
                         style="flex:1;padding:0.5rem;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;background:#22c55e;color:white;transition:all 0.2s;">
-                        <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span> Боти
+                        🤖 Боти
                     </button>
                     <button onclick="botsSwitchTab('sessions')" id="botsTabSessions"
                         style="flex:1;padding:0.5rem;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;background:transparent;color:#525252;transition:all 0.2s;">
-                        <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Сесії
+                        💬 Сесії
                     </button>
                     <button onclick="botsSwitchTab('settings')" id="botsTabSettings"
                         style="flex:1;padding:0.5rem;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;background:transparent;color:#525252;transition:all 0.2s;">
-                        <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>️ Налаштування
+                        ⚙️ Налаштування
                     </button>
                 </div>
                 <div id="botsListView"></div>
@@ -77,7 +77,7 @@
         const container = document.getElementById('botsListView');
         if (!container || botsSubTab !== 'list') return;
 
-        const channelIcons = { telegram: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 2s-4 0-5.5 1.5L10 7 1.8 5.2l-1.1 1 7 3.8-3 3.2.4 1.2 2.6.8 1.2.4 3.2-3 3.8 7z"/></svg></span>️', instagram: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>', whatsapp: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', web: '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>' };
+        const channelIcons = { telegram: '✈️', instagram: '📸', whatsapp: '💬', web: '🌐' };
         const statusColors = { active: '#22c55e', draft: '#9ca3af', paused: '#f97316' };
 
         container.innerHTML = `
@@ -93,7 +93,7 @@
 
             ${botsFlows.length === 0 ? `
                 <div style="text-align:center;padding:3rem;background:white;border-radius:12px;box-shadow:var(--shadow);">
-                    <div style="font-size:2.5rem;margin-bottom:0.75rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span></div>
+                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">🤖</div>
                     <div style="font-weight:600;margin-bottom:0.4rem;">Ботів поки немає</div>
                     <div style="font-size:0.85rem;color:#6b7280;margin-bottom:1rem;">Створіть першого бота і налаштуйте автоматичні сценарії</div>
                     <button onclick="openCreateFlowModal()" style="padding:0.6rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">+ Створити бота</button>
@@ -104,7 +104,7 @@
                             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
                                 <div>
                                     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
-                                        <span style="font-size:1.1rem;">${channelIcons[flow.channel] || '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span>'}</span>
+                                        <span style="font-size:1.1rem;">${channelIcons[flow.channel] || '🤖'}</span>
                                         <span style="font-weight:700;font-size:0.95rem;">${escH(flow.name)}</span>
                                         <span style="font-size:0.7rem;background:${statusColors[flow.status] || '#9ca3af'}22;color:${statusColors[flow.status] || '#9ca3af'};padding:0.15rem 0.5rem;border-radius:20px;font-weight:600;">${flow.status || 'draft'}</span>
                                     </div>
@@ -114,7 +114,7 @@
                                 </div>
                                 <div style="display:flex;gap:0.4rem;">
                                     <button onclick="openFlowEditor('${flow.id}')" style="padding:0.4rem 0.75rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">
-                                        <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>️ Редагувати
+                                        ✏️ Редагувати
                                     </button>
                                     <button onclick="toggleFlowStatus('${flow.id}','${flow.status}')"
                                         style="padding:0.4rem 0.65rem;background:${flow.status==='active'?'#fee2e2':'#f0fdf4'};color:${flow.status==='active'?'#ef4444':'#16a34a'};border:none;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:600;">
@@ -125,7 +125,7 @@
                                     </button>
                                 </div>
                             </div>
-                            ${flow.triggerKeyword ? `<div style="margin-top:0.5rem;font-size:0.75rem;color:#6b7280;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span> Тригер: <code style="background:#f9fafb;padding:1px 5px;border-radius:4px;">${escH(flow.triggerKeyword)}</code></div>` : ''}
+                            ${flow.triggerKeyword ? `<div style="margin-top:0.5rem;font-size:0.75rem;color:#6b7280;">🔑 Тригер: <code style="background:#f9fafb;padding:1px 5px;border-radius:4px;">${escH(flow.triggerKeyword)}</code></div>` : ''}
                         </div>`).join('')}
                 </div>`}
         `;
@@ -137,7 +137,7 @@
         await firebase.firestore().collection('companies').doc(window.currentCompanyId)
             .collection('flows').doc(flowId)
             .update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        if (typeof showToast === 'function') showToast(newStatus === 'active' ? '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> Бота активовано' : '⏸ Бота на паузі', 'success');
+        if (typeof showToast === 'function') showToast(newStatus === 'active' ? '✅ Бота активовано' : '⏸ Бота на паузі', 'success');
     };
 
     window.confirmDeleteFlow = function (flowId) {
@@ -155,7 +155,7 @@
                 <div style="background:white;border-radius:16px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,0.2);">
                     <div style="padding:1.25rem;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
                         <div style="font-weight:700;">Новий бот</div>
-                        <button onclick="document.getElementById('botsCreateOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                        <button onclick="document.getElementById('botsCreateOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;">✕</button>
                     </div>
                     <div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;">
                         <div>
@@ -166,10 +166,10 @@
                         <div>
                             <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">КАНАЛ</label>
                             <select id="newFlowChannel" style="width:100%;padding:0.6rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;background:white;">
-                                <option value="telegram"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 2s-4 0-5.5 1.5L10 7 1.8 5.2l-1.1 1 7 3.8-3 3.2.4 1.2 2.6.8 1.2.4 3.2-3 3.8 7z"/></svg></span>️ Telegram</option>
-                                <option value="instagram"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Instagram</option>
-                                <option value="whatsapp"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> WhatsApp</option>
-                                <option value="web"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> Web Widget</option>
+                                <option value="telegram">✈️ Telegram</option>
+                                <option value="instagram">📸 Instagram</option>
+                                <option value="whatsapp">💬 WhatsApp</option>
+                                <option value="web">🌐 Web Widget</option>
                             </select>
                         </div>
                         <div>
@@ -180,7 +180,7 @@
                     </div>
                     <div style="padding:1rem 1.25rem;border-top:1px solid #f0f0f0;display:flex;gap:0.5rem;justify-content:flex-end;">
                         <button onclick="document.getElementById('botsCreateOverlay').remove()" style="padding:0.55rem 1rem;background:#f9fafb;color:#525252;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;">Скасувати</button>
-                        <button onclick="saveNewFlow()" style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span> Створити</button>
+                        <button onclick="saveNewFlow()" style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">✓ Створити</button>
                     </div>
                 </div>
             </div>`;
@@ -204,7 +204,7 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             document.getElementById('botsCreateOverlay')?.remove();
-            if (typeof showToast === 'function') showToast('Бота створено <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span>', 'success');
+            if (typeof showToast === 'function') showToast('Бота створено ✓', 'success');
             openFlowEditor(ref.id);
         } catch (err) { alert('Помилка: ' + err.message); }
     };
@@ -226,17 +226,17 @@
     function renderFlowEditorPanel(flowData) {
         document.getElementById('botsEditorOverlay')?.remove();
         const nodeTypes = [
-            ['message','Повідомлення','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>'],
-            ['question','Питання','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>'],
-            ['buttons','Кнопки','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></span>'],
-            ['condition','Умова','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>'],
-            ['ai','AI відповідь','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span>'],
+            ['message','Повідомлення','💬'],
+            ['question','Питання','❓'],
+            ['buttons','Кнопки','🔘'],
+            ['condition','Умова','⚡'],
+            ['ai','AI відповідь','🤖'],
             ['delay','Затримка','⏳'],
-            ['talko_task','Задача TALKO','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>'],
-            ['talko_deal','Угода CRM','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>'],
-            ['tag','Тег контакту','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>️'],
-            ['human','Передати менеджеру','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>'],
-            ['end','Завершення','<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>'],
+            ['talko_task','Задача TALKO','✅'],
+            ['talko_deal','Угода CRM','💼'],
+            ['tag','Тег контакту','🏷️'],
+            ['human','Передати менеджеру','👤'],
+            ['end','Завершення','🏁'],
         ];
 
         const html = `
@@ -251,8 +251,8 @@
                             <div style="font-size:0.78rem;color:#6b7280;margin-top:1px;">${botsFlowNodes.length} вузлів · тригер: <code style="background:#f0fdf4;color:#16a34a;padding:1px 5px;border-radius:4px;">${escH(flowData.triggerKeyword || '/start')}</code></div>
                         </div>
                         <div style="display:flex;gap:0.5rem;">
-                            <button onclick="saveFlowNodes()" style="padding:0.45rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span> Зберегти</button>
-                            <button onclick="document.getElementById('botsEditorOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                            <button onclick="saveFlowNodes()" style="padding:0.45rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">💾 Зберегти</button>
+                            <button onclick="document.getElementById('botsEditorOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1.3rem;">✕</button>
                         </div>
                     </div>
 
@@ -281,7 +281,7 @@
                         <!-- Node editor -->
                         <div style="flex:1;overflow-y:auto;padding:1rem;" id="botsNodeEditor">
                             <div style="text-align:center;padding:3rem 1rem;color:#9ca3af;">
-                                <div style="font-size:2rem;margin-bottom:0.5rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></span></div>
+                                <div style="font-size:2rem;margin-bottom:0.5rem;">👈</div>
                                 <div>Виберіть вузол або додайте новий</div>
                             </div>
                         </div>
@@ -298,7 +298,7 @@
     function renderBotsNodesList() {
         const container = document.getElementById('botsNodesList');
         if (!container) return;
-        const icons = { message:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', question:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>', buttons:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></span>', condition:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>', ai:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span>', delay:'⏳', talko_task:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>', talko_deal:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>', tag:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>️', human:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>', end:'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>' };
+        const icons = { message:'💬', question:'❓', buttons:'🔘', condition:'⚡', ai:'🤖', delay:'⏳', talko_task:'✅', talko_deal:'💼', tag:'🏷️', human:'👤', end:'🏁' };
 
         if (botsFlowNodes.length === 0) {
             container.innerHTML = '<div style="text-align:center;padding:1rem;color:#9ca3af;font-size:0.8rem;">Вузлів немає</div>';
@@ -308,7 +308,7 @@
         container.innerHTML = botsFlowNodes.map((node, i) => `
             <div onclick="selectFlowNode('${node.id}')" data-node-id="${node.id}"
                 style="padding:0.45rem 0.6rem;border-radius:7px;cursor:pointer;margin-bottom:0.25rem;background:${botsSelectedNodeId===node.id?'#f0fdf4':'white'};border:1px solid ${botsSelectedNodeId===node.id?'#22c55e':'#e5e7eb'};transition:all 0.15s;display:flex;align-items:center;gap:0.4rem;">
-                <span style="font-size:0.82rem;">${icons[node.type]||'<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>'}</span>
+                <span style="font-size:0.82rem;">${icons[node.type]||'📋'}</span>
                 <div style="flex:1;min-width:0;">
                     <div style="font-size:0.78rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escH(node.name||node.type)}</div>
                     <div style="font-size:0.68rem;color:#9ca3af;">${node.type}</div>
@@ -317,7 +317,7 @@
                     ${i>0?`<button onclick="event.stopPropagation();moveNode('${node.id}',-1)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:0.65rem;padding:1px;">▲</button>`:''}
                     ${i<botsFlowNodes.length-1?`<button onclick="event.stopPropagation();moveNode('${node.id}',1)" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:0.65rem;padding:1px;">▼</button>`:''}
                 </div>
-                <button onclick="event.stopPropagation();deleteFlowNode('${node.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.72rem;padding:2px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                <button onclick="event.stopPropagation();deleteFlowNode('${node.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:0.72rem;padding:2px;">✕</button>
             </div>`).join('');
     }
 
@@ -388,7 +388,7 @@
                                 <option value="">→ авто</option>
                                 ${allNodes.map(n=>`<option value="${n.id}" ${o.nextNode===n.id?'selected':''}>${escH(n.name||n.type)}</option>`).join('')}
                             </select>
-                            <button onclick="removeNodeOpt('${nodeId}',${i})" style="background:#fee2e2;border:none;color:#ef4444;border-radius:5px;cursor:pointer;padding:3px 6px;font-size:0.72rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
+                            <button onclick="removeNodeOpt('${nodeId}',${i})" style="background:#fee2e2;border:none;color:#ef4444;border-radius:5px;cursor:pointer;padding:3px 6px;font-size:0.72rem;">✕</button>
                         </div>`).join('')}
                 </div>
                 <button onclick="addNodeOpt('${nodeId}')" style="width:100%;padding:0.4rem;background:#f0fdf4;color:#16a34a;border:1px dashed #bbf7d0;border-radius:6px;cursor:pointer;font-size:0.8rem;">+ Додати кнопку</button>
@@ -434,9 +434,9 @@
                     <option value="manager">Менеджер</option>
                 </select>` +
                 field('ПРІОРИТЕТ') + `<select onchange="updateNode('${nodeId}','taskPriority',this.value)" style="width:100%;padding:0.55rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;background:white;">
-                    <option value="high"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#ef4444" stroke="none"><circle cx="12" cy="12" r="10"/></svg></span> Високий</option>
-                    <option value="medium" selected><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><circle cx="12" cy="12" r="10"/></svg></span> Середній</option>
-                    <option value="low"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#22c55e" stroke="none"><circle cx="12" cy="12" r="10"/></svg></span> Низький</option>
+                    <option value="high">🔴 Високий</option>
+                    <option value="medium" selected>🟡 Середній</option>
+                    <option value="low">🟢 Низький</option>
                 </select>`;
         }
 
@@ -451,12 +451,12 @@
 
         if (node.type === 'human') {
             specific = `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:0.75rem;font-size:0.82rem;color:#9a3412;margin-bottom:0.75rem;">
-                <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Цей вузол передає розмову живому менеджеру. Бот надішле сповіщення в TALKO і зупинить автоматичні відповіді до вирішення.
+                👤 Цей вузол передає розмову живому менеджеру. Бот надішле сповіщення в TALKO і зупинить автоматичні відповіді до вирішення.
             </div>` + field('ПОВІДОМЛЕННЯ ДЛЯ КЛІЄНТА') + textarea(node.text||'Дякую! Зараз передам вас до менеджера.', `updateNode('${nodeId}','text',this.value)`);
         }
 
         if (node.type === 'end') {
-            specific = field('ФІНАЛЬНЕ ПОВІДОМЛЕННЯ') + textarea(node.text||'Дякуємо за звернення! До зустрічі. <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span>', `updateNode('${nodeId}','text',this.value)`);
+            specific = field('ФІНАЛЬНЕ ПОВІДОМЛЕННЯ') + textarea(node.text||'Дякуємо за звернення! До зустрічі. 👋', `updateNode('${nodeId}','text',this.value)`);
         }
 
         const showNextNode = !['buttons','condition','end'].includes(node.type);
@@ -513,7 +513,7 @@
             await firebase.firestore().collection('companies').doc(window.currentCompanyId)
                 .collection('flows').doc(botsCurrentFlowId)
                 .update({ nodes: botsFlowNodes, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-            if (typeof showToast === 'function') showToast('Збережено <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span>', 'success');
+            if (typeof showToast === 'function') showToast('Збережено ✓', 'success');
         } catch (e) { alert('Помилка: ' + e.message); }
     };
 
@@ -566,39 +566,243 @@
 
         const compDoc = await firebase.firestore().collection('companies').doc(window.currentCompanyId).get();
         const compData = compDoc.data() || {};
+        const integrations = compData.integrations || {};
+        const webhookBase = `${location.origin}/api/webhook?companyId=${window.currentCompanyId}&channel=`;
+
+        const channelStatus = (ch) => {
+            const ok = integrations[ch]?.connected;
+            return ok
+                ? `<span style="color:#22c55e;font-size:0.78rem;font-weight:600;">● Підключено</span>`
+                : `<span style="color:#9ca3af;font-size:0.78rem;">○ Не підключено</span>`;
+        };
 
         container.innerHTML = `
-            <div style="background:white;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:1rem;">
-                <h3 style="font-weight:700;font-size:0.95rem;margin-bottom:0.25rem;"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span> API Ключі (BYOK)</h3>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
 
-                <div>
-                    <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">OPENAI API KEY</label>
-                    <div style="display:flex;gap:0.5rem;">
-                        <input type="password" id="botsOpenAIKey" value="${compData.openaiApiKey ? '••••••••' + compData.openaiApiKey.slice(-4) : ''}"
-                            placeholder="sk-..."
-                            style="flex:1;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;">
-                        <button onclick="saveBotApiKey('openai')" style="padding:0.55rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">Зберегти</button>
+                <!-- TELEGRAM -->
+                <div style="background:white;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow);">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-16.5 6.75a2.25 2.25 0 0 0 .126 4.238l3.553 1.184 1.184 3.553a2.25 2.25 0 0 0 4.238.126l6.75-16.5a2.242 2.242 0 0 0-.329-2.566z"/></svg>
+                            <span style="font-weight:700;font-size:0.95rem;">Telegram</span>
+                        </div>
+                        ${channelStatus('telegram')}
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                        <div>
+                            <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">Bot Token (від @BotFather)</label>
+                            <div style="display:flex;gap:0.5rem;">
+                                <input type="password" id="tgBotToken"
+                                    value="${integrations.telegram?.botToken ? '••••••••' + (integrations.telegram.botToken).slice(-6) : ''}"
+                                    placeholder="123456789:AAF..."
+                                    style="flex:1;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;">
+                                <button onclick="botsConnectTelegram()" style="padding:0.55rem 1rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;">Підключити</button>
+                            </div>
+                        </div>
+                        ${integrations.telegram?.connected ? `
+                        <div style="background:#f0fdf4;border-radius:8px;padding:0.6rem 0.75rem;font-size:0.78rem;color:#166534;">
+                            Вебхук: <code style="word-break:break-all;">${webhookBase}telegram</code>
+                        </div>
+                        <button onclick="botsDisconnectChannel('telegram')" style="align-self:flex-start;padding:0.35rem 0.75rem;background:#fee2e2;color:#ef4444;border:none;border-radius:6px;cursor:pointer;font-size:0.78rem;">Відключити</button>
+                        ` : `
+                        <div style="font-size:0.78rem;color:#6b7280;">
+                            1. Створіть бота через <a href="https://t.me/BotFather" target="_blank" style="color:#22c55e;">@BotFather</a> → скопіюйте токен<br>
+                            2. Вставте токен вище → натисніть "Підключити"<br>
+                            3. Система автоматично встановить вебхук
+                        </div>
+                        `}
                     </div>
                 </div>
 
-                <div>
-                    <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">ANTHROPIC API KEY</label>
-                    <div style="display:flex;gap:0.5rem;">
-                        <input type="password" id="botsAnthropicKey" value="${compData.anthropicApiKey ? '••••••••' + compData.anthropicApiKey.slice(-4) : ''}"
-                            placeholder="sk-ant-..."
-                            style="flex:1;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;">
-                        <button onclick="saveBotApiKey('anthropic')" style="padding:0.55rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">Зберегти</button>
+                <!-- INSTAGRAM -->
+                <div style="background:white;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow);">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e1306c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                            <span style="font-weight:700;font-size:0.95rem;">Instagram</span>
+                        </div>
+                        ${channelStatus('instagram')}
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                        <div>
+                            <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">Page Access Token</label>
+                            <div style="display:flex;gap:0.5rem;">
+                                <input type="password" id="igPageToken"
+                                    value="${integrations.instagram?.pageToken ? '••••••' + (integrations.instagram.pageToken).slice(-6) : ''}"
+                                    placeholder="EAABwzL..."
+                                    style="flex:1;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;">
+                                <button onclick="botsConnectMeta('instagram')" style="padding:0.55rem 1rem;background:#e1306c;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;">Підключити</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">Verify Token (довільний рядок)</label>
+                            <input type="text" id="igVerifyToken"
+                                value="${integrations.instagram?.verifyToken || ''}"
+                                placeholder="talko_verify_123"
+                                style="width:100%;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;box-sizing:border-box;">
+                        </div>
+                        ${integrations.instagram?.connected ? `
+                        <div style="background:#fff0f6;border-radius:8px;padding:0.6rem 0.75rem;font-size:0.78rem;color:#831843;">
+                            Вебхук URL: <code style="word-break:break-all;">${webhookBase}instagram</code><br>
+                            Додайте цей URL в Meta Developer Console → Webhooks
+                        </div>
+                        <button onclick="botsDisconnectChannel('instagram')" style="align-self:flex-start;padding:0.35rem 0.75rem;background:#fee2e2;color:#ef4444;border:none;border-radius:6px;cursor:pointer;font-size:0.78rem;">Відключити</button>
+                        ` : `
+                        <div style="font-size:0.78rem;color:#6b7280;">
+                            1. Створіть додаток на <a href="https://developers.facebook.com" target="_blank" style="color:#22c55e;">developers.facebook.com</a><br>
+                            2. Отримайте Page Access Token<br>
+                            3. Вставте токен і Verify Token → "Підключити"<br>
+                            4. Додайте Webhook URL в Meta Console
+                        </div>
+                        `}
                     </div>
                 </div>
 
-                <div style="background:#f0fdf4;border-radius:10px;padding:0.75rem;font-size:0.82rem;color:#166534;">
-                    <strong>Як підключити Telegram бота:</strong><br>
-                    1. Створіть бота через @BotFather → отримайте токен<br>
-                    2. Встановіть у Firebase Functions: <code style="background:white;padding:1px 4px;border-radius:3px;">firebase functions:secrets:set TELEGRAM_BOT_TOKEN</code><br>
-                    3. Встановіть вебхук: <code style="background:white;padding:1px 4px;border-radius:3px;">https://api.telegram.org/bot{TOKEN}/setWebhook?url={FUNCTIONS_URL}/telegramWebhook</code>
+                <!-- FACEBOOK -->
+                <div style="background:white;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow);">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1877f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                            <span style="font-weight:700;font-size:0.95rem;">Facebook Messenger</span>
+                        </div>
+                        ${channelStatus('facebook')}
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                        <div>
+                            <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">Page Access Token</label>
+                            <div style="display:flex;gap:0.5rem;">
+                                <input type="password" id="fbPageToken"
+                                    value="${integrations.facebook?.pageToken ? '••••••' + (integrations.facebook.pageToken).slice(-6) : ''}"
+                                    placeholder="EAABwzL..."
+                                    style="flex:1;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;">
+                                <button onclick="botsConnectMeta('facebook')" style="padding:0.55rem 1rem;background:#1877f2;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;">Підключити</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">Verify Token</label>
+                            <input type="text" id="fbVerifyToken"
+                                value="${integrations.facebook?.verifyToken || ''}"
+                                placeholder="talko_verify_456"
+                                style="width:100%;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;box-sizing:border-box;">
+                        </div>
+                        ${integrations.facebook?.connected ? `
+                        <div style="background:#eff6ff;border-radius:8px;padding:0.6rem 0.75rem;font-size:0.78rem;color:#1e3a8a;">
+                            Вебхук URL: <code style="word-break:break-all;">${webhookBase}facebook</code>
+                        </div>
+                        <button onclick="botsDisconnectChannel('facebook')" style="align-self:flex-start;padding:0.35rem 0.75rem;background:#fee2e2;color:#ef4444;border:none;border-radius:6px;cursor:pointer;font-size:0.78rem;">Відключити</button>
+                        ` : `
+                        <div style="font-size:0.78rem;color:#6b7280;">
+                            1. Той самий Meta Developer додаток<br>
+                            2. Підключіть Messenger product<br>
+                            3. Отримайте Page Access Token для своєї сторінки
+                        </div>
+                        `}
+                    </div>
+                </div>
+
+                <!-- AI KEYS -->
+                <div style="background:white;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow);">
+                    <h3 style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;color:#374151;">AI Ключі (для AI вузлів у флоу)</h3>
+                    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                        <div>
+                            <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">OpenAI API Key</label>
+                            <div style="display:flex;gap:0.5rem;">
+                                <input type="password" id="botsOpenAIKey" value="${compData.openaiApiKey ? '••••••••' + compData.openaiApiKey.slice(-4) : ''}"
+                                    placeholder="sk-..." style="flex:1;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;">
+                                <button onclick="saveBotApiKey('openai')" style="padding:0.55rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">Зберегти</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size:0.78rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">Anthropic API Key</label>
+                            <div style="display:flex;gap:0.5rem;">
+                                <input type="password" id="botsAnthropicKey" value="${compData.anthropicApiKey ? '••••••••' + compData.anthropicApiKey.slice(-4) : ''}"
+                                    placeholder="sk-ant-..." style="flex:1;padding:0.55rem 0.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;">
+                                <button onclick="saveBotApiKey('anthropic')" style="padding:0.55rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">Зберегти</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>`;
     }
+
+    // ── Connect Telegram ──────────────────────────────────────
+    window.botsConnectTelegram = async function() {
+        const token = document.getElementById('tgBotToken')?.value.trim();
+        if (!token || token.includes('•')) {
+            if (typeof showToast === 'function') showToast('Введіть Bot Token', 'error');
+            return;
+        }
+        try {
+            if (typeof showToast === 'function') showToast('Підключаємо...', 'info');
+
+            // Встановлюємо вебхук через Telegram API
+            const webhookUrl = `${location.origin}/api/webhook?companyId=${window.currentCompanyId}&channel=telegram`;
+            const tgRes = await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: webhookUrl, allowed_updates: ['message', 'callback_query'] }),
+            });
+            const tgData = await tgRes.json();
+            if (!tgData.ok) throw new Error(tgData.description || 'Telegram error');
+
+            // Отримуємо інфо про бота
+            const meRes = await fetch(`https://api.telegram.org/bot${token}/getMe`);
+            const meData = await meRes.json();
+            const botName = meData.result?.username || 'bot';
+
+            // Зберігаємо в Firestore
+            await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
+                'integrations.telegram.botToken': token,
+                'integrations.telegram.botName': botName,
+                'integrations.telegram.webhookUrl': webhookUrl,
+                'integrations.telegram.connected': true,
+                'integrations.telegram.connectedAt': firebase.firestore.FieldValue.serverTimestamp(),
+            });
+
+            if (typeof showToast === 'function') showToast(`Telegram @${botName} підключено!`, 'success');
+            renderBotsSettingsView();
+        } catch(e) {
+            if (typeof showToast === 'function') showToast('Помилка: ' + e.message, 'error');
+        }
+    };
+
+    // ── Connect Meta (Instagram/Facebook) ────────────────────
+    window.botsConnectMeta = async function(channel) {
+        const tokenId = channel === 'instagram' ? 'igPageToken' : 'fbPageToken';
+        const verifyId = channel === 'instagram' ? 'igVerifyToken' : 'fbVerifyToken';
+        const token = document.getElementById(tokenId)?.value.trim();
+        const verifyToken = document.getElementById(verifyId)?.value.trim();
+        if (!token || token.includes('•')) {
+            if (typeof showToast === 'function') showToast('Введіть Page Access Token', 'error');
+            return;
+        }
+        try {
+            await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
+                [`integrations.${channel}.pageToken`]: token,
+                [`integrations.${channel}.verifyToken`]: verifyToken || 'talko_verify',
+                [`integrations.${channel}.connected`]: true,
+                [`integrations.${channel}.connectedAt`]: firebase.firestore.FieldValue.serverTimestamp(),
+            });
+            if (typeof showToast === 'function') showToast(`${channel} підключено! Додайте Webhook URL в Meta Console.`, 'success');
+            renderBotsSettingsView();
+        } catch(e) {
+            if (typeof showToast === 'function') showToast('Помилка: ' + e.message, 'error');
+        }
+    };
+
+    // ── Disconnect Channel ────────────────────────────────────
+    window.botsDisconnectChannel = async function(channel) {
+        if (!confirm(`Відключити ${channel}?`)) return;
+        try {
+            await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
+                [`integrations.${channel}.connected`]: false,
+            });
+            if (typeof showToast === 'function') showToast(`${channel} відключено`, 'success');
+            renderBotsSettingsView();
+        } catch(e) {
+            if (typeof showToast === 'function') showToast('Помилка: ' + e.message, 'error');
+        }
+    };
 
     window.saveBotApiKey = async function (provider) {
         const inputId = provider === 'openai' ? 'botsOpenAIKey' : 'botsAnthropicKey';
@@ -608,7 +812,7 @@
         try {
             await firebase.firestore().collection('companies').doc(window.currentCompanyId)
                 .update({ [field]: key });
-            if (typeof showToast === 'function') showToast('Ключ збережено <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 12 4 12"/></svg></span>', 'success');
+            if (typeof showToast === 'function') showToast('Ключ збережено ✓', 'success');
             document.getElementById(inputId).value = '••••••••' + key.slice(-4);
         } catch (e) { alert('Помилка: ' + e.message); }
     };

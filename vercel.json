@@ -55,6 +55,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/webhook",
+      "destination": "/api/webhook"
+    },
+    {
       "source": "/p/:companyId/:slug",
       "destination": "/pages/p/[companyId]/[slug]"
     },
