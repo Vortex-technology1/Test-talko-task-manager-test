@@ -38,6 +38,7 @@
                 }
                 
                 currentCompany = companyId;
+                window.currentCompanyId = companyId; // для CRM, Marketing, Bots модулів
                 
                 const userDoc = await db.collection('companies').doc(companyId).collection('users').doc(user.uid).get();
                 currentUserData = userDoc.exists ? { id: user.uid, ...userDoc.data() } : { id: user.uid, email: user.email, role: 'employee' };
