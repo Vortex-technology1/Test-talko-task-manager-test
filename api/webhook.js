@@ -143,6 +143,7 @@ module.exports = async (req, res) => {
         }
 
         console.log(`[webhook] Flow: ${flow.id}, nodes: ${flow.nodes?.length || 0}`);
+        console.log(`[webhook] Node types:`, (flow.nodes||[]).map(n=>n.id+':'+n.type).join(', '));
 
         // Будуємо map вузлів
         const nodeMap = {};
@@ -151,6 +152,7 @@ module.exports = async (req, res) => {
         // Визначаємо поточний вузол — пропускаємо start/trigger вузли
         const firstRealNode = (flow.nodes || []).find(n => n.type !== 'start' && n.type !== 'trigger');
         let nodeId = (!isStart && session.currentNodeId) ? session.currentNodeId : (firstRealNode?.id || flow.nodes?.[0]?.id || null);
+        console.log(`[webhook] firstRealNode: ${firstRealNode?.id}, nodeId: ${nodeId}, isStart: ${isStart}`);
 
         // Обробляємо відповідь якщо чекали
         if (!isStart && session.waitingForInput) {
