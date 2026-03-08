@@ -6,21 +6,26 @@
 
 const admin = require('firebase-admin');
 
+let initError = null;
 if (!admin.apps.length) {
-    let pk = process.env.FIREBASE_PRIVATE_KEY || '';
-    if (pk && !pk.includes('-----BEGIN')) {
-        try { pk = Buffer.from(pk, 'base64').toString('utf8'); } catch(e) {}
+    try {
+        let pk = process.env.FIREBASE_PRIVATE_KEY || '';
+        pk = pk.replace(/\\n/g, '\n');
+        if (!pk.includes('-----BEGIN') && pk.length > 100) {
+            try { pk = Buffer.from(pk, 'base64').toString('utf8'); } catch(e) {}
+        }
+        admin.initializeApp({
+            credential: admin.credential.cert({
+                projectId: process.env.FIREBASE_PROJECT_ID || 'task-manager-44e84',
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                privateKey: pk || undefined,
+            }),
+        });
+    } catch(e) {
+        initError = e.message;
     }
-    if (pk && pk.includes('\\n')) pk = pk.replace(/\\n/g, '\n');
-    admin.initializeApp({
-        credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID || 'task-manager-44e84',
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: pk || undefined,
-        }),
-    });
 }
-const db = admin.firestore();
+const db = initError ? null : admin.firestore();
 
 module.exports = async (req, res) => {
     if (req.method === 'GET') {
@@ -28,6 +33,7 @@ module.exports = async (req, res) => {
         const diag = {
             ok: true,
             service: 'TALKO Webhook v2',
+            initError: initError || null,
             env: {
                 hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
                 hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
@@ -38,6 +44,7 @@ module.exports = async (req, res) => {
         };
         // Спробуємо підключитись до Firebase
         try {
+            if (!db) throw new Error('DB not initialized: ' + initError);
             await db.collection('companies').limit(1).get();
             diag.firebase = 'connected';
         } catch(e) {
