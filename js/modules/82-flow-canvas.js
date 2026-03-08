@@ -397,6 +397,38 @@ function renderNodes() {
 }
 
 function buildNodeEl(node) {
+    // START вузол — маленький зелений блок як у SendPulse
+    if (node.type === 'start') {
+        const el = document.createElement('div');
+        el.id = `fcn_${node.id}`;
+        el.dataset.nid = node.id;
+        el.style.cssText = `position:absolute;left:${node.x}px;top:${node.y}px;
+            width:100px;height:40px;border-radius:20px;
+            background:linear-gradient(135deg,#22c55e,#16a34a);
+            border:none;box-shadow:0 4px 12px rgba(34,197,94,0.4);
+            cursor:grab;display:flex;align-items:center;justify-content:center;
+            gap:6px;z-index:2;user-select:none;`;
+        el.innerHTML = `
+            <span style="font-size:13px;font-weight:800;color:white;letter-spacing:0.5px;">▶ Старт</span>
+            <div data-port-out="${node.id}" data-port-id="out"
+                style="position:absolute;right:-8px;top:50%;transform:translateY(-50%);
+                width:16px;height:16px;border-radius:50%;background:#16a34a;
+                border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.3);
+                cursor:crosshair;z-index:3;"
+                title="Перетягни щоб з'єднати"
+                onmouseenter="this.style.transform='translateY(-50%) scale(1.4)'"
+                onmouseleave="this.style.transform='translateY(-50%) scale(1)'"
+            ></div>`;
+        el.addEventListener('mousedown', e => onNodeMouseDown(e, node.id));
+        el.querySelectorAll('[data-port-out]').forEach(portEl => {
+            portEl.addEventListener('mousedown', e => {
+                e.stopPropagation();
+                onPortMouseDown(e, node.id, portEl.dataset.portId);
+            });
+        });
+        return el;
+    }
+
     const cfg = NODES[node.type] || NODES.message;
     const isSelected = fc.selected === node.id;
     const d = node.config || {};
@@ -410,9 +442,9 @@ function buildNodeEl(node) {
         `top:${node.y}px`,
         `width:${W}px`,
         `border-radius:10px`,
-        `background:${node.type === 'start' ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' : 'white'}`,
-        `border:2px solid ${node.type === 'start' ? '#22c55e' : (isSelected ? cfg.color : '#e2e8f0')}`,
-        `box-shadow:${(isSelected || node.type === 'start') ? `0 0 0 3px ${cfg.color}33,` : ''}0 4px 16px rgba(0,0,0,0.12)`,
+        `background:white`,
+        `border:2px solid ${isSelected ? cfg.color : '#e2e8f0'}`,
+        `box-shadow:${isSelected ? `0 0 0 3px ${cfg.color}33,` : ''}0 4px 16px rgba(0,0,0,0.12)`,
         `cursor:pointer`,
         `transition:border-color 0.15s,box-shadow 0.15s`,
         `overflow:visible`,
