@@ -149,9 +149,9 @@ module.exports = async (req, res) => {
         const nodeMap = {};
         (flow.nodes || []).forEach(n => { if (n.id) nodeMap[n.id] = n; });
 
-        // Визначаємо поточний вузол — пропускаємо start/trigger вузли
-        const firstRealNode = (flow.nodes || []).find(n => n.type !== 'start' && n.type !== 'trigger');
-        let nodeId = (!isStart && session.currentNodeId) ? session.currentNodeId : (firstRealNode?.id || flow.nodes?.[0]?.id || null);
+        // Визначаємо поточний вузол — пропускаємо вузли без id та start/trigger
+        const firstRealNode = (flow.nodes || []).find(n => n.id && n.type !== 'start' && n.type !== 'trigger');
+        let nodeId = (!isStart && session.currentNodeId) ? session.currentNodeId : (firstRealNode?.id || null);
         console.log(`[webhook] firstRealNode: ${firstRealNode?.id}, nodeId: ${nodeId}, isStart: ${isStart}`);
 
         // Обробляємо відповідь якщо чекали
