@@ -1,5 +1,5 @@
 // ============================================================
-// TALKO Universal Webhook — Vercel Serverless v2
+// TALKO Universal Webhook — Vercel Serverless v3
 // POST /api/webhook?companyId=X&channel=telegram
 // Flows: companies/{id}/bots/{botId}/flows/{flowId}
 // ============================================================
@@ -373,7 +373,7 @@ async function sendTg(token, chatId, text, buttons) {
         payload.reply_markup = { inline_keyboard: [
             buttons.map(b => b.url
                 ? { text: b.label||b.text||'?', url: b.url }
-                : { text: b.label||b.text||'?', callback_data: b.value||b.label||b.id||'?' }
+                : { text: b.label||b.text||'?', callback_data: String(b.value||b.label||b.id||'btn').slice(0,60) }
             )
         ]};
     }
