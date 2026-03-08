@@ -23,7 +23,28 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 module.exports = async (req, res) => {
-    if (req.method === 'GET') return res.status(200).json({ ok: true, service: 'TALKO Webhook v2' });
+    if (req.method === 'GET') {
+        // Діагностика — перевіряємо env та Firebase
+        const diag = {
+            ok: true,
+            service: 'TALKO Webhook v2',
+            env: {
+                hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
+                hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
+                hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+                projectId: process.env.FIREBASE_PROJECT_ID || 'NOT SET',
+            },
+            query: req.query,
+        };
+        // Спробуємо підключитись до Firebase
+        try {
+            await db.collection('companies').limit(1).get();
+            diag.firebase = 'connected';
+        } catch(e) {
+            diag.firebase = 'ERROR: ' + e.message;
+        }
+        return res.status(200).json(diag);
+    }
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     const { companyId, channel } = req.query;
