@@ -1329,7 +1329,7 @@ async function saveFlow() {
         .filter(n=>n.type!=='start')
         .map(n => {
             const ports = edgeMap[n.id] || {};
-            const d = {...n.config, _x:n.x, _y:n.y};
+            const d = {...n.config, id:n.id, type:n.type, _x:n.x, _y:n.y};
             if (n.type==='filter') { d.trueNode=ports.yes||null; d.falseNode=ports.no||null; }
             else if (n.type==='random') { d.branchA=ports.a||null; d.branchB=ports.b||null; }
             else if (n.type==='ai'||n.type==='api') { d.nextNode=ports.ok||ports.out||null; d.errorNode=ports.err||null; }
