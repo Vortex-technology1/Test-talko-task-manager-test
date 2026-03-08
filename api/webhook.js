@@ -313,8 +313,9 @@ async function callAI(node, userText, session, compRef) {
         const r = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-            body: JSON.stringify({ model: node.model||'gpt-4o-mini', max_tokens:500,
-                messages:[{role:'system',content:node.systemPrompt||'You are helpful.'},{role:'user',content:userText}] })
+            const sysPrompt = (node.systemPrompt||'You are helpful.') + '\n\nВАЖЛИВО: Завжди відповідай ТІЛЬКИ українською мовою.';
+        body: JSON.stringify({ model: node.model||'gpt-4o-mini', max_tokens:500,
+                messages:[{role:'system',content:sysPrompt},{role:'user',content:userText}] })
         });
         const d = await r.json();
         return d.choices?.[0]?.message?.content || node.fallback || 'Дякуємо!';

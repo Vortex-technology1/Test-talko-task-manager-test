@@ -77,6 +77,22 @@ window.openFlowCanvas = async function(flowId, botId) {
             };
         });
         fc.edges = stored.edges || [];
+        // Якщо немає start вузла — додаємо автоматично
+        if (!fc.nodes.find(n => n.type === 'start')) {
+            const minX = fc.nodes.length ? Math.min(...fc.nodes.map(n=>n.x)) : 360;
+            const minY = fc.nodes.length ? Math.min(...fc.nodes.map(n=>n.y)) : 200;
+            const startNode = {id:'start_0', type:'start', x: minX - 280, y: minY,
+                config:{triggerKeyword: fc.flowData.triggerKeyword || '/start'},
+                outputs: ['out']};
+            fc.nodes.unshift(startNode);
+            // З'єднуємо start з першим вузлом
+            if (fc.nodes.length > 1) {
+                const firstId = fc.nodes[1].id;
+                if (firstId && !fc.edges.find(e=>e.fromNode==='start_0')) {
+                    fc.edges.unshift({id:'e_start_out', fromNode:'start_0', fromPort:'out', toNode:firstId, toPort:'in'});
+                }
+            }
+        }
     } else {
         // Migrate old linear nodes or fresh start
         const oldNodes = fc.flowData.nodes || [];
@@ -1289,7 +1305,8 @@ window.fcApplyNodeData = function(nodeId) {
 
     renderAll();
     renderPropPanel();
-    if (typeof showToast === 'function') showToast('Вузол збережено <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>', 'success');
+    // Автозберігаємо в Firestore після Застосувати
+    saveFlow();
 };
 
 window.fcDeleteNode = function(nodeId) {
