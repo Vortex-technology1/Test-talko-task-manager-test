@@ -179,6 +179,8 @@ module.exports = async (req, res) => {
 
             if (n.type === 'message') {
                 const text = interp(n.text || n.config?.text || '', session.data);
+                // Пропускаємо порожні вузли (наприклад start-тригер збережений як message)
+                if (!text.trim()) { nodeId = n.nextNode || null; continue; }
                 const btns = n.options?.length ? n.options : (n.buttons?.length ? n.buttons : null);
                 await sendTg(botToken, normalized.senderId, text, btns);
                 if (btns?.length) {
