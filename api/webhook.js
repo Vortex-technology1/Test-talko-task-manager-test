@@ -148,8 +148,9 @@ module.exports = async (req, res) => {
         const nodeMap = {};
         (flow.nodes || []).forEach(n => { if (n.id) nodeMap[n.id] = n; });
 
-        // Визначаємо поточний вузол
-        let nodeId = (!isStart && session.currentNodeId) ? session.currentNodeId : (flow.nodes?.[0]?.id || null);
+        // Визначаємо поточний вузол — пропускаємо start/trigger вузли
+        const firstRealNode = (flow.nodes || []).find(n => n.type !== 'start' && n.type !== 'trigger');
+        let nodeId = (!isStart && session.currentNodeId) ? session.currentNodeId : (firstRealNode?.id || flow.nodes?.[0]?.id || null);
 
         // Обробляємо відповідь якщо чекали
         if (!isStart && session.waitingForInput) {

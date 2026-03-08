@@ -169,6 +169,11 @@ function mountCanvas() {
 
         <div style="width:1px;height:28px;background:#334155;"></div>
 
+        <button id="fcBtnToggleStatus"
+            style="padding:7px 14px;background:#334155;border:none;border-radius:8px;
+            color:#94a3b8;cursor:pointer;font-weight:600;font-size:12px;">
+            draft
+        </button>
         <button id="fcBtnSave"
             style="padding:7px 18px;background:#22c55e;border:none;border-radius:8px;
             color:white;cursor:pointer;font-weight:700;font-size:13px;">
@@ -238,6 +243,30 @@ function mountCanvas() {
     document.getElementById('fcBtnBack').onclick = closeCanvas;
     document.getElementById('fcBtnClose').onclick = closeCanvas;
     document.getElementById('fcBtnSave').onclick = saveFlow;
+
+    // Toggle flow status button
+    const statusBtn = document.getElementById('fcBtnToggleStatus');
+    if (statusBtn && fc.flowData) {
+        const st = fc.flowData.status || 'draft';
+        statusBtn.textContent = st === 'active' ? '🟢 active' : '⚫ draft';
+        statusBtn.style.background = st === 'active' ? '#dcfce7' : '#334155';
+        statusBtn.style.color = st === 'active' ? '#16a34a' : '#94a3b8';
+        statusBtn.onclick = async function() {
+            const cur = fc.flowData.status || 'draft';
+            const next = cur === 'active' ? 'draft' : 'active';
+            try {
+                const ref = fc.botId
+                    ? firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('bots').doc(fc.botId).collection('flows').doc(fc.flowId)
+                    : firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('flows').doc(fc.flowId);
+                await ref.update({ status: next });
+                fc.flowData.status = next;
+                statusBtn.textContent = next === 'active' ? '🟢 active' : '⚫ draft';
+                statusBtn.style.background = next === 'active' ? '#dcfce7' : '#334155';
+                statusBtn.style.color = next === 'active' ? '#16a34a' : '#94a3b8';
+                if (typeof showToast === 'function') showToast(next === 'active' ? '🟢 Флоу активовано' : '⚫ Флоу на паузі', 'success');
+            } catch(e) { alert('Помилка: ' + e.message); }
+        };
+    }
     document.getElementById('fcBtnZoomIn').onclick = () => doZoom(0.15);
     document.getElementById('fcBtnZoomOut').onclick = () => doZoom(-0.15);
     document.getElementById('fcBtnFit').onclick = fitView;

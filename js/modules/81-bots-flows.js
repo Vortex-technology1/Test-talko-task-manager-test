@@ -100,32 +100,40 @@
                 </div>` : `
                 <div style="display:flex;flex-direction:column;gap:0.75rem;">
                     ${botsFlows.map(flow => `
-                        <div style="background:white;border-radius:12px;padding:1rem;box-shadow:var(--shadow);border-left:3px solid ${statusColors[flow.status] || '#9ca3af'};">
-                            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
-                                <div>
-                                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
-                                        <span style="font-size:1.1rem;">${channelIcons[flow.channel] || '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>'}</span>
-                                        <span style="font-weight:700;font-size:0.95rem;">${escH(flow.name)}</span>
-                                        <span style="font-size:0.7rem;background:${statusColors[flow.status] || '#9ca3af'}22;color:${statusColors[flow.status] || '#9ca3af'};padding:0.15rem 0.5rem;border-radius:20px;font-weight:600;">${flow.status || 'draft'}</span>
+                        <div style="background:white;border-radius:14px;padding:1.1rem 1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.08);border-left:4px solid ${statusColors[flow.status] || '#9ca3af'};transition:box-shadow 0.2s;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
+                                <div style="flex:1;min-width:0;">
+                                    <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.35rem;flex-wrap:wrap;">
+                                        <span style="font-size:1.2rem;">${channelIcons[flow.channel] || '📱'}</span>
+                                        <span style="font-weight:700;font-size:1rem;color:#111827;">${escH(flow.name)}</span>
+                                        <span style="font-size:0.72rem;background:${statusColors[flow.status] || '#9ca3af'}20;color:${statusColors[flow.status] || '#9ca3af'};padding:0.2rem 0.6rem;border-radius:20px;font-weight:700;letter-spacing:0.02em;">
+                                            ${flow.status === 'active' ? '🟢 active' : flow.status === 'paused' ? '⏸ paused' : '⚫ draft'}
+                                        </span>
                                     </div>
-                                    <div style="font-size:0.78rem;color:#6b7280;">
-                                        ${flow.channel || 'telegram'} · ${(flow.nodes || []).length} вузлів · ${flow.sessionCount || 0} сесій
+                                    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                                        <span style="font-size:0.78rem;color:#6b7280;">📡 ${flow.channel || 'telegram'}</span>
+                                        <span style="font-size:0.78rem;color:#6b7280;">🔷 ${(flow.nodes || []).length} вузлів</span>
+                                        <span style="font-size:0.78rem;color:#6b7280;">👥 ${flow.sessionCount || 0} сесій</span>
+                                        ${flow.triggerKeyword ? `<span style="font-size:0.78rem;color:#6b7280;">🔑 <code style="background:#f3f4f6;padding:1px 5px;border-radius:4px;font-size:0.75rem;">${escH(flow.triggerKeyword)}</code></span>` : ''}
                                     </div>
+                                    ${flow.deepLink || flow.slug ? `<div style="margin-top:0.4rem;font-size:0.74rem;color:#9ca3af;word-break:break-all;">🔗 ${escH(flow.deepLink || flow.slug)}</div>` : ''}
                                 </div>
-                                <div style="display:flex;gap:0.4rem;">
-                                    <button onclick="openFlowEditor('${flow.id}')" style="padding:0.4rem 0.75rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">
-                                        <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></span>️ Редагувати
-                                    </button>
+                                <div style="display:flex;gap:0.4rem;flex-shrink:0;">
                                     <button onclick="toggleFlowStatus('${flow.id}','${flow.status}')"
-                                        style="padding:0.4rem 0.65rem;background:${flow.status==='active'?'#fee2e2':'#f0fdf4'};color:${flow.status==='active'?'#ef4444':'#16a34a'};border:none;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:600;">
-                                        ${flow.status === 'active' ? 'Пауза' : 'Активувати'}
+                                        title="${flow.status === 'active' ? 'Поставити на паузу' : 'Активувати ланцюг'}"
+                                        style="padding:0.45rem 0.9rem;background:${flow.status==='active'?'#fee2e2':'#f0fdf4'};color:${flow.status==='active'?'#ef4444':'#16a34a'};border:1.5px solid ${flow.status==='active'?'#fca5a5':'#86efac'};border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;">
+                                        ${flow.status === 'active' ? '⏸ Пауза' : '▶ Активувати'}
                                     </button>
-                                    <button onclick="confirmDeleteFlow('${flow.id}')" style="padding:0.4rem 0.5rem;background:#fee2e2;color:#ef4444;border:none;border-radius:8px;cursor:pointer;">
-                                        <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+                                    <button onclick="openFlowEditor('${flow.id}')" title="Редагувати"
+                                        style="padding:0.45rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;">
+                                        ✏️ Редагувати
+                                    </button>
+                                    <button onclick="confirmDeleteFlow('${flow.id}')" title="Видалити"
+                                        style="padding:0.45rem 0.6rem;background:#fee2e2;color:#ef4444;border:none;border-radius:8px;cursor:pointer;">
+                                        🗑
                                     </button>
                                 </div>
                             </div>
-                            ${flow.triggerKeyword ? `<div style="margin-top:0.5rem;font-size:0.75rem;color:#6b7280;">🔑 Тригер: <code style="background:#f9fafb;padding:1px 5px;border-radius:4px;">${escH(flow.triggerKeyword)}</code></div>` : ''}
                         </div>`).join('')}
                 </div>`}
         `;
