@@ -354,11 +354,11 @@ async function callAI(node, userText, session, compRef) {
         const compDoc = await compRef.get();
         const apiKey = node.aiApiKey || compDoc.data()?.openaiApiKey || process.env.OPENAI_API_KEY;
         if (!apiKey) return node.fallback || 'Дякуємо!';
+        const sysPrompt = (node.systemPrompt||'You are helpful.') + '\n\nВАЖЛИВО: Завжди відповідай ТІЛЬКИ українською мовою.';
         const r = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-            const sysPrompt = (node.systemPrompt||'You are helpful.') + '\n\nВАЖЛИВО: Завжди відповідай ТІЛЬКИ українською мовою.';
-        body: JSON.stringify({ model: node.model||'gpt-4o-mini', max_tokens:500,
+            body: JSON.stringify({ model: node.model||'gpt-4o-mini', max_tokens:500,
                 messages:[{role:'system',content:sysPrompt},{role:'user',content:userText}] })
         });
         const d = await r.json();
