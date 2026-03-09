@@ -400,7 +400,13 @@ async function callAI(node, userText, session, compRef) {
             const r = await fetch(baseUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                body: JSON.stringify({ model, max_tokens: 1500, messages })
+                body: JSON.stringify({
+                    model,
+                    ...(model.startsWith('o3') || model.startsWith('o4') || model.startsWith('gpt-5')
+                        ? { max_completion_tokens: 1500 }
+                        : { max_tokens: 1500 }),
+                    messages
+                })
             });
             const d = await r.json();
             console.log('[callAI] status:', r.status, 'error:', d.error?.message || 'none');
