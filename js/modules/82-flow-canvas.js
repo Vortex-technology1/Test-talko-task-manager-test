@@ -28,7 +28,7 @@ const W = 220; // node width
 // ── Node config ────────────────────────────────────────────
 const NODES = {
     start:      {label:'Старт',       color:'#22c55e', border:'#16a34a', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg></span>',  outputs:['out']},
-    message:    {label:'Повідомлення',color:'#6366f1', border:'#4f46e5', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', outputs:['out','btn']},
+    message:    {label:'Повідомлення',color:'#22c55e', border:'#16a34a', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>', outputs:['out','btn']},
     action:     {label:'Дія',         color:'#f59e0b', border:'#d97706', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>', outputs:['out']},
     filter:     {label:'Фільтр',      color:'#f97316', border:'#ea580c', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18-6-6 6-6"/><path d="m15 6 6 6-6 6"/></svg></span>', outputs:['yes','no']},
     pause:      {label:'Пауза',       color:'#64748b', border:'#475569', icon:'⏸',  outputs:['out']},
@@ -441,10 +441,10 @@ function buildNodeEl(node) {
         `left:${node.x}px`,
         `top:${node.y}px`,
         `width:${W}px`,
-        `border-radius:10px`,
+        `border-radius:12px`,
         `background:white`,
-        `border:2px solid ${isSelected ? cfg.color : '#e2e8f0'}`,
-        `box-shadow:${isSelected ? `0 0 0 3px ${cfg.color}33,` : ''}0 4px 16px rgba(0,0,0,0.12)`,
+        `border:2px solid ${isSelected ? cfg.color : 'transparent'}`,
+        `box-shadow:${isSelected ? `0 0 0 3px ${cfg.color}33,` : ''}0 2px 12px rgba(0,0,0,0.15)`,
         `cursor:pointer`,
         `transition:border-color 0.15s,box-shadow 0.15s`,
         `overflow:visible`,
@@ -478,9 +478,11 @@ function buildNodeEl(node) {
         const totalPorts = outputs.length;
         const topPct = totalPorts === 1 ? 50 : 25 + (i / (totalPorts-1)) * 50;
         return `
-        <div style="position:absolute;right:-70px;top:${topPct}%;transform:translateY(-50%);
-            display:flex;align-items:center;gap:4px;z-index:3;">
-            <span style="font-size:9px;color:#64748b;white-space:nowrap;">${label}</span>
+        <div style="position:absolute;right:-8px;top:${topPct}%;transform:translateY(-50%);
+            display:flex;align-items:center;z-index:3;">
+            <span style="position:absolute;right:18px;font-size:9px;color:#64748b;white-space:nowrap;
+                background:rgba(255,255,255,0.9);padding:1px 4px;border-radius:3px;
+                pointer-events:none;">${label}</span>
             <div data-port-out="${node.id}" data-port-id="${portId}"
                 style="width:14px;height:14px;border-radius:50%;
                 background:${connected ? portColor : '#e2e8f0'};
@@ -496,8 +498,8 @@ function buildNodeEl(node) {
     el.innerHTML = `
         ${inPortHTML}
         <!-- HEADER -->
-        <div style="background:${cfg.color};border-radius:8px 8px 0 0;
-            padding:8px 12px;display:flex;align-items:center;gap:6px;position:relative;">
+        <div style="background:${cfg.color};border-radius:10px 10px 0 0;
+            padding:9px 12px;display:flex;align-items:center;gap:7px;position:relative;">
             <span style="font-size:14px;">${cfg.icon}</span>
             <span style="font-weight:700;font-size:12px;color:white;flex:1;
                 overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${cfg.label}</span>
@@ -511,7 +513,7 @@ function buildNodeEl(node) {
             ` : ''}
         </div>
         <!-- BODY -->
-        <div style="padding:10px 12px;min-height:40px;">
+        <div style="padding:10px 12px;min-height:44px;border-radius:0 0 10px 10px;">
             ${preview
                 ? `<div style="font-size:11px;color:${node.type==='start'?'#16a34a':'#475569'};line-height:1.4;
                     font-weight:${node.type==='start'?'600':'400'};

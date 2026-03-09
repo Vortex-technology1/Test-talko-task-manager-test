@@ -36,7 +36,7 @@ function loadBots() {
         .onSnapshot(snap => {
             bp.bots = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             if (bp.subTab === 'bots') renderBotsTab();
-            if (bp.activeBotId && bp.subTab === 'flows') renderFlowsHeader();
+            if (bp.activeBotId && bp.subTab === 'flows') renderFlowsTab();
         });
 }
 
