@@ -32,7 +32,7 @@ const NODES = {
     action:     {label:'Дія',         color:'#f59e0b', border:'#d97706', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>', outputs:['out']},
     filter:     {label:'Фільтр',      color:'#f97316', border:'#ea580c', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18-6-6 6-6"/><path d="m15 6 6 6-6 6"/></svg></span>', outputs:['yes','no']},
     pause:      {label:'Пауза',       color:'#64748b', border:'#475569', icon:'⏸',  outputs:['out']},
-    ai:         {label:'ШІ Агент',    color:'#8b5cf6', border:'#7c3aed', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>', outputs:['out','err']},
+    ai:         {label:'ШІ Агент',    color:'#8b5cf6', border:'#7c3aed', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="15" x2="8" y2="15.01"/><line x1="16" y1="15" x2="16" y2="15.01"/></svg></span>', outputs:['out']},
     api:        {label:'Запит API',   color:'#0ea5e9', border:'#0284c7', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></span>',  outputs:['ok','err']},
     sheets:     {label:'Google Sheets',color:'#10b981',border:'#059669', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>', outputs:['out']},
     random:     {label:'Випадково',   color:'#ec4899', border:'#db2777', icon:'<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>',  outputs:['a','b']},
@@ -342,6 +342,30 @@ function buildSidebar() {
         ['end',     '#ef4444', `<svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="none"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>`, 'Кінець'],
     ];
 
+    // AI Воронка — окрема кнопка внизу сайдбара
+    const aiFunnelBtn = `
+        <div style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;">
+            <div onclick="fcOpenAiFunnelModal()"
+                title="AI Асистент воронки"
+                style="width:60px;display:flex;flex-direction:column;align-items:center;
+                gap:4px;padding:6px 4px;border-radius:10px;cursor:pointer;
+                transition:background 0.12s;"
+                onmouseenter="this.style.background='#f0fdf4'"
+                onmouseleave="this.style.background='transparent'">
+                <div style="width:36px;height:36px;border-radius:9px;
+                    background:linear-gradient(135deg,#22c55e,#8b5cf6);
+                    display:flex;align-items:center;justify-content:center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/>
+                        <path d="M18 2v4h4"/>
+                    </svg>
+                </div>
+                <div style="font-size:9.5px;color:#22c55e;text-align:center;
+                    line-height:1.2;font-weight:600;">AI
+Воронка</div>
+            </div>
+        </div>`;
+
     sb.innerHTML = items.map(([type, color, svg, label]) => `
         <div draggable="true" data-sbtype="${type}"
             title="${NODES[type]?.label || label}"
@@ -357,7 +381,7 @@ function buildSidebar() {
             <div style="font-size:9.5px;color:#6b7280;text-align:center;
                 line-height:1.2;font-weight:500;">${label}</div>
         </div>`
-    ).join('');
+    ).join('') + aiFunnelBtn;
 
     // Drag from sidebar → canvas
     sb.querySelectorAll('[data-sbtype]').forEach(el => {
@@ -925,6 +949,127 @@ function addNode(type, x, y) {
 }
 window.fcAddNode = addNode;
 
+// ── AI Воронка Modal ───────────────────────────────────────
+window.fcOpenAiFunnelModal = function() {
+    if (document.getElementById('fcAiFunnelModal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'fcAiFunnelModal';
+    modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.7);
+        z-index:9999;display:flex;align-items:center;justify-content:center;`;
+    modal.innerHTML = `
+        <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;
+            padding:24px;width:520px;max-height:80vh;overflow-y:auto;position:relative;">
+            <button onclick="document.getElementById('fcAiFunnelModal').remove()"
+                style="position:absolute;top:12px;right:12px;background:none;border:none;
+                color:#94a3b8;font-size:20px;cursor:pointer;">✕</button>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                <div style="width:36px;height:36px;border-radius:9px;
+                    background:linear-gradient(135deg,#22c55e,#8b5cf6);
+                    display:flex;align-items:center;justify-content:center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
+                </div>
+                <div>
+                    <div style="color:white;font-weight:700;font-size:15px;">AI Асистент воронки</div>
+                    <div style="color:#64748b;font-size:11px;">Опиши бізнес — отримай готову воронку</div>
+                </div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">Опишіть ваш бізнес і ціль воронки:</div>
+                <textarea id="fcAiFunnelInput" rows="4"
+                    placeholder="Наприклад: Стоматологічна клініка в Києві, 3 лікарі. Ціль — записати людину на безкоштовну консультацію через Telegram бот. Аудиторія — люди 25-45 років."
+                    style="width:100%;padding:10px;background:#0f172a;border:1px solid #334155;
+                    border-radius:8px;color:white;font-size:12px;box-sizing:border-box;resize:vertical;"></textarea>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <button onclick="fcRunAiFunnel('funnel')"
+                    style="flex:1;padding:10px;background:linear-gradient(135deg,#22c55e,#16a34a);
+                    border:none;border-radius:8px;color:white;font-weight:600;font-size:12px;cursor:pointer;">
+                    Згенерувати воронку
+                </button>
+                <button onclick="fcRunAiFunnel('prompt')"
+                    style="flex:1;padding:10px;background:#334155;
+                    border:none;border-radius:8px;color:#94a3b8;font-weight:600;font-size:12px;cursor:pointer;">
+                    Промпт для AI вузла
+                </button>
+            </div>
+            <div id="fcAiFunnelResult" style="display:none;">
+                <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">Результат:</div>
+                <div id="fcAiFunnelResultText"
+                    style="background:#0f172a;border:1px solid #334155;border-radius:8px;
+                    padding:12px;color:#e2e8f0;font-size:12px;white-space:pre-wrap;
+                    max-height:300px;overflow-y:auto;line-height:1.6;"></div>
+                <button onclick="fcCopyFunnelResult()"
+                    style="margin-top:8px;width:100%;padding:8px;background:#22c55e22;
+                    border:1px solid #22c55e;border-radius:8px;color:#22c55e;
+                    font-size:11px;cursor:pointer;">Копіювати результат</button>
+            </div>
+            <div id="fcAiFunnelLoader" style="display:none;text-align:center;padding:20px;color:#64748b;font-size:12px;">
+                Генерую воронку...
+            </div>
+        </div>`;
+    document.body.appendChild(modal);
+};
+
+window.fcRunAiFunnel = async function(mode) {
+    const input = document.getElementById('fcAiFunnelInput')?.value?.trim();
+    if (!input) return alert('Опишіть бізнес');
+    document.getElementById('fcAiFunnelLoader').style.display = 'block';
+    document.getElementById('fcAiFunnelResult').style.display = 'none';
+
+    const systemPrompt = mode === 'funnel'
+        ? `Ти — експерт з Telegram маркетингу і воронок продажів. 
+Твоя задача — написати готову воронку повідомлень для Telegram бота.
+Структура воронки:
+1. Привітання + цінність (1 повідомлення)
+2. Кваліфікаційне питання (з кнопками відповіді)
+3. Наступне питання (з кнопками)
+4. Презентація оферу / результату
+5. Заклик до дії (CTA)
+
+Для кожного повідомлення пиши:
+[ПОВІДОМЛЕННЯ 1]
+Текст: ...
+Кнопки: Варіант 1 | Варіант 2
+
+Пиши коротко, без води. Мова — українська.`
+        : `Ти — експерт з AI асистентів для бізнесу.
+Напиши системний промпт для AI бота в Telegram.
+Промпт має:
+- Визначати роль і ціль бота
+- Описувати стиль спілкування
+- Містити правила кваліфікації клієнта
+- Вказувати як збирати контакти
+- Як пропонувати продукт/послугу
+Формат: готовий текст промпту який можна вставити в поле "Системний промпт" AI вузла.
+Мова — українська.`;
+
+    try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-6',
+                max_tokens: 2000,
+                system: systemPrompt,
+                messages: [{ role: 'user', content: input }]
+            })
+        });
+        const data = await resp.json();
+        const result = data.content?.[0]?.text || 'Помилка генерації';
+        document.getElementById('fcAiFunnelResultText').textContent = result;
+        document.getElementById('fcAiFunnelResult').style.display = 'block';
+    } catch(e) {
+        document.getElementById('fcAiFunnelResultText').textContent = 'Помилка: ' + e.message;
+        document.getElementById('fcAiFunnelResult').style.display = 'block';
+    }
+    document.getElementById('fcAiFunnelLoader').style.display = 'none';
+};
+
+window.fcCopyFunnelResult = function() {
+    const text = document.getElementById('fcAiFunnelResultText')?.textContent || '';
+    navigator.clipboard.writeText(text).then(() => showToast('Скопійовано!', 'success'));
+};
+
 // ── Керування кнопками в повідомленні ──────────────────────
 window.fcAddButton = function() {
     const node = fc.nodes.find(n => n.id === fc.selected);
@@ -1089,14 +1234,32 @@ function renderPropPanel() {
                 </div>`;
             break;
         }
-        case 'action':
+        case 'action': {
+            const aType = d.actionType || 'set_var';
+            const notifyFields = aType === 'notify_admin' ? `
+                <div style="background:#0f172a;border:1px solid #22c55e33;border-radius:10px;padding:10px;margin-top:8px;">
+                    <div style="font-size:10px;color:#22c55e;font-weight:700;margin-bottom:8px;text-transform:uppercase;">Налаштування сповіщення</div>
+                    <div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">Chat ID менеджера
+                        <a href="https://t.me/userinfobot" target="_blank" style="color:#3b82f6;margin-left:4px;font-size:9px;">Дізнатись ID →</a>
+                    </div>
+                    <input id="fcp_notifyChatId" type="text" value="${d.notifyChatId||''}"
+                        placeholder="123456789"
+                        style="width:100%;padding:8px;background:#1e293b;border:1px solid #334155;
+                        border-radius:7px;color:white;font-size:11px;box-sizing:border-box;margin-bottom:6px;">
+                    <div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">Текст повідомлення</div>
+                    <textarea id="fcp_notifyText" rows="3"
+                        placeholder="Новий лід: {{senderName}} розпочав діалог"
+                        style="width:100%;padding:8px;background:#1e293b;border:1px solid #334155;
+                        border-radius:7px;color:white;font-size:11px;box-sizing:border-box;resize:vertical;">${d.notifyText||'🔔 Новий лід: {{senderName}}\nКанал: {{channel}}\nДані: {{ai_response}}'}</textarea>
+                </div>` : fld('Параметри (JSON)', ta('actionPayload', d.actionPayload, '{"variable":"phone","value":"{{input}}"}', 3));
             fields = fld('Тип дії', sel('actionType',
                 [['set_var','Встановити змінну'],['set_tag','Додати тег'],
                  ['remove_tag','Видалити тег'],['notify_admin','Сповістити менеджера'],
                  ['start_flow','Запустити інший флоу'],['stop_flow','Зупинити флоу']],
-                d.actionType||'set_var'))
-                + fld('Параметри (JSON)', ta('actionPayload', d.actionPayload, '{"variable":"phone","value":"{{input}}"}', 3));
+                aType))
+                + notifyFields;
             break;
+        }
         case 'filter':
             fields = fld('Змінна', inp('condVar', d.condVar, 'phone'))
                 + fld('Оператор', sel('condOp',
@@ -1308,6 +1471,8 @@ window.fcApplyNodeData = function(nodeId) {
         case 'action':
             node.config.actionType = get('actionType');
             node.config.actionPayload = get('actionPayload');
+            node.config.notifyChatId = document.getElementById('fcp_notifyChatId')?.value?.trim() || null;
+            node.config.notifyText = document.getElementById('fcp_notifyText')?.value || null;
             break;
         case 'filter':
             node.config.condVar = get('condVar');

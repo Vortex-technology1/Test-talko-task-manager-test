@@ -230,6 +230,7 @@ module.exports = async (req, res) => {
         }
 
         // ── Виконуємо ланцюг вузлів ──────────────────────────
+        session._botToken = botToken; // для notify_admin
         let safety = 0;
         while (nodeId && safety++ < 30) {
             const n = nodeMap[nodeId];
@@ -257,12 +258,17 @@ module.exports = async (req, res) => {
                 // Обрізаємо до 20 повідомлень (10 пар)
                 if (session.aiHistory.length > 20) session.aiHistory = session.aiHistory.slice(-20);
 
-                const reply = await callAI(n, normalized.text, session, compRef);
+                const rawReply = await callAI(n, normalized.text, session, compRef);
 
-                // Додаємо відповідь AI в історію
-                session.aiHistory.push({ role: 'assistant', content: reply });
+                // Парсимо кнопки з відповіді AI: [BTN:текст кнопки]
+                const btnMatches = [...rawReply.matchAll(/\[BTN:([^\]]+)\]/g)];
+                const aiBtns = btnMatches.map((m, i) => ({ label: m[1], nextNode: null }));
+                const cleanReply = rawReply.replace(/\[BTN:[^\]]+\]/g, '').trim();
 
-                await sendTg(botToken, normalized.senderId, reply);
+                // Додаємо відповідь AI в історію (без тегів кнопок)
+                session.aiHistory.push({ role: 'assistant', content: cleanReply });
+
+                await sendTg(botToken, normalized.senderId, cleanReply, aiBtns.length ? aiBtns : null);
 
                 // AI loop — залишаємось у тому ж вузлі, чекаємо наступного повідомлення
                 Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
@@ -365,6 +371,18 @@ async function doAction(node, session) {
     } else if (node.actionType === 'set_tag' || node.actionType === 'add_tag') {
         if (!session.tags) session.tags = [];
         if (node.actionPayload) session.tags.push(node.actionPayload);
+    } else if (node.actionType === 'notify_admin') {
+        const chatId = node.config?.notifyChatId || node.notifyChatId;
+        const token = session._botToken; // передається нижче
+        if (chatId && token) {
+            let text = node.config?.notifyText || node.notifyText || '🔔 Новий лід: {{senderName}}';
+            text = text
+                .replace(/\{\{senderName\}\}/g, session.senderName || '')
+                .replace(/\{\{senderId\}\}/g, session.senderId || '')
+                .replace(/\{\{channel\}\}/g, session.channel || '')
+                .replace(/\{\{(\w+)\}\}/g, (_, k) => session.data?.[k] || '');
+            await sendTg(token, chatId, text).catch(() => {});
+        }
     }
 }
 
