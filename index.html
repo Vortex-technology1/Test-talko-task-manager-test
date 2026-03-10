@@ -546,6 +546,10 @@ document.addEventListener('mousedown', function(e) {
                     <i data-lucide="bot" class="icon"></i>
                     <span>Боти</span>
                 </button>
+                <button class="tab-btn" onclick="switchTab('sites')" data-tab="sites" id="sitesNavBtn" aria-label="Сайти" style="display:none;">
+                    <i data-lucide="globe" class="icon"></i>
+                    <span>Сайти</span>
+                </button>
 
 
 
@@ -842,6 +846,11 @@ document.addEventListener('mousedown', function(e) {
             </div>
             <div id="learningTab" class="tab-content">
                 <!-- rendered by 80-learning.js -->
+            </div>
+
+            <!-- Sites Tab -->
+            <div id="sitesTab" class="tab-content">
+                <div id="sitesContainer"></div>
             </div>
 
             <!-- CRM Tab -->
@@ -3537,6 +3546,9 @@ document.addEventListener('mousedown', function(e) {
     <script src="js/modules/78-landing-pages.js" defer></script>
     <script src="js/modules/79-funnels.js" defer></script>
     <script src="js/modules/84-event-bus.js" defer></script>
+    <script src="js/modules/93-sites-list.js" defer></script>
+    <script src="js/modules/94-sites-builder.js" defer></script>
+    <script src="js/modules/95-sites-forms.js" defer></script>
     <script src="js/modules/81-bots-flows.js" defer></script>
     <script src="js/modules/82-flow-canvas.js" defer></script>
     <script src="js/modules/83-bots-contacts.js" defer></script>
