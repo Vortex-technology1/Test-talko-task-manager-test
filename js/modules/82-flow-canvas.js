@@ -492,7 +492,10 @@ function buildSidebar() {
 // ── Render All ─────────────────────────────────────────────
 function renderAll() {
     renderNodes();
-    renderEdges();
+    // Чекаємо layout браузера перед рендером ліній (щоб port coords були з DOM)
+    requestAnimationFrame(() => {
+        renderEdges();
+    });
 }
 
 // ── Nodes ──────────────────────────────────────────────────
@@ -800,15 +803,31 @@ function renderEdges() {
     });
 }
 
+function _domPortPos(nodeId, selector) {
+    const el = document.getElementById('fcn_' + nodeId);
+    const wrap = document.getElementById('fcCanvasWrap');
+    if (!el || !wrap) return null;
+    const portEl = el.querySelector(selector);
+    if (!portEl) return null;
+    const wr = wrap.getBoundingClientRect();
+    const pr = portEl.getBoundingClientRect();
+    return {
+        x: (pr.left + pr.width/2  - wr.left - fc.pan.x) / fc.scale,
+        y: (pr.top  + pr.height/2 - wr.top  - fc.pan.y) / fc.scale
+    };
+}
+
 function getOutPortPos(node, portId) {
-    // Start вузол має спеціальні розміри
     if (node.type === 'start') {
         return { x: node.x + 110, y: node.y + 19 };
     }
+    // Читаємо реальну позицію порту з DOM
+    const pos = _domPortPos(node.id, `[data-port-out="${node.id}"][data-port-id="${portId}"]`);
+    if (pos) return pos;
+    // fallback (до першого рендеру)
     const outputs = node.outputs || NODES[node.type]?.outputs || ['out'];
     const idx = outputs.indexOf(portId);
     const total = outputs.length;
-    // Синхронізовано з renderNode: topPct = total===1 ? 50 : 20 + (i/(total-1))*60 (у %)
     const topPct = total === 1 ? 0.5 : (20 + (idx / Math.max(1, total-1)) * 60) / 100;
     const h = getNodeHeight(node);
     return { x: node.x + W, y: node.y + h * topPct };
@@ -818,6 +837,10 @@ function getInPortPos(node) {
     if (node.type === 'start') {
         return { x: node.x, y: node.y + 19 };
     }
+    // Читаємо реальну позицію in-порту з DOM
+    const pos = _domPortPos(node.id, `[data-port-in="${node.id}"]`);
+    if (pos) return pos;
+    // fallback
     const h = getNodeHeight(node);
     return { x: node.x, y: node.y + h * 0.5 };
 }
