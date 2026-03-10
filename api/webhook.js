@@ -470,7 +470,7 @@ async function callAI(node, userText, session, compRef) {
         let responseText = null;
 
         // ── OpenAI / Deepseek (same API format) ──────────────
-        if (provider === 'openai' || provider === 'deepseek' || model.startsWith('gpt-') || model.startsWith('o3') || model.startsWith('o4') || model.startsWith('deepseek')) {
+        if (provider === 'openai' || provider === 'deepseek' || model.startsWith('gpt-') || model.startsWith('o3') || model.startsWith('o4') || model.startsWith('o1') || model.startsWith('deepseek')) {
             const baseUrl = (provider === 'deepseek' || model.startsWith('deepseek'))
                 ? 'https://api.deepseek.com/v1/chat/completions'
                 : 'https://api.openai.com/v1/chat/completions';

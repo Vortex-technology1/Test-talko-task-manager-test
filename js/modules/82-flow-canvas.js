@@ -1357,9 +1357,11 @@ function renderPropPanel() {
             // Тільки синхронне читання кешу (await заборонено в switch/case)
             const fallbackModels = {
                 openai:    [
-                    ['gpt-4.1-mini','GPT-4.1 mini (швидкий) ⭐'],
-                    ['gpt-4o-mini','GPT-4o mini (стабільний)'],
+                    ['gpt-5-mini-2025-08-07','GPT-5 mini (швидкий, дешевий) ⭐'],
+                    ['gpt-5.4','GPT-5.4 (найрозумніший)'],
+                    ['gpt-4.1-mini','GPT-4.1 mini (швидкий)'],
                     ['gpt-4.1','GPT-4.1 (розумний)'],
+                    ['gpt-4o-mini','GPT-4o mini (стабільний)'],
                     ['gpt-4o','GPT-4o'],
                     ['gpt-4.1-nano','GPT-4.1 nano (найдешевший)'],
                     ['o4-mini','o4-mini (мислить)'],
