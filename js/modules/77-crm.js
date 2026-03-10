@@ -26,6 +26,7 @@ const I = {
     web:      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
     ig:       '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>',
     check:    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    settings: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>',
     funnel:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>',
     users:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
 };
@@ -61,9 +62,10 @@ function _renderShell() {
     if (!container) return;
 
     const tabs = [
-        ['kanban',    I.funnel, 'Воронка'],
-        ['clients',   I.users,  'Клієнти'],
-        ['analytics', I.chart,  'Аналітика'],
+        ['kanban',    I.funnel,   'Воронка'],
+        ['clients',   I.users,   'Клієнти'],
+        ['analytics', I.chart,   'Аналітика'],
+        ['settings',  I.settings,'Налаштування'],
     ];
 
     container.innerHTML = `
@@ -95,6 +97,7 @@ function _renderShell() {
             <div id="crmViewKanban" style="height:100%;overflow:auto;"></div>
             <div id="crmViewClients" style="height:100%;overflow:auto;display:none;padding:1rem;"></div>
             <div id="crmViewAnalytics" style="height:100%;overflow:auto;display:none;padding:1rem;"></div>
+            <div id="crmViewSettings" style="height:100%;overflow:auto;display:none;padding:1rem;"></div>
         </div>
     </div>`;
 
@@ -103,7 +106,7 @@ function _renderShell() {
 
 window.crmSwitchTab = function(tab) {
     crm.subTab = tab;
-    ['kanban','clients','analytics'].forEach(t => {
+    ['kanban','clients','analytics','settings'].forEach(t => {
         const view = document.getElementById('crmView' + t.charAt(0).toUpperCase() + t.slice(1));
         const btn  = document.getElementById('crmTab_' + t);
         if (view) view.style.display = t === tab ? '' : 'none';
@@ -116,6 +119,7 @@ window.crmSwitchTab = function(tab) {
     if (tab === 'kanban')    _renderKanban();
     if (tab === 'clients')   _renderClients();
     if (tab === 'analytics') _renderAnalytics();
+    if (tab === 'settings')  _renderCRMSettings();
 };
 
 // ── Load ───────────────────────────────────────────────────
@@ -924,6 +928,231 @@ function _renderAnalytics() {
         </div>
     </div>`;
 }
+
+
+// ══════════════════════════════════════════════════════════
+// НАЛАШТУВАННЯ CRM — воронки, стадії, кольори
+// ══════════════════════════════════════════════════════════
+function _renderCRMSettings() {
+    const c = document.getElementById('crmViewSettings');
+    if (!c) return;
+
+    const pipeline = crm.pipeline;
+    const stages   = (pipeline?.stages || []).slice().sort((a,b) => a.order - b.order);
+
+    const inp = 'padding:0.4rem 0.5rem;border:1px solid #e8eaed;border-radius:6px;font-size:0.8rem;font-family:inherit;';
+    const sectionTitle = 'font-weight:700;font-size:0.82rem;color:#111827;margin-bottom:0.65rem;';
+
+    c.innerHTML = `
+    <div style="max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:1rem;">
+
+        <!-- Воронки -->
+        <div style="background:white;border-radius:10px;padding:1.1rem;border:1px solid #e8eaed;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+                <div style="${sectionTitle}margin-bottom:0;">Воронки продажів</div>
+                <button onclick="crmCreatePipeline()"
+                    style="display:flex;align-items:center;gap:0.3rem;padding:0.35rem 0.75rem;
+                    background:#22c55e;color:white;border:none;border-radius:6px;
+                    cursor:pointer;font-size:0.78rem;font-weight:600;">
+                    ${I.plus} Нова воронка
+                </button>
+            </div>
+            <div id="crmPipelineList">
+                ${crm.pipelines.map(p => `
+                <div style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.65rem;
+                    background:${p.id === crm.pipeline?.id ? '#f0fdf4' : '#f8fafc'};
+                    border:1px solid ${p.id === crm.pipeline?.id ? '#bbf7d0' : '#e8eaed'};
+                    border-radius:7px;margin-bottom:0.35rem;cursor:pointer;"
+                    onclick="crmSelectPipeline('${p.id}')">
+                    <div style="flex:1;">
+                        <span style="font-size:0.82rem;font-weight:600;color:#111827;">${_esc(p.name)}</span>
+                        ${p.isDefault ? '<span style="font-size:0.65rem;background:#f0fdf4;color:#16a34a;padding:1px 6px;border-radius:4px;margin-left:0.4rem;font-weight:600;">основна</span>' : ''}
+                    </div>
+                    <span style="font-size:0.72rem;color:#9ca3af;">${(p.stages||[]).length} стадій</span>
+                    ${!p.isDefault ? `<button onclick="event.stopPropagation();crmDeletePipeline('${p.id}','${_esc(p.name)}')"
+                        style="background:none;border:none;cursor:pointer;color:#fca5a5;padding:2px;
+                        display:flex;align-items:center;" title="Видалити">${I.trash}</button>` : ''}
+                </div>`).join('')}
+            </div>
+        </div>
+
+        <!-- Стадії поточної воронки -->
+        <div style="background:white;border-radius:10px;padding:1.1rem;border:1px solid #e8eaed;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+                <div>
+                    <div style="${sectionTitle}margin-bottom:0;">Стадії: ${_esc(pipeline?.name || '')}</div>
+                    <div style="font-size:0.7rem;color:#9ca3af;">Перетягуй щоб змінити порядок</div>
+                </div>
+                <button onclick="crmAddStage()"
+                    style="display:flex;align-items:center;gap:0.3rem;padding:0.35rem 0.75rem;
+                    background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:6px;
+                    cursor:pointer;font-size:0.78rem;font-weight:600;">
+                    ${I.plus} Стадія
+                </button>
+            </div>
+            <div id="crmStageList" style="display:flex;flex-direction:column;gap:0.35rem;">
+                ${stages.map((s, i) => `
+                <div id="crmStage_${s.id}" draggable="true"
+                    ondragstart="crmStageDragStart(event,'${s.id}')"
+                    ondragover="crmStageDragOver(event)"
+                    ondrop="crmStageDrop(event,'${s.id}')"
+                    style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.65rem;
+                    background:#f8fafc;border:1px solid #e8eaed;border-radius:7px;cursor:grab;
+                    border-left:4px solid ${s.color};">
+                    <span style="color:#d1d5db;font-size:0.75rem;cursor:grab;">⠿</span>
+                    <input value="${_esc(s.label)}" onchange="crmUpdateStageLabel('${s.id}',this.value)"
+                        style="${inp}flex:1;background:transparent;border:none;padding:0;font-weight:500;color:#111827;"
+                        onclick="event.stopPropagation()">
+                    <input type="color" value="${s.color}"
+                        onchange="crmUpdateStageColor('${s.id}',this.value)"
+                        style="width:26px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;"
+                        title="Колір стадії">
+                    ${!['won','lost'].includes(s.id) ? `
+                    <button onclick="crmRemoveStage('${s.id}')"
+                        style="background:none;border:none;cursor:pointer;color:#fca5a5;
+                        display:flex;align-items:center;padding:2px;" title="Видалити">${I.trash}</button>` : ''}
+                </div>`).join('')}
+            </div>
+            <button onclick="crmSaveStages()"
+                style="margin-top:0.75rem;width:100%;padding:0.5rem;background:#22c55e;color:white;
+                border:none;border-radius:7px;cursor:pointer;font-weight:600;font-size:0.82rem;">
+                Зберегти стадії
+            </button>
+        </div>
+    </div>`;
+}
+
+// ── Pipeline CRUD ──────────────────────────────────────────
+window.crmSelectPipeline = async function(pipelineId) {
+    crm.pipeline = crm.pipelines.find(p => p.id === pipelineId) || crm.pipeline;
+    // Reload deals for this pipeline
+    crm.loading = true;
+    crm.unsubs.forEach(u => u && u());
+    crm.unsubs = [];
+    const dealUnsub = firebase.firestore()
+        .collection('companies').doc(window.currentCompanyId).collection('crm_deals')
+        .where('pipelineId','==', crm.pipeline.id).limit(200)
+        .onSnapshot(snap => {
+            crm.deals = snap.docs.map(d => ({id:d.id,...d.data()}))
+                .sort((a,b) => (b.createdAt?.toMillis?.()??0)-(a.createdAt?.toMillis?.()??0));
+            crm.loading = false;
+        });
+    crm.unsubs.push(dealUnsub);
+    _renderCRMSettings();
+    if (typeof showToast === 'function') showToast('Воронку вибрано: ' + crm.pipeline.name, 'success');
+};
+
+window.crmCreatePipeline = function() {
+    const name = prompt('Назва нової воронки:');
+    if (!name?.trim()) return;
+    _doCreatePipeline(name.trim());
+};
+
+async function _doCreatePipeline(name) {
+    const stages = [
+        {id:'new_'+Date.now(),    label:'Новий',      color:'#6b7280', order:0},
+        {id:'contact_'+Date.now(),label:'Контакт',    color:'#3b82f6', order:1},
+        {id:'proposal_'+Date.now(),label:'Пропозиція',color:'#f59e0b', order:2},
+        {id:'won',                label:'Виграно',    color:'#22c55e', order:3},
+        {id:'lost',               label:'Програно',   color:'#ef4444', order:4},
+    ];
+    try {
+        const ref = await firebase.firestore()
+            .collection('companies').doc(window.currentCompanyId).collection('crm_pipeline')
+            .add({ name, isDefault:false, stages, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        crm.pipelines.push({ id:ref.id, name, isDefault:false, stages });
+        if (typeof showToast === 'function') showToast('Воронку створено', 'success');
+        _renderCRMSettings();
+    } catch(e) {
+        alert('Помилка: ' + e.message);
+    }
+}
+
+window.crmDeletePipeline = async function(pipelineId, name) {
+    if (!confirm(`Видалити воронку "${name}"?\nВсі угоди в ній залишаться.`)) return;
+    try {
+        await firebase.firestore()
+            .doc('companies/' + window.currentCompanyId + '/crm_pipeline/' + pipelineId).delete();
+        crm.pipelines = crm.pipelines.filter(p => p.id !== pipelineId);
+        if (crm.pipeline?.id === pipelineId) {
+            crm.pipeline = crm.pipelines[0];
+        }
+        if (typeof showToast === 'function') showToast('Видалено', 'success');
+        _renderCRMSettings();
+    } catch(e) {
+        alert('Помилка: ' + e.message);
+    }
+};
+
+// ── Stage CRUD ─────────────────────────────────────────────
+window.crmAddStage = function() {
+    if (!crm.pipeline) return;
+    const id    = 'stage_' + Date.now();
+    const order = (crm.pipeline.stages || []).length;
+    const stage = { id, label:'Нова стадія', color:'#8b5cf6', order };
+    crm.pipeline.stages = [...(crm.pipeline.stages || []), stage];
+    _renderCRMSettings();
+};
+
+window.crmUpdateStageLabel = function(stageId, label) {
+    const s = crm.pipeline?.stages?.find(s => s.id === stageId);
+    if (s) s.label = label;
+};
+
+window.crmUpdateStageColor = function(stageId, color) {
+    const s = crm.pipeline?.stages?.find(s => s.id === stageId);
+    if (s) { s.color = color; _renderCRMSettings(); }
+};
+
+window.crmRemoveStage = function(stageId) {
+    if (!confirm('Видалити стадію? Угоди залишаться.')) return;
+    if (!crm.pipeline) return;
+    crm.pipeline.stages = crm.pipeline.stages.filter(s => s.id !== stageId);
+    _renderCRMSettings();
+};
+
+window.crmSaveStages = async function() {
+    if (!crm.pipeline) return;
+    // Оновлюємо order
+    crm.pipeline.stages.forEach((s,i) => s.order = i);
+    try {
+        await firebase.firestore()
+            .doc('companies/' + window.currentCompanyId + '/crm_pipeline/' + crm.pipeline.id)
+            .update({ stages: crm.pipeline.stages, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        // Sync в pipelines array
+        const idx = crm.pipelines.findIndex(p => p.id === crm.pipeline.id);
+        if (idx >= 0) crm.pipelines[idx].stages = crm.pipeline.stages;
+        if (typeof showToast === 'function') showToast('Стадії збережено ✓', 'success');
+        _renderKanban();
+    } catch(e) {
+        if (typeof showToast === 'function') showToast('Помилка: ' + e.message, 'error');
+    }
+};
+
+// Stage drag-and-drop reorder
+let _stageDragId = null;
+window.crmStageDragStart = function(e, stageId) {
+    _stageDragId = stageId;
+    e.dataTransfer.effectAllowed = 'move';
+};
+window.crmStageDragOver = function(e) {
+    e.preventDefault();
+    e.currentTarget.style.background = '#eef2ff';
+};
+window.crmStageDrop = function(e, targetId) {
+    e.preventDefault();
+    e.currentTarget.style.background = '#f8fafc';
+    if (!_stageDragId || _stageDragId === targetId || !crm.pipeline) return;
+    const stages = crm.pipeline.stages;
+    const fromIdx = stages.findIndex(s => s.id === _stageDragId);
+    const toIdx   = stages.findIndex(s => s.id === targetId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const [moved] = stages.splice(fromIdx, 1);
+    stages.splice(toIdx, 0, moved);
+    stages.forEach((s,i) => s.order = i);
+    _stageDragId = null;
+    _renderCRMSettings();
+};
 
 // ══════════════════════════════════════════════════════════
 // HELPERS

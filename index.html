@@ -549,6 +549,10 @@ document.addEventListener('mousedown', function(e) {
                         <button class="tab-btn _ntab" id="sitesNavBtn" onclick="event.stopPropagation();switchTab('sites');closeNavDropdowns();" style="display:none;width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;gap:0.6rem;">
                             <i data-lucide="globe" class="icon icon-sm"></i><span>Сайти</span>
                         </button>
+                        <div style="height:1px;background:#f1f5f9;margin:0.2rem 0;"></div>
+                        <button class="tab-btn _ntab" id="integrationsNavBtn" onclick="event.stopPropagation();switchTab('integrations');closeNavDropdowns();" style="width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;gap:0.6rem;">
+                            <i data-lucide="plug" class="icon icon-sm"></i><span>Інтеграції</span>
+                        </button>
                     </div>
                 </div>
 
@@ -852,6 +856,11 @@ document.addEventListener('mousedown', function(e) {
             <!-- Sites Tab -->
             <div id="sitesTab" class="tab-content">
                 <div id="sitesContainer"></div>
+            </div>
+
+            <!-- Integrations Tab -->
+            <div id="integrationsTab" class="tab-content">
+                <div id="integrationsContainer"></div>
             </div>
 
             <!-- CRM Tab -->
@@ -3548,6 +3557,7 @@ document.addEventListener('mousedown', function(e) {
     <script src="js/modules/79-funnels.js" defer></script>
     <script src="js/modules/84-event-bus.js" defer></script>
     <script src="js/modules/93-sites-list.js" defer></script>
+    <script src="js/modules/96-integrations.js" defer></script>
     <script src="js/modules/94-sites-builder.js" defer></script>
     <script src="js/modules/95-sites-forms.js" defer></script>
     <script src="js/modules/81-bots-flows.js" defer></script>
