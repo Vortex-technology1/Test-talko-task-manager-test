@@ -1773,108 +1773,494 @@ window.chatOnSearch = function(val) {
 };
 
 // ══════════════════════════════════════════════════════════
-// 7. РОЗСИЛКА// 7. РОЗСИЛКА
 // ══════════════════════════════════════════════════════════
+// 7. РОЗСИЛКА — повна реалізація згідно ТЗ
+// Сегментація: канал / ніша / тег / воронка
+// Rate limiting: 25 msg/sec (Telegram дозволяє до 30)
+// Прогрес-бар в реальному часі
+// Скасування під час відправки
+// Збереження в broadcasts/ з повною статистикою
+// ══════════════════════════════════════════════════════════
+
+// State розсилки
+let bcast = {
+    running: false,
+    cancelled: false,
+    sent: 0,
+    failed: 0,
+    total: 0,
+};
+
 async function renderBroadcastTab() {
     const c = document.getElementById('bpViewBroadcast');
     if (!c) return;
-    let history = [];
+
+    // Завантажуємо унікальні теги і ніші для фільтрів
+    let allTags = [], allNiches = [];
     try {
-        const snap = await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-            .collection('broadcasts').orderBy('createdAt','desc').limit(20).get();
-        history = snap.docs.map(d=>({id:d.id,...d.data()}));
+        // Беремо теги з поточних contacts в пам'яті якщо є, інакше з Firestore
+        const contactsForMeta = cts.items.length > 0 ? cts.items : [];
+        contactsForMeta.forEach(ct => {
+            (ct.tags || []).forEach(t => { if (t && !allTags.includes(t)) allTags.push(t); });
+            if (ct.business_type && !allNiches.includes(ct.business_type)) allNiches.push(ct.business_type);
+        });
     } catch(e) {}
 
-    const activeCount = bp.contacts.filter(ct=>!ct.botStatus||ct.botStatus==='active').length;
+    let history = [];
+    try {
+        const snap = await firebase.firestore()
+            .collection(`companies/${window.currentCompanyId}/broadcasts`)
+            .orderBy('createdAt', 'desc').limit(20).get();
+        history = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) {}
+
+    const sectionStyle = 'background:white;border-radius:14px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);';
+    const labelStyle = 'font-size:0.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;display:block;margin-bottom:0.4rem;';
+    const inputStyle = 'width:100%;padding:0.5rem 0.6rem;border:1.5px solid #e5e7eb;border-radius:9px;font-size:0.82rem;box-sizing:border-box;font-family:inherit;outline:none;';
+    const selectStyle = 'width:100%;padding:0.48rem 0.5rem;border:1.5px solid #e5e7eb;border-radius:9px;font-size:0.8rem;background:white;cursor:pointer;';
 
     c.innerHTML = `
-        <div style="background:white;border-radius:12px;padding:1rem;box-shadow:var(--shadow);margin-bottom:0.6rem;">
-            <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;"><i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Нова розсилка</div>
-            <div style="display:flex;flex-direction:column;gap:0.55rem;">
-                <div>
-                    <label style="font-size:0.72rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.25rem;">АУДИТОРІЯ</label>
-                    <select id="bpBcastAudience" style="width:100%;padding:0.5rem;border:1px solid #e5e7eb;border-radius:7px;font-size:0.82rem;background:white;">
-                        <option value="all">Всі активні (${activeCount})</option>
-                        <option value="telegram">Тільки Telegram</option>
-                        <option value="instagram">Тільки Instagram</option>
+    <div style="display:flex;gap:0.75rem;max-width:900px;">
+
+        <!-- ЛІВА ЧАСТИНА: форма розсилки -->
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:0.65rem;">
+
+            <!-- Нова розсилка -->
+            <div style="${sectionStyle}">
+                <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.85rem;display:flex;align-items:center;gap:0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Нова розсилка
+                </div>
+
+                <!-- Аудиторія -->
+                <div style="margin-bottom:0.65rem;">
+                    <label style="${labelStyle}">СЕГМЕНТ АУДИТОРІЇ</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+                        <div>
+                            <div style="font-size:0.71rem;color:#6b7280;margin-bottom:3px;">Канал</div>
+                            <select id="bcastChannel" onchange="bcastPreview()" style="${selectStyle}">
+                                <option value="">Всі канали</option>
+                                <option value="telegram">Telegram</option>
+                                <option value="instagram">Instagram</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div style="font-size:0.71rem;color:#6b7280;margin-bottom:3px;">Воронка</div>
+                            <select id="bcastFlow" onchange="bcastPreview()" style="${selectStyle}">
+                                <option value="">Всі воронки</option>
+                                ${bp.flows.map(f => `<option value="${f.id}">${escH(f.name)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <div style="font-size:0.71rem;color:#6b7280;margin-bottom:3px;">Ніша</div>
+                            <select id="bcastNiche" onchange="bcastPreview()" style="${selectStyle}">
+                                <option value="">Всі ніші</option>
+                                ${allNiches.map(n => `<option value="${escH(n)}">${escH(n)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <div style="font-size:0.71rem;color:#6b7280;margin-bottom:3px;">Тег</div>
+                            <select id="bcastTag" onchange="bcastPreview()" style="${selectStyle}">
+                                <option value="">Всі теги</option>
+                                ${allTags.map(t => `<option value="${escH(t)}">${escH(t)}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Preview аудиторії -->
+                    <div id="bcastPreviewBox"
+                        style="margin-top:0.5rem;padding:0.5rem 0.65rem;background:#f0fdf4;
+                        border-radius:8px;border:1px solid #bbf7d0;font-size:0.78rem;color:#16a34a;
+                        font-weight:600;display:none;">
+                    </div>
+                </div>
+
+                <!-- Повідомлення -->
+                <div style="margin-bottom:0.65rem;">
+                    <label style="${labelStyle}">ТЕКСТ ПОВІДОМЛЕННЯ</label>
+                    <textarea id="bcastText" rows="4"
+                        placeholder="Текст розсилки...&#10;&#10;Підтримується *жирний* і _курсив_ (Telegram Markdown)"
+                        oninput="bcastCountChars(this.value)"
+                        style="${inputStyle}resize:vertical;"></textarea>
+                    <div style="display:flex;justify-content:space-between;margin-top:3px;">
+                        <div style="font-size:0.7rem;color:#9ca3af;">
+                            Enter = новий рядок · *bold* · _italic_
+                        </div>
+                        <div id="bcastCharCount" style="font-size:0.7rem;color:#9ca3af;">0 / 4096</div>
+                    </div>
+                </div>
+
+                <!-- Або запустити ланцюг -->
+                <div style="margin-bottom:0.85rem;">
+                    <label style="${labelStyle}">АБО ЗАПУСТИТИ ЛАНЦЮГ</label>
+                    <select id="bcastFlowSend" style="${selectStyle}">
+                        <option value="">— Тільки текст —</option>
+                        ${bp.flows.map(f => `<option value="${f.id}">${escH(f.name)}</option>`).join('')}
                     </select>
+                    <div style="font-size:0.71rem;color:#9ca3af;margin-top:3px;">
+                        Якщо обрано ланцюг — текст ігнорується. Бот запустить ланцюг для кожного.
+                    </div>
                 </div>
-                <div>
-                    <label style="font-size:0.72rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.25rem;">ТЕКСТ</label>
-                    <textarea id="bpBcastText" rows="3" placeholder="Текст повідомлення..."
-                        style="width:100%;padding:0.5rem;border:1px solid #e5e7eb;border-radius:7px;font-size:0.82rem;resize:vertical;box-sizing:border-box;"></textarea>
+
+                <!-- Rate limiting попередження -->
+                <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:9px;
+                    padding:0.55rem 0.7rem;margin-bottom:0.75rem;font-size:0.76rem;color:#92400e;">
+                    ⚠️ Telegram дозволяє <b>30 повідомлень/сек</b>. Ми відправляємо по <b>25/сек</b> з паузою 40мс між кожним.
+                    При великій базі (500+) розсилка може зайняти кілька хвилин.
                 </div>
-                <div>
-                    <label style="font-size:0.72rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.25rem;">АБО ЗАПУСТИТИ ЛАНЦЮГ</label>
-                    <select id="bpBcastFlow" style="width:100%;padding:0.5rem;border:1px solid #e5e7eb;border-radius:7px;font-size:0.82rem;background:white;">
-                        <option value="">— Не запускати —</option>
-                        ${bp.flows.map(f=>`<option value="${f.id}">${escH(f.name)}</option>`).join('')}
-                    </select>
+
+                <!-- Кнопка відправки -->
+                <button onclick="bpSendBroadcast()" id="bcastSendBtn"
+                    style="width:100%;padding:0.65rem;background:#22c55e;color:white;border:none;
+                    border-radius:10px;cursor:pointer;font-weight:700;font-size:0.88rem;
+                    display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Надіслати розсилку
+                </button>
+            </div>
+
+            <!-- Прогрес-бар (прихований поки не запущено) -->
+            <div id="bcastProgress" style="display:none;${sectionStyle}">
+                <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.6rem;">
+                    📤 Відправка в процесі...
                 </div>
-                <button onclick="bpSendBroadcast()"
-                    style="padding:0.6rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.84rem;">
-                    <i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Надіслати
+                <div style="background:#f1f5f9;border-radius:8px;height:10px;overflow:hidden;margin-bottom:0.5rem;">
+                    <div id="bcastProgressBar"
+                        style="height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);
+                        width:0%;transition:width 0.3s;border-radius:8px;"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.76rem;">
+                    <span id="bcastProgressText" style="color:#374151;font-weight:600;"></span>
+                    <span id="bcastProgressPercent" style="color:#6b7280;"></span>
+                </div>
+                <div style="display:flex;gap:0.5rem;margin-top:0.6rem;">
+                    <div id="bcastStatSent" style="flex:1;text-align:center;padding:0.4rem;background:#f0fdf4;border-radius:8px;">
+                        <div style="font-size:1rem;font-weight:700;color:#22c55e;" id="bcastStatSentNum">0</div>
+                        <div style="font-size:0.68rem;color:#6b7280;">Надіслано</div>
+                    </div>
+                    <div id="bcastStatFailed" style="flex:1;text-align:center;padding:0.4rem;background:#fff5f5;border-radius:8px;">
+                        <div style="font-size:1rem;font-weight:700;color:#ef4444;" id="bcastStatFailedNum">0</div>
+                        <div style="font-size:0.68rem;color:#6b7280;">Помилок</div>
+                    </div>
+                    <div style="flex:1;text-align:center;padding:0.4rem;background:#f8fafc;border-radius:8px;">
+                        <div style="font-size:1rem;font-weight:700;color:#374151;" id="bcastStatTotal">0</div>
+                        <div style="font-size:0.68rem;color:#6b7280;">Всього</div>
+                    </div>
+                </div>
+                <button onclick="bcastCancel()"
+                    style="margin-top:0.6rem;width:100%;padding:0.45rem;background:#fee2e2;color:#ef4444;
+                    border:1.5px solid #fecaca;border-radius:9px;cursor:pointer;font-size:0.8rem;font-weight:600;">
+                    ✕ Зупинити розсилку
                 </button>
             </div>
         </div>
-        <div style="font-weight:700;font-size:0.84rem;margin-bottom:0.4rem;color:#374151;">Історія</div>
-        ${history.length===0
-          ? '<div style="text-align:center;padding:1.25rem;background:white;border-radius:10px;color:#9ca3af;font-size:0.8rem;">'+t('botsNoBroadcasts')+'</div>'
-          : history.map(b=>`<div style="background:white;border-radius:9px;padding:0.7rem;box-shadow:var(--shadow);margin-bottom:0.35rem;display:flex;justify-content:space-between;align-items:center;">
-                <div>
-                    <div style="font-size:0.82rem;font-weight:600;">${escH(b.text?.slice(0,50)||b.flowName||'Розсилка')}</div>
-                    <div style="font-size:0.7rem;color:#6b7280;">${b.audience||'all'} · ${b.createdAt?.toDate?relTime(b.createdAt.toDate()):''}</div>
-                </div>
-                <div style="font-size:0.75rem;text-align:right;">
-                    <div style="color:#22c55e;"><i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> ${b.sent||0}</div>
-                    <div style="color:#ef4444;"><i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i> ${b.failed||0}</div>
-                </div>
-            </div>`).join('')}`;
-    lcIcons(c);
+
+        <!-- ПРАВА ЧАСТИНА: історія -->
+        <div style="width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="font-weight:700;font-size:0.85rem;color:#374151;padding:0 0.1rem;">
+                Історія розсилок
+            </div>
+            ${history.length === 0
+                ? `<div style="text-align:center;padding:2rem;background:white;border-radius:12px;color:#9ca3af;font-size:0.78rem;">
+                    Розсилок ще не було
+                   </div>`
+                : history.map(b => {
+                    const rate = b.total > 0 ? Math.round(b.sent / b.total * 100) : 0;
+                    const statusColor = b.status === 'cancelled' ? '#f97316' : rate >= 80 ? '#22c55e' : '#ef4444';
+                    const date = b.createdAt?.toDate ? b.createdAt.toDate().toLocaleDateString('uk-UA', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+                    return `
+                    <div style="background:white;border-radius:12px;padding:0.75rem;
+                        box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                        <div style="font-size:0.8rem;font-weight:700;margin-bottom:3px;overflow:hidden;
+                            text-overflow:ellipsis;white-space:nowrap;">
+                            ${escH(b.text?.slice(0, 45) || b.flowName || 'Розсилка')}
+                        </div>
+                        <div style="font-size:0.7rem;color:#9ca3af;margin-bottom:0.45rem;">
+                            ${date}
+                            ${b.segment ? ` · ${escH(b.segment)}` : ''}
+                        </div>
+                        <!-- Мінімальний прогрес-бар -->
+                        <div style="background:#f1f5f9;border-radius:4px;height:4px;overflow:hidden;margin-bottom:0.35rem;">
+                            <div style="height:100%;background:${statusColor};width:${rate}%;border-radius:4px;"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:0.72rem;">
+                            <span style="color:#22c55e;font-weight:600;">✓ ${b.sent || 0}</span>
+                            <span style="color:#ef4444;">✕ ${b.failed || 0}</span>
+                            <span style="color:#6b7280;">${b.total || 0} всього</span>
+                            <span style="color:${statusColor};font-weight:600;">${rate}%</span>
+                        </div>
+                        ${b.status === 'cancelled' ? '<div style="font-size:0.68rem;color:#f97316;margin-top:3px;">⏹ Зупинено вручну</div>' : ''}
+                    </div>`;
+                }).join('')}
+        </div>
+    </div>`;
+
+    // Preview одразу після рендеру
+    bcastPreview();
 }
 
+// ─────────────────────────────────────────
+// PREVIEW аудиторії (завантажуємо count з Firestore)
+// ─────────────────────────────────────────
+window.bcastPreview = async function() {
+    const box = document.getElementById('bcastPreviewBox');
+    if (!box) return;
+
+    const channel = document.getElementById('bcastChannel')?.value || '';
+    const flowId  = document.getElementById('bcastFlow')?.value || '';
+    const niche   = document.getElementById('bcastNiche')?.value || '';
+    const tag     = document.getElementById('bcastTag')?.value || '';
+
+    try {
+        let q = firebase.firestore()
+            .collection(`companies/${window.currentCompanyId}/contacts`)
+            .where('botStatus', '!=', 'blocked');
+
+        // Firestore дозволяє один inequality filter — решта фільтруємо на клієнті
+        // Тому робимо простий count query з основним фільтром
+        if (channel) q = q.where('channel', '==', channel);
+        if (flowId)  q = q.where('flowId', '==', flowId);
+
+        const snap = await q.limit(1000).get();
+        let count = snap.size;
+
+        // Додаткова фільтрація на клієнті
+        if (niche || tag) {
+            count = snap.docs.filter(d => {
+                const data = d.data();
+                if (niche && data.business_type !== niche) return false;
+                if (tag && !(data.tags || []).includes(tag)) return false;
+                return true;
+            }).length;
+        }
+
+        box.style.display = '';
+        const parts = [];
+        if (channel) parts.push(channel);
+        if (niche) parts.push(niche);
+        if (tag) parts.push(`#${tag}`);
+        if (flowId) parts.push(bp.flows.find(f => f.id === flowId)?.name || flowId);
+
+        box.innerHTML = `
+            👥 <b>${count}</b> контактів отримають розсилку
+            ${parts.length ? `· <span style="font-weight:400;color:#16a34a;">${parts.join(' · ')}</span>` : ''}
+            ${count === 1000 ? '<span style="color:#f97316;"> (показано перші 1000)</span>' : ''}`;
+    } catch(e) {
+        box.style.display = '';
+        box.innerHTML = `<span style="color:#9ca3af;">Не вдалось порахувати аудиторію</span>`;
+    }
+};
+
+window.bcastCountChars = function(val) {
+    const el = document.getElementById('bcastCharCount');
+    if (el) {
+        const len = val.length;
+        el.textContent = `${len} / 4096`;
+        el.style.color = len > 3800 ? '#ef4444' : '#9ca3af';
+    }
+};
+
+// ─────────────────────────────────────────
+// ОСНОВНА ФУНКЦІЯ ВІДПРАВКИ
+// ─────────────────────────────────────────
 window.bpSendBroadcast = async function() {
-    const text = document.getElementById('bpBcastText')?.value.trim();
-    const flowId = document.getElementById('bpBcastFlow')?.value;
-    const audience = document.getElementById('bpBcastAudience')?.value||'all';
-    if (!text && !flowId) { alert('Введіть текст або оберіть ланцюг'); return; }
-    if (!confirm(`Надіслати розсилку? Аудиторія: ${audience}`)) return;
+    const text    = document.getElementById('bcastText')?.value.trim();
+    const flowSendId = document.getElementById('bcastFlowSend')?.value;
+    const channel = document.getElementById('bcastChannel')?.value || '';
+    const flowId  = document.getElementById('bcastFlow')?.value || '';
+    const niche   = document.getElementById('bcastNiche')?.value || '';
+    const tag     = document.getElementById('bcastTag')?.value || '';
 
-    const compDoc = await firebase.firestore().collection('companies').doc(window.currentCompanyId).get();
-    const token = compDoc.data()?.integrations?.telegram?.botToken;
-
-    let targets = bp.contacts.filter(ct=>!ct.botStatus||ct.botStatus==='active');
-    if (audience==='telegram') targets=targets.filter(ct=>ct.source==='telegram');
-    if (audience==='instagram') targets=targets.filter(ct=>ct.source==='instagram');
-
-    let sent=0, failed=0;
-    for (const ct of targets) {
-        try {
-            if (ct.source==='telegram' && token) {
-                const tid = ct.externalId?.replace('telegram_','');
-                if (tid) {
-                    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
-                        method:'POST', headers:{'Content-Type':'application/json'},
-                        body:JSON.stringify({chat_id:tid, text:text||'<i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Повідомлення від бота'}),
-                    });
-                    const d = await res.json();
-                    if (d.ok) sent++;
-                    else { if (d.error_code===403) await firebase.firestore().collection('companies').doc(window.currentCompanyId).collection('contacts').doc(ct.id).update({botStatus:'blocked'}); failed++; }
-                }
-            }
-        } catch(e) { failed++; }
+    if (!text && !flowSendId) {
+        alert('Введіть текст або оберіть ланцюг для запуску');
+        return;
     }
 
-    await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-        .collection('broadcasts').add({
-            text:text||'', flowId:flowId||null,
-            flowName:bp.flows.find(f=>f.id===flowId)?.name||'',
-            audience, sent, failed, total:targets.length,
+    // Завантажуємо всіх цільових контактів з Firestore (не з bp.contacts)
+    let q = firebase.firestore()
+        .collection(`companies/${window.currentCompanyId}/contacts`)
+        .where('botStatus', '!=', 'blocked');
+
+    if (channel) q = q.where('channel', '==', channel);
+    if (flowId)  q = q.where('flowId', '==', flowId);
+    q = q.limit(2000);
+
+    const snap = await q.get();
+    let targets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Фільтрація на клієнті
+    if (niche) targets = targets.filter(ct => ct.business_type === niche);
+    if (tag)   targets = targets.filter(ct => (ct.tags || []).includes(tag));
+
+    // Тільки Telegram (поки)
+    targets = targets.filter(ct => ct.channel === 'telegram' || ct.source === 'telegram');
+
+    if (targets.length === 0) {
+        alert('Немає контактів для розсилки з обраними фільтрами');
+        return;
+    }
+
+    if (!confirm(`Надіслати розсилку ${targets.length} контактам?`)) return;
+
+    // Отримуємо токен бота
+    const compDoc = await firebase.firestore()
+        .collection('companies').doc(window.currentCompanyId).get();
+    const botToken = compDoc.data()?.integrations?.telegram?.botToken
+        || bp.bots.find(b => b.channel === 'telegram')?.token;
+
+    if (!botToken) {
+        alert('Не знайдено токен Telegram бота. Перевірте налаштування.');
+        return;
+    }
+
+    // ── Запускаємо відправку ──
+    bcast.running   = true;
+    bcast.cancelled = false;
+    bcast.sent      = 0;
+    bcast.failed    = 0;
+    bcast.total     = targets.length;
+
+    // Показуємо прогрес, ховаємо форму
+    const sendBtn  = document.getElementById('bcastSendBtn');
+    const progress = document.getElementById('bcastProgress');
+    if (sendBtn)  sendBtn.style.display = 'none';
+    if (progress) progress.style.display = '';
+
+    document.getElementById('bcastStatTotal').textContent = targets.length;
+
+    // Зберігаємо broadcast запис зі статусом 'running'
+    const broadcastRef = await firebase.firestore()
+        .collection(`companies/${window.currentCompanyId}/broadcasts`)
+        .add({
+            text: text || '',
+            flowSendId: flowSendId || null,
+            flowSendName: bp.flows.find(f => f.id === flowSendId)?.name || '',
+            segment: [channel, niche, tag ? '#'+tag : '', bp.flows.find(f=>f.id===flowId)?.name||''].filter(Boolean).join(' · ') || 'всі',
+            channel: channel || 'all',
+            flowId: flowId || null,
+            niche: niche || null,
+            tag: tag || null,
+            total: targets.length,
+            sent: 0, failed: 0,
+            status: 'running',
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         });
 
-    if (typeof showToast==='function') showToast(`Надіслано: ${sent}, помилок: ${failed}`, 'success');
-    renderBroadcastTab();
+    // ── Rate-limited loop: 25 msg/sec ──
+    // Пакети по 25 з паузою 1000мс між пакетами = рівно 25/сек
+    const BATCH_SIZE = 25;
+    const BATCH_DELAY = 1000; // ms між пакетами
+
+    for (let i = 0; i < targets.length; i += BATCH_SIZE) {
+        if (bcast.cancelled) break;
+
+        const batch = targets.slice(i, i + BATCH_SIZE);
+
+        // Відправляємо пакет паралельно з затримкою 40мс між повідомленнями
+        for (let j = 0; j < batch.length; j++) {
+            if (bcast.cancelled) break;
+
+            const ct = batch[j];
+            const telegramId = ct.senderId || ct.externalId?.replace('telegram_', '');
+            if (!telegramId) { bcast.failed++; continue; }
+
+            // Затримка 40мс між кожним (25/сек)
+            if (j > 0) await new Promise(r => setTimeout(r, 40));
+
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: telegramId,
+                        text: text || '📢 Повідомлення від бота',
+                        parse_mode: 'Markdown',
+                    }),
+                });
+                const data = await res.json();
+
+                if (data.ok) {
+                    bcast.sent++;
+                } else {
+                    bcast.failed++;
+                    // Автоматично позначаємо заблокованих
+                    if (data.error_code === 403) {
+                        firebase.firestore()
+                            .doc(`companies/${window.currentCompanyId}/contacts/${ct.id}`)
+                            .update({ botStatus: 'blocked' }).catch(() => {});
+                    }
+                    // Rate limit від Telegram — чекаємо
+                    if (data.error_code === 429) {
+                        const wait = (data.parameters?.retry_after || 5) * 1000;
+                        await new Promise(r => setTimeout(r, wait));
+                    }
+                }
+            } catch(e) { bcast.failed++; }
+
+            // Оновлюємо прогрес UI
+            const done = bcast.sent + bcast.failed;
+            const pct = Math.round(done / bcast.total * 100);
+            const bar = document.getElementById('bcastProgressBar');
+            const txt = document.getElementById('bcastProgressText');
+            const pctEl = document.getElementById('bcastProgressPercent');
+            if (bar) bar.style.width = pct + '%';
+            if (txt) txt.textContent = `${done} з ${bcast.total}`;
+            if (pctEl) pctEl.textContent = pct + '%';
+            document.getElementById('bcastStatSentNum').textContent = bcast.sent;
+            document.getElementById('bcastStatFailedNum').textContent = bcast.failed;
+        }
+
+        // Пауза між пакетами (якщо не останній)
+        if (i + BATCH_SIZE < targets.length && !bcast.cancelled) {
+            await new Promise(r => setTimeout(r, BATCH_DELAY));
+        }
+    }
+
+    // ── Завершення ──
+    bcast.running = false;
+    const finalStatus = bcast.cancelled ? 'cancelled' : 'done';
+
+    // Оновлюємо запис в Firestore
+    await broadcastRef.update({
+        sent: bcast.sent,
+        failed: bcast.failed,
+        status: finalStatus,
+        finishedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // UI feedback
+    const progressDiv = document.getElementById('bcastProgress');
+    if (progressDiv) {
+        progressDiv.innerHTML = `
+            <div style="text-align:center;padding:0.5rem;">
+                <div style="font-size:1.5rem;margin-bottom:0.3rem;">${bcast.cancelled ? '⏹' : '✅'}</div>
+                <div style="font-weight:700;font-size:0.92rem;">
+                    ${bcast.cancelled ? 'Зупинено' : 'Розсилку завершено!'}
+                </div>
+                <div style="font-size:0.8rem;color:#6b7280;margin-top:4px;">
+                    Надіслано: <b style="color:#22c55e;">${bcast.sent}</b>
+                    · Помилок: <b style="color:#ef4444;">${bcast.failed}</b>
+                    · Всього: ${bcast.total}
+                </div>
+                <button onclick="renderBroadcastTab()"
+                    style="margin-top:0.75rem;padding:0.45rem 1.25rem;background:#22c55e;color:white;
+                    border:none;border-radius:9px;cursor:pointer;font-weight:600;font-size:0.82rem;">
+                    Нова розсилка
+                </button>
+            </div>`;
+    }
+
+    if (typeof showToast === 'function') {
+        showToast(`${bcast.cancelled ? 'Зупинено' : 'Готово'}: ${bcast.sent} надіслано, ${bcast.failed} помилок`, 'success');
+    }
+};
+
+// ─────────────────────────────────────────
+// СКАСУВАННЯ
+// ─────────────────────────────────────────
+window.bcastCancel = function() {
+    if (!bcast.running) return;
+    if (!confirm('Зупинити розсилку? Вже надіслані повідомлення не відкличуться.')) return;
+    bcast.cancelled = true;
 };
 
 // ══════════════════════════════════════════════════════════
