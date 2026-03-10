@@ -702,9 +702,17 @@ function getNodeHeight(node) {
 }
 
 function bezier(x1, y1, x2, y2) {
-    const dx = Math.abs(x2-x1);
-    const cp = Math.max(60, dx*0.55);
-    return `M${x1},${y1} C${x1+cp},${y1} ${x2-cp},${y2} ${x2},${y2}`;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    if (dx >= 0) {
+        // Ціль справа — стандартна крива
+        const cp = Math.max(60, dx * 0.55);
+        return `M${x1},${y1} C${x1+cp},${y1} ${x2-cp},${y2} ${x2},${y2}`;
+    } else {
+        // Ціль зліва — робимо петлю через низ/верх
+        const offset = Math.max(80, Math.abs(dy) * 0.4 + 80);
+        return `M${x1},${y1} C${x1+offset},${y1} ${x1+offset},${y2} ${x2-offset},${y2} S${x2},${y2} ${x2},${y2}`;
+    }
 }
 
 // ── Background Dots ────────────────────────────────────────
