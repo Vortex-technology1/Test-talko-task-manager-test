@@ -3539,5 +3539,13 @@ document.addEventListener('mousedown', function(e) {
     <script src="js/modules/81-bots-flows.js" defer></script>
     <script src="js/modules/82-flow-canvas.js" defer></script>
     <script src="js/modules/83-bots-contacts.js" defer></script>
+    <script>
+      // Keep webhook warm — пінг кожні 20 сек поки юзер на сайті
+      (function() {
+        function ping() { fetch('/api/ping', {method:'GET'}).catch(()=>{}); }
+        ping();
+        setInterval(ping, 20000);
+      })();
+    </script>
 </body>
 </html>
