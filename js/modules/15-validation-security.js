@@ -192,9 +192,10 @@
                 errors.push(t('descTooLong'));
             }
             
-            // P1 FIX: перевіряємо assigneeId
+            // assigneeId — не блокуємо збереження, автопідстановка в 13-tasks.js
+            // якщо прийшов порожнім — warning в console, не error
             if (!data.assigneeId || data.assigneeId.trim().length === 0) {
-                errors.push(t('assigneeRequired') || 'Вкажіть виконавця');
+                console.warn('[Validation] assigneeId empty — will fallback to currentUser');
             }
             
             return errors;

@@ -265,9 +265,12 @@
                 // FEAT-006: Ховаємо time tracking для нових завдань
                 document.getElementById('timeTrackingSection').style.display = 'none';
                 
-                // Auto-assign employee to self
-                if (currentUserData?.role === 'employee' && currentUser?.uid) {
-                    document.getElementById('taskAssignee').value = currentUser.uid;
+                // Auto-assign: для employee — завжди себе; для manager/owner — себе якщо select порожній
+                if (currentUser?.uid) {
+                    const sel = document.getElementById('taskAssignee');
+                    if (sel && !sel.value) {
+                        sel.value = currentUser.uid;
+                    }
                 }
             }
         }

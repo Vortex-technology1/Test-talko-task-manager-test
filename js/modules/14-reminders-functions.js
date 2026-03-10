@@ -100,7 +100,9 @@
                 title: document.getElementById('taskTitle').value.trim(),
                 deadlineDate: document.getElementById('taskDeadlineDate').value,
                 deadlineTime: document.getElementById('taskDeadlineTime').value,
-                description: document.getElementById('taskDescription').value.trim()
+                description: document.getElementById('taskDescription').value.trim(),
+                // FIX: передаємо assigneeId — якщо не вибрано, ставимо поточного юзера
+                assigneeId: (document.getElementById('taskAssignee')?.value || currentUser?.uid || '').trim()
             };
             
             // Валідація
