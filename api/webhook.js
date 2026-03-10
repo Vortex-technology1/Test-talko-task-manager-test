@@ -271,31 +271,54 @@ module.exports = async (req, res) => {
                 nodeId = n.nextNode || null;
 
             } else if (n.type === 'ai' || n.type === 'ai_response') {
-                // AI вузол з пам'яттю — зберігаємо історію, loop поки AI веде діалог
+                // AI вузол з пам'яттю
                 if (!session.aiHistory) session.aiHistory = [];
-                // Додаємо повідомлення юзера в історію
                 session.aiHistory.push({ role: 'user', content: normalized.text });
-                // Обрізаємо до 20 повідомлень (10 пар)
                 if (session.aiHistory.length > 20) session.aiHistory = session.aiHistory.slice(-20);
 
                 const rawReply = await callAI(n, normalized.text, session, compRef);
 
-                // Парсимо кнопки з відповіді AI: [BTN:текст кнопки]
+                // Парсимо спеціальні теги з відповіді AI:
+                // [BTN:текст] — динамічна кнопка
+                // [DONE] — AI завершив збір даних, іти до наступного вузла
+                // [SAVE:змінна=значення] — зберегти дані в сесію
                 const btnMatches = [...rawReply.matchAll(/\[BTN:([^\]]+)\]/g)];
                 const aiBtns = btnMatches.map((m, i) => ({ label: m[1], nextNode: null }));
-                const cleanReply = rawReply.replace(/\[BTN:[^\]]+\]/g, '').trim();
+                const isDone = rawReply.includes('[DONE]');
 
-                // Додаємо відповідь AI в історію (без тегів кнопок)
+                // Парсимо [SAVE:key=value] теги
+                const saveMatches = [...rawReply.matchAll(/\[SAVE:([^=\]]+)=([^\]]+)\]/g)];
+                saveMatches.forEach(m => { session.data[m[1].trim()] = m[2].trim(); });
+
+                // Чистимо відповідь від службових тегів
+                const cleanReply = rawReply
+                    .replace(/\[BTN:[^\]]+\]/g, '')
+                    .replace(/\[DONE\]/g, '')
+                    .replace(/\[SAVE:[^\]]+\]/g, '')
+                    .trim();
+
                 session.aiHistory.push({ role: 'assistant', content: cleanReply });
+                // Зберігаємо останню AI відповідь для {{ai_response}} в наступних вузлах
+                session.data.ai_response = cleanReply;
 
-                await sendTg(botToken, normalized.senderId, cleanReply, aiBtns.length ? aiBtns : null);
+                if (cleanReply) {
+                    await sendTg(botToken, normalized.senderId, cleanReply, aiBtns.length ? aiBtns : null);
+                }
 
-                // AI loop — залишаємось у тому ж вузлі, чекаємо наступного повідомлення
-                Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
-                    currentNodeId: nodeId, waitingForInput: nodeId,
-                    aiHistory: session.aiHistory });
-                await sessionRef.set(session, { merge: true });
-                return res.status(200).json({ ok: true });
+                if (isDone && n.nextNode) {
+                    // AI завершив — іти до наступного вузла в ланцюгу
+                    console.log('[webhook] AI DONE → next node:', n.nextNode);
+                    nodeId = n.nextNode;
+                    session.waitingForInput = null;
+                    session.aiHistory = []; // очищаємо історію діалогу
+                } else {
+                    // AI продовжує діалог — залишаємось у вузлі
+                    Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
+                        currentNodeId: nodeId, waitingForInput: nodeId,
+                        aiHistory: session.aiHistory });
+                    await sessionRef.set(session, { merge: true });
+                    return res.status(200).json({ ok: true });
+                }
 
             } else if (n.type === 'pause') {
                 Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
