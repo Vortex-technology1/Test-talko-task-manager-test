@@ -301,8 +301,14 @@ module.exports = async (req, res) => {
                 session.aiHistory.push({ role: 'user', content: normalized.text });
                 if (session.aiHistory.length > 20) session.aiHistory = session.aiHistory.slice(-20);
 
-                // Typing індикатор — показує "бот друкує..." поки AI думає
-                await sendTyping(botToken, normalized.senderId);
+                // Typing індикатор — шле кожні 4 сек поки AI думає (Telegram показує max 5 сек)
+                let typingActive = true;
+                const typingLoop = (async () => {
+                    while (typingActive) {
+                        await sendTyping(botToken, normalized.senderId);
+                        await new Promise(r => setTimeout(r, 4000));
+                    }
+                })();
 
                 // FIX 6: відправляємо ⏳ і зберігаємо message_id щоб потім відредагувати
                 const isFirstAiMsg = !session.aiHistory || session.aiHistory.length <= 1;
@@ -312,6 +318,7 @@ module.exports = async (req, res) => {
                 }
 
                 const rawReply = await callAI(n, normalized.text, session, compRef, _compData);
+                typingActive = false; // зупиняємо typing loop
 
                 // Парсимо спеціальні теги з відповіді AI:
                 // [BTN:текст] — динамічна кнопка
