@@ -284,6 +284,7 @@ module.exports = async (req, res) => {
             if (n.type === 'message') {
                 const text = interp(n.text || '', session.data);
                 if (!text.trim()) { nodeId = n.nextNode || null; continue; }
+                await sendTyping(botToken, normalized.senderId);
                 const btns = n.buttons?.length ? n.buttons : (n.options?.length ? n.options : null);
                 await sendTg(botToken, normalized.senderId, text, btns);
                 if (btns?.length) {
@@ -299,6 +300,9 @@ module.exports = async (req, res) => {
                 if (!session.aiHistory) session.aiHistory = [];
                 session.aiHistory.push({ role: 'user', content: normalized.text });
                 if (session.aiHistory.length > 20) session.aiHistory = session.aiHistory.slice(-20);
+
+                // Typing індикатор — показує "бот друкує..." поки AI думає
+                await sendTyping(botToken, normalized.senderId);
 
                 // FIX 6: відправляємо ⏳ і зберігаємо message_id щоб потім відредагувати
                 const isFirstAiMsg = !session.aiHistory || session.aiHistory.length <= 1;
@@ -629,6 +633,18 @@ async function sendTg(token, chatId, text, buttons) {
         const result = await r.json();
         if (!result.ok) console.error('[sendTg] Error:', result.description, JSON.stringify(payload).slice(0, 200));
     } catch(e) { console.error('[sendTg] fetch error:', e.message); }
+}
+
+// Показує індикатор "бот друкує..." в Telegram
+async function sendTyping(token, chatId) {
+    if (!token || !chatId) return;
+    try {
+        fetch(`https://api.telegram.org/bot${token}/sendChatAction`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, action: 'typing' })
+        }).catch(() => {});
+    } catch(e) {}
 }
 
 // Відправляє повідомлення і повертає message_id
