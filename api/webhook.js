@@ -20,12 +20,26 @@ if (!admin.apps.length) {
 }
 const db = initError ? null : admin.firestore();
 
-// ── Основна обробка (запускається асинхронно після 200 OK) ──
-async function processWebhook(req) {
-    if (req.method !== 'POST') return;
+module.exports = async (req, res) => {
+    // ── GET: діагностика ─────────────────────────────────────
+    if (req.method === 'GET') {
+        const diag = { ok: true, initError: initError || null, env: {
+            hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
+            hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
+            hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+        }};
+        try {
+            if (!db) throw new Error('DB not initialized');
+            await db.collection('companies').limit(1).get();
+            diag.firebase = 'connected';
+        } catch(e) { diag.firebase = 'ERROR: ' + e.message; }
+        return res.status(200).json(diag);
+    }
+
+    if (req.method !== 'POST') return res.status(405).end();
 
     const { companyId, channel } = req.query;
-    if (!companyId || !channel) return;
+    if (!companyId || !channel) return res.status(400).json({ error: 'Missing params' });
 
     try {
         const body = req.body;
@@ -37,9 +51,9 @@ async function processWebhook(req) {
         if (channel === 'telegram') {
             const msg = body?.message;
             const cb = body?.callback_query;
-            if (!msg && !cb) return;
+            if (!msg && !cb) return res.status(200).json({ ok: true, skipped: 'no message' });
             const from = msg?.from || cb?.from;
-            if (!from) return;
+            if (!from) return res.status(200).json({ ok: true, skipped: 'no from' });
             normalized = {
                 senderId: String(from.id),
                 senderName: [from.first_name, from.last_name].filter(Boolean).join(' ') || from.username || '',
@@ -48,11 +62,11 @@ async function processWebhook(req) {
             if (cb) callbackQueryId = cb.id;
         } else if (channel === 'facebook' || channel === 'instagram') {
             const messaging = body?.entry?.[0]?.messaging?.[0];
-            if (!messaging) return;
+            if (!messaging) return res.status(200).json({ ok: true, skipped: 'no messaging' });
             normalized = { senderId: messaging.sender?.id || '', senderName: '', text: messaging.message?.text || '' };
         }
 
-        if (!normalized) return;
+        if (!normalized) return res.status(200).json({ ok: true, skipped: 'unsupported channel' });
 
         console.log(`[webhook] ${channel} from ${normalized.senderId}: "${normalized.text}"`);
 
@@ -70,7 +84,7 @@ async function processWebhook(req) {
             const compDoc = await compRef.get();
             botToken = compDoc.data()?.integrations?.telegram?.botToken;
         }
-        if (!botToken) return;
+        if (!botToken) return res.status(200).json({ ok: true, skipped: 'no token' });
 
         // Підтверджуємо callback_query одразу (прибирає "годинник" на кнопці)
         if (callbackQueryId && botToken) {
@@ -128,7 +142,7 @@ async function processWebhook(req) {
 
         if (!flow) {
             if (isStart) await sendTg(botToken, normalized.senderId, 'Вітаємо! Бот активний ✅');
-            return;
+            return res.status(200).json({ ok: true, skipped: 'no flow' });
         }
 
         // ── Підвантажуємо великі промпти з nodePrompts підколекції ──
@@ -232,7 +246,7 @@ async function processWebhook(req) {
 
         if (!nodeId) {
             await sessionRef.set(session, { merge: true });
-            return;
+            return res.status(200).json({ ok: true });
         }
 
         // ── Виконуємо ланцюг вузлів ──────────────────────────
@@ -252,7 +266,7 @@ async function processWebhook(req) {
                     Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
                         currentNodeId: nodeId, waitingForInput: nodeId });
                     await sessionRef.set(session, { merge: true });
-                    return;
+                    return res.status(200).json({ ok: true });
                 }
                 nodeId = n.nextNode || null;
 
@@ -303,14 +317,14 @@ async function processWebhook(req) {
                         currentNodeId: nodeId, waitingForInput: nodeId,
                         aiHistory: session.aiHistory });
                     await sessionRef.set(session, { merge: true });
-                    return;
+                    return res.status(200).json({ ok: true });
                 }
 
             } else if (n.type === 'pause') {
                 Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
                     currentNodeId: n.nextNode || null, waitingForInput: nodeId });
                 await sessionRef.set(session, { merge: true });
-                return;
+                return res.status(200).json({ ok: true });
 
             } else if (n.type === 'filter') {
                 nodeId = evalFilter(n, session.data) ? n.trueNode : n.falseNode;
@@ -352,44 +366,13 @@ async function processWebhook(req) {
         }
         session.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         await sessionRef.set(session, { merge: true });
-        return;
+        return res.status(200).json({ ok: true });
 
     } catch(err) {
         console.error('[webhook] ERROR:', err.message, err.stack);
-        return; // завжди 200 щоб Telegram не ретраїв
-    }
-}
-
-// ── Export: відповідаємо Telegram одразу, обробка у фоні ──
-module.exports = async (req, res) => {
-    if (req.method === 'GET') {
-        // Діагностика — окремо, без processWebhook
-        const diag = { ok: true, env: {
-            hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
-            hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
-            hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
-        }};
-        try {
-            if (!db) throw new Error('DB not initialized');
-            await db.collection('companies').limit(1).get();
-            diag.firebase = 'connected';
-        } catch(e) { diag.firebase = 'ERROR: ' + e.message; }
-        return res.status(200).json(diag);
-    }
-
-    if (req.method !== 'POST') return res.status(405).end();
-
-    // Одразу 200 OK — Telegram перестає чекати, зникає "годинник"
-    res.status(200).json({ ok: true });
-
-    // Vercel тримає функцію живою поки await не завершиться
-    try {
-        await processWebhook(req);
-    } catch(e) {
-        console.error('[webhook error]', e.message, e.stack);
+        return res.status(200).json({ ok: true }); // завжди 200 щоб Telegram не ретраїв
     }
 };
-
 
 // ── Helpers ───────────────────────────────────────────────
 
