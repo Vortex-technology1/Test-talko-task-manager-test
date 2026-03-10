@@ -1619,9 +1619,27 @@ async function saveFlow() {
         // Firestore не приймає undefined — замінюємо на null
         const sanitize = (obj) => JSON.parse(JSON.stringify(obj, (k, v) => v === undefined ? null : v));
 
+        // Виносимо великі aiSystem промпти в окрему підколекцію nodePrompts
+        // щоб не перевищувати ліміт 1MB на документ флоу
+        const promptsRef = saveRef.collection('nodePrompts');
+        const stripPrompts = (nodesList) => nodesList.map(n => {
+            const aiText = n.config?.aiSystem || n.aiSystem || '';
+            if (aiText && aiText.length > 300) {
+                promptsRef.doc(n.id).set({ aiSystem: aiText, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                const stripped = JSON.parse(JSON.stringify(n));
+                if (stripped.config?.aiSystem) stripped.config.aiSystem = '__ref:' + n.id;
+                if (stripped.aiSystem) stripped.aiSystem = '__ref:' + n.id;
+                return stripped;
+            }
+            return n;
+        });
+
+        const strippedCanvas = { ...canvasData, nodes: stripPrompts(canvasData.nodes) };
+        const strippedNodes = stripPrompts(ordered);
+
         await saveRef.update({
-                canvasData: sanitize(canvasData),
-                nodes: sanitize(ordered),
+                canvasData: sanitize(strippedCanvas),
+                nodes: sanitize(strippedNodes),
                 triggerKeyword: triggerKeyword || '/start',
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             });

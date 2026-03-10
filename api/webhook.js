@@ -145,10 +145,31 @@ module.exports = async (req, res) => {
             return res.status(200).json({ ok: true, skipped: 'no flow' });
         }
 
+        // ── Підвантажуємо великі промпти з nodePrompts підколекції ──
+        // (збережені окремо щоб не перевищувати ліміт 1MB документа)
+        const flowDocRef = compRef.collection('bots').doc(currentBotId).collection('flows').doc(flow.id);
+        const promptsSnap = await flowDocRef.collection('nodePrompts').get();
+        const nodePromptsMap = {};
+        promptsSnap.forEach(doc => { nodePromptsMap[doc.id] = doc.data().aiSystem || ''; });
+
+        const restorePrompts = (nodesList) => nodesList.map(n => {
+            const sys = n.config?.aiSystem || n.aiSystem || '';
+            if (sys.startsWith('__ref:')) {
+                const refId = sys.replace('__ref:', '');
+                const realPrompt = nodePromptsMap[refId] || '';
+                const restored = JSON.parse(JSON.stringify(n));
+                if (restored.config?.aiSystem) restored.config.aiSystem = realPrompt;
+                if (restored.aiSystem) restored.aiSystem = realPrompt;
+                return restored;
+            }
+            return n;
+        });
+
         // ── Будуємо runtime nodes ─────────────────────────────
         // flow.nodes — лінійний масив (зберігається при saveFlow)
         // flow.canvasData.edges — з'єднання між вузлами
         let runtimeNodes = (flow.nodes || []).filter(n => n.id && n.type !== 'start' && n.type !== 'trigger');
+        runtimeNodes = restorePrompts(runtimeNodes);
 
         // Fallback: якщо flow.nodes порожній — беремо з canvasData
         if (runtimeNodes.length === 0 && flow.canvasData?.nodes?.length) {
