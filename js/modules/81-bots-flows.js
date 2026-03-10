@@ -142,15 +142,15 @@
                                     <button onclick="toggleFlowStatus('${flow.id}','${flow.status}')"
                                         title="${flow.status === 'active' ? 'Поставити на паузу' : 'Активувати ланцюг'}"
                                         style="padding:0.45rem 0.9rem;background:${flow.status==='active'?'#fee2e2':'#f0fdf4'};color:${flow.status==='active'?'#ef4444':'#16a34a'};border:1.5px solid ${flow.status==='active'?'#fca5a5':'#86efac'};border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">
-                                        ${flow.status === 'active' ? '&#9646;&#9646; Пауза' : '&#9654; Активувати'}
+                                        ${flow.status === 'active' ? '⏸ Пауза' : '▶ Активувати'}
                                     </button>
                                     <button onclick="openFlowEditor('${flow.id}')" title="Редагувати"
                                         style="padding:0.45rem 0.9rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600;">
-                                        &#9998; Редагувати
+                                        ✏ Редагувати
                                     </button>
                                     <button onclick="confirmDeleteFlow('${flow.id}')" title="Видалити"
-                                        style="padding:0.45rem 0.7rem;background:#fee2e2;color:#ef4444;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;">
-                                        &#128465;
+                                        style="padding:0.45rem 0.7rem;background:#fee2e2;color:#ef4444;border:none;border-radius:8px;cursor:pointer;font-size:1rem;font-weight:600;line-height:1;">
+                                        ✕
                                     </button>
                                 </div>
                             </div>
