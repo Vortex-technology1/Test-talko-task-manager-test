@@ -41,12 +41,12 @@ function _renderFormsShell() {
 async function _loadSiteAndForms() {
     try {
         const db = firebase.firestore();
-        const siteDoc = await db.doc('companies/' + window.currentCompanyId + '/sites/' + sf.siteId).get();
+        const siteDoc = await window.companyDoc('sites/' + sf.siteId).get();
         sf.site = { id: siteDoc.id, ...siteDoc.data() };
         const nameEl = document.getElementById('sfSiteName');
         if (nameEl) nameEl.textContent = sf.site.name || 'Сайт';
 
-        const formsSnap = await db.collection('companies/' + window.currentCompanyId + '/sites/' + sf.siteId + '/forms')
+        const formsSnap = await window.companyDoc('sites/' + sf.siteId).collection('forms')
             .orderBy('createdAt','desc').get();
         sf.forms = formsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         _renderView();
@@ -213,7 +213,7 @@ window.sfCreate = async function () {
     try {
         const db  = firebase.firestore();
         const ref = await db
-            .collection('companies/' + window.currentCompanyId + '/sites/' + sf.siteId + '/forms')
+            .collection(window.currentCompanyId + '/sites/' + sf.siteId + '/forms')
             .add({
                 name, fields, crmIntegration, telegramNotify,
                 cta: 'Відправити',
@@ -245,7 +245,7 @@ async function _renderFormEditor() {
     if (!form) {
         try {
             const doc = await firebase.firestore()
-                .doc('companies/' + window.currentCompanyId + '/sites/' + sf.siteId + '/forms/' + sf.activeFormId).get();
+                .doc(window.currentCompanyId + '/sites/' + sf.siteId + '/forms/' + sf.activeFormId).get();
             form = { id: doc.id, ...doc.data() };
             sf.forms.push(form);
         } catch(e) { return; }
@@ -377,8 +377,8 @@ window.sfSaveForm = async function (formId) {
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
     try {
-        await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/sites/' + sf.siteId + '/forms/' + formId)
+        await window.companyRef()
+            .collection(window.DB_COLS.SITES).doc( + '/sites/' + sf.siteId + '/forms/' + formId)
             .update(data);
         // Оновлюємо кеш
         const idx = sf.forms.findIndex(f => f.id === formId);
@@ -410,7 +410,7 @@ window.sfOpenSubmissions = async function (formId) {
 
     try {
         const snap = await firebase.firestore()
-            .collection('companies/' + window.currentCompanyId + '/sites/' + sf.siteId + '/forms/' + formId + '/submissions')
+            .collection(window.currentCompanyId + '/sites/' + sf.siteId + '/forms/' + formId + '/submissions')
             .orderBy('createdAt','desc').limit(50).get();
 
         const submissions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -457,8 +457,8 @@ window.sfOpenSubmissions = async function (formId) {
 window.sfDelete = async function (formId, name) {
     if (!(await (window.showConfirmModal ? showConfirmModal('Видалити форму "' + name + '"?\nВсі заявки будуть видалені.',{danger:true}) : Promise.resolve(confirm('Видалити форму "' + name + '"?\nВсі заявки будуть видалені.'))))) return;
     try {
-        await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/sites/' + sf.siteId + '/forms/' + formId).delete();
+        await window.companyRef()
+            .collection(window.DB_COLS.SITES).doc( + '/sites/' + sf.siteId + '/forms/' + formId).delete();
         sf.forms = sf.forms.filter(f => f.id !== formId);
         if (typeof showToast === 'function') showToast('Форму видалено', 'success');
         _renderFormsList();
@@ -472,7 +472,7 @@ window.sfDelete = async function (formId, name) {
 window.sfHandleSubmit = async function (siteId, formId, fieldsData) {
     try {
         const db = firebase.firestore();
-        const base = 'companies/' + window.currentCompanyId;
+        const cRef = window.companyRef();
         const formRef = db.doc(base + '/sites/' + siteId + '/forms/' + formId);
         const formDoc = await formRef.get();
         if (!formDoc.exists) return { ok: false, error: 'Form not found' };

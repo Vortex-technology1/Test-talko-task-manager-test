@@ -125,7 +125,7 @@ window.crmSwitchTab = function(tab) {
 
 // ── Load ───────────────────────────────────────────────────
 async function _loadAll() {
-    const base = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+    const base = window.companyRef();
     crm.unsubs.forEach(u => u && u());
     crm.unsubs = [];
 
@@ -150,9 +150,8 @@ async function _createDefaultPipeline() {
         { id:'won',         label:'Виграно',      color:'#22c55e', order:5 },
         { id:'lost',        label:'Програно',     color:'#ef4444', order:6 },
     ];
-    const ref = await firebase.firestore()
-        .collection('companies').doc(window.currentCompanyId)
-        .collection('crm_pipeline').add({
+    const ref = await window.companyRef()
+        .collection(window.DB_COLS.CRM_PIPELINE).add({
             name:'Основна воронка', isDefault:true, stages,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         });
@@ -358,7 +357,7 @@ window.crmDrop = async function(e, newStage) {
     deal.stage = newStage;
     _renderKanban();
     try {
-        const ref = firebase.firestore().doc(`companies/${window.currentCompanyId}/crm_deals/${deal.id}`);
+        const ref = window.companyRef().collection(window.DB_COLS.CRM_DEALS).doc(deal.id);
         await ref.update({ stage: newStage, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         await ref.collection('history').add({
             type:'stage_changed', from:oldStage, to:newStage,
@@ -539,7 +538,7 @@ window.crmSaveDeal = async function(dealId) {
 
     try {
         const updates = { title:title||deal.title, stage:stage||deal.stage, amount, clientName:client||deal.clientName, clientNiche:niche, note, expectedClose:expClose||null, updatedAt:firebase.firestore.FieldValue.serverTimestamp() };
-        await firebase.firestore().doc(`companies/${window.currentCompanyId}/crm_deals/${dealId}`).update(updates);
+        await window.companyRef().collection(window.DB_COLS.CRM_DEALS).doc(dealId).update(updates);
         if (stage !== deal.stage && typeof emitTalkoEvent === 'function' && window.TALKO_EVENTS) {
             await emitTalkoEvent(window.TALKO_EVENTS.DEAL_STAGE_CHANGED, { dealId, fromStage:deal.stage, toStage:stage, clientName:deal.clientName, amount });
         }
@@ -557,7 +556,7 @@ window.crmSaveDeal = async function(dealId) {
 window.crmDeleteDeal = async function(dealId) {
     if (!(await (window.showConfirmModal ? showConfirmModal('Видалити угоду?',{danger:true}) : Promise.resolve(confirm('Видалити угоду?'))))) return;
     try {
-        await firebase.firestore().doc(`companies/${window.currentCompanyId}/crm_deals/${dealId}`).delete();
+        await window.companyRef().collection(window.DB_COLS.CRM_DEALS).doc(dealId).delete();
         crmCloseDeal();
         if (typeof showToast === 'function') showToast('Видалено', 'success');
     } catch(e) {
@@ -571,8 +570,7 @@ async function _loadActivityTab(deal) {
     if (!content) return;
     content.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#9ca3af;font-size:0.82rem;">Завантаження...</div>';
     try {
-        const snap = await firebase.firestore()
-            .collection(`companies/${window.currentCompanyId}/crm_deals/${deal.id}/history`)
+        const snap = await window.companyRef().collection(window.DB_COLS.CRM_DEALS).doc(deal.id).collection('history')
             .orderBy('at','desc').limit(30).get();
         const events = snap.docs.map(d => ({ id:d.id, ...d.data() }));
 
@@ -633,8 +631,7 @@ window.crmAddActivity = async function(dealId) {
     if (!text) return;
     if (textEl) textEl.value = '';
     try {
-        await firebase.firestore()
-            .collection(`companies/${window.currentCompanyId}/crm_deals/${dealId}/history`)
+        await window.companyRef().collection(window.DB_COLS.CRM_DEALS).doc(dealId).collection('history')
             .add({ type, text, by: window.currentUser?.email||'manager', at: firebase.firestore.FieldValue.serverTimestamp() });
         const deal = crm.deals.find(d => d.id === dealId);
         if (deal) _loadActivityTab(deal);
@@ -793,7 +790,7 @@ window.crmCreateDeal = async function() {
     if (!title && !client) { if(window.showToast)showToast("Введіть назву або ім'я клієнта",'warning'); else alert("Введіть назву або ім'я клієнта"); return; }
     try {
         const ref = await firebase.firestore()
-            .collection(`companies/${window.currentCompanyId}/crm_deals`).add({
+            .collection(window.DB_COLS.CRM_DEALS).add({
                 title: title||client, clientName: client||title, clientNiche: niche||'',
                 stage, pipelineId: crm.pipeline?.id || '',
                 amount, source:'manual',
@@ -1046,7 +1043,7 @@ function _subscribeDeals() {
     crm.loading = true;
     if (!crm.pipeline) return;
     const dealUnsub = firebase.firestore()
-        .collection('companies').doc(window.currentCompanyId).collection('crm_deals')
+        window.companyRef().collection(window.DB_COLS.CRM_DEALS)
         .where('pipelineId','==', crm.pipeline.id).limit(200)
         .onSnapshot(snap => {
             crm.deals = snap.docs.map(d => ({id:d.id,...d.data()}))
@@ -1073,7 +1070,7 @@ async function _doCreatePipeline(name) {
     ];
     try {
         const ref = await firebase.firestore()
-            .collection('companies').doc(window.currentCompanyId).collection('crm_pipeline')
+            window.companyRef().collection(window.DB_COLS.CRM_PIPELINE)
             .add({ name, isDefault:false, stages, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
         crm.pipelines.push({ id:ref.id, name, isDefault:false, stages });
         if (typeof showToast === 'function') showToast('Воронку створено', 'success');
@@ -1085,7 +1082,7 @@ window.crmDeletePipeline = async function(pipelineId, name) {
     if (!(await (window.showConfirmModal ? showConfirmModal(`Видалити воронку "${name}"?\nВсі угоди в ній залишаться.`,{danger:true}) : Promise.resolve(confirm(`Видалити воронку "${name}"?\nВсі угоди в ній залишаться.`))))) return;
     try {
         await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/crm_pipeline/' + pipelineId).delete();
+            .doc(window.currentCompanyId + '/crm_pipeline/' + pipelineId).delete();
         crm.pipelines = crm.pipelines.filter(p => p.id !== pipelineId);
         if (crm.pipeline?.id === pipelineId) {
             crm.pipeline = crm.pipelines[0];
@@ -1128,7 +1125,7 @@ window.crmSaveStages = async function() {
     crm.pipeline.stages.forEach((s,i) => s.order = i);
     try {
         await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/crm_pipeline/' + crm.pipeline.id)
+            .doc(window.currentCompanyId + '/crm_pipeline/' + crm.pipeline.id)
             .update({ stages: crm.pipeline.stages, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         // Sync в pipelines array
         const idx = crm.pipelines.findIndex(p => p.id === crm.pipeline.id);

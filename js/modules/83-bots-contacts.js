@@ -49,7 +49,7 @@ window.destroyBotsModule = function() {
 function loadBots() {
     if (bp.botsUnsub) bp.botsUnsub();
     bp.botsUnsub = firebase.firestore()
-        .collection('companies').doc(window.currentCompanyId)
+        window.companyRef()
         .collection('bots')
         .orderBy('createdAt', 'desc')
         .onSnapshot(snap => {
@@ -228,7 +228,7 @@ window.openBot = function(botId) {
     // Підписуємось на flows цього бота
     if (bp.flowsUnsub) bp.flowsUnsub();
     bp.flowsUnsub = firebase.firestore()
-        .collection('companies').doc(window.currentCompanyId)
+        window.companyRef()
         .collection('bots').doc(botId)
         .collection('flows')
         .orderBy('createdAt','desc')
@@ -492,7 +492,7 @@ window.createAndConnectBot = async function() {
 
         // Save bot to Firestore
         const botRef = await firebase.firestore()
-            .collection('companies').doc(window.currentCompanyId)
+            window.companyRef()
             .collection('bots').add({
                 name,
                 channel,
@@ -508,7 +508,7 @@ window.createAndConnectBot = async function() {
             });
 
         // Also save token in integrations for webhook.js compatibility
-        await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
+        await window.companyRef().update({
             [`integrations.${channel}.botToken`]: token,
             [`integrations.${channel}.botName`]: username,
             [`integrations.${channel}.webhookUrl`]: webhookUrl,
@@ -532,7 +532,7 @@ window.openBotSettings = async function(botId) {
 
 window.confirmDeleteBot = async function(botId) {
     if (!(await (window.showConfirmModal ? showConfirmModal('Видалити бота і всі його ланцюги?',{danger:true}) : Promise.resolve(confirm('Видалити бота і всі його ланцюги?'))))) return;
-    firebase.firestore().collection('companies').doc(window.currentCompanyId)
+    window.companyRef()
         .collection('bots').doc(botId).delete()
         .then(() => { if (typeof showToast === 'function') showToast('Бота видалено', 'success'); });
 };
@@ -581,7 +581,7 @@ window.saveNewFlow = async function() {
     const bot = bp.bots.find(b=>b.id===bp.activeBotId);
     try {
         const ref = await firebase.firestore()
-            .collection('companies').doc(window.currentCompanyId)
+            window.companyRef()
             .collection('bots').doc(bp.activeBotId)
             .collection('flows').add({
                 name,
@@ -594,7 +594,7 @@ window.saveNewFlow = async function() {
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             });
         // Update bot flowCount
-        await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+        await window.companyRef()
             .collection('bots').doc(bp.activeBotId)
             .update({ flowCount: firebase.firestore.FieldValue.increment(1) });
 
@@ -612,7 +612,7 @@ window.editFlow = function(flowId) {
 
 window.toggleFlowStatus = async function(flowId, status) {
     const newStatus = status === 'active' ? 'paused' : 'active';
-    await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+    await window.companyRef()
         .collection('bots').doc(bp.activeBotId)
         .collection('flows').doc(flowId)
         .update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -621,7 +621,7 @@ window.toggleFlowStatus = async function(flowId, status) {
 
 window.deleteFlow = async function(flowId) {
     if (!(await (window.showConfirmModal ? showConfirmModal('Видалити ланцюг?',{danger:true}) : Promise.resolve(confirm('Видалити ланцюг?'))))) return;
-    firebase.firestore().collection('companies').doc(window.currentCompanyId)
+    window.companyRef()
         .collection('bots').doc(bp.activeBotId)
         .collection('flows').doc(flowId).delete()
         .then(() => { if (typeof showToast === 'function') showToast('Видалено', 'success'); });
@@ -761,7 +761,7 @@ async function ctsLoad(reset = false) {
 
     try {
         const db = firebase.firestore();
-        let q = db.collection(`companies/${window.currentCompanyId}/contacts`)
+        let q = db.collection(window.currentCompanyId + '/contacts')
             .orderBy('createdAt', 'desc');
 
         // Фільтри Firestore (індексовані поля)
@@ -1114,7 +1114,7 @@ window.ctsAddTag = async function(contactId) {
     if (!ct) return;
     const tags = [...(ct.tags||[]), tag];
     await firebase.firestore()
-        .doc(`companies/${window.currentCompanyId}/contacts/${contactId}`)
+        .doc(window.currentCompanyId + '/contacts/' + contactId)
         .update({ tags, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     ct.tags = tags;
     if (input) input.value = '';
@@ -1126,7 +1126,7 @@ window.ctsRemoveTag = async function(contactId, index) {
     if (!ct) return;
     const tags = (ct.tags||[]).filter((_,i) => i !== index);
     await firebase.firestore()
-        .doc(`companies/${window.currentCompanyId}/contacts/${contactId}`)
+        .doc(window.currentCompanyId + '/contacts/' + contactId)
         .update({ tags, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     ct.tags = tags;
     ctsOpenCard(contactId);
@@ -1138,7 +1138,7 @@ window.ctsRemoveTag = async function(contactId, index) {
 window.ctsSaveNote = async function(contactId) {
     const note = document.getElementById('ctsNote')?.value.trim() || '';
     await firebase.firestore()
-        .doc(`companies/${window.currentCompanyId}/contacts/${contactId}`)
+        .doc(window.currentCompanyId + '/contacts/' + contactId)
         .update({ managerNote: note, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     const ct = cts.items.find(c => c.id === contactId);
     if (ct) ct.managerNote = note;
@@ -1183,7 +1183,7 @@ window.ctsDeleteContact = async function(contactId) {
     if (!(await (window.showConfirmModal ? showConfirmModal('Видалити контакт? Цю дію не можна скасувати.',{danger:true}) : Promise.resolve(confirm('Видалити контакт? Цю дію не можна скасувати.'))))) return;
     try {
         await firebase.firestore()
-            .doc(`companies/${window.currentCompanyId}/contacts/${contactId}`)
+            .doc(window.currentCompanyId + '/contacts/' + contactId)
             .delete();
         cts.items = cts.items.filter(c => c.id !== contactId);
         ctsCloseCard();
@@ -1202,7 +1202,7 @@ window.ctsExportCSV = async function() {
     if (typeof showToast === 'function') showToast('Готуємо CSV...', 'info');
     try {
         const db = firebase.firestore();
-        let q = db.collection(`companies/${window.currentCompanyId}/contacts`)
+        let q = db.collection(window.currentCompanyId + '/contacts')
             .orderBy('createdAt', 'desc');
         if (cts.botId)   q = q.where('botId', '==', cts.botId);
         if (cts.flowId)  q = q.where('flowId', '==', cts.flowId);
@@ -1245,7 +1245,7 @@ function _ctsStartRealtimeCounter() {
     if (cts.unsub) cts.unsub();
     // Слухаємо тільки останній документ — дешево
     cts.unsub = firebase.firestore()
-        .collection(`companies/${window.currentCompanyId}/contacts`)
+        .collection(window.currentCompanyId + '/contacts')
         .orderBy('createdAt', 'desc')
         .limit(1)
         .onSnapshot(snap => {
@@ -1426,7 +1426,7 @@ async function chatLoadContacts(reset = true) {
 
     try {
         let q = firebase.firestore()
-            .collection(`companies/${window.currentCompanyId}/contacts`)
+            .collection(window.currentCompanyId + '/contacts')
             .orderBy('lastMessageAt', 'desc');
 
         if (chat.lastContactDoc) q = q.startAfter(chat.lastContactDoc);
@@ -1541,7 +1541,7 @@ window.bpOpenChat = async function(contactId) {
     if (!ct) {
         // Завантажуємо якщо не в списку
         const doc = await firebase.firestore()
-            .doc(`companies/${window.currentCompanyId}/contacts/${contactId}`).get();
+            .doc(window.currentCompanyId + '/contacts/' + contactId).get();
         if (doc.exists) {
             ct = { id: doc.id, ...doc.data() };
             chat.contacts.unshift(ct);
@@ -1563,7 +1563,7 @@ window.bpOpenChat = async function(contactId) {
 
     // Підписуємось на messages цього контакту
     chat.msgsUnsub = firebase.firestore()
-        .collection(`companies/${window.currentCompanyId}/contacts/${contactId}/messages`)
+        .companyRef().collection('contacts').doc(contactId).collection('messages')
         .orderBy('timestamp', 'asc')
         .limitToLast(100)
         .onSnapshot(snap => {
@@ -1703,7 +1703,7 @@ window.chatSend = window.bpSendMsg = async function() {
         console.error('[chat] send:', e);
         // Fallback: пишемо напряму в Firestore (без Telegram)
         await firebase.firestore()
-            .collection(`companies/${window.currentCompanyId}/contacts/${chat.activeId}/messages`)
+            .companyRef().collection('contacts').doc(chat.activeId).collection('messages')
             .add({
                 text, from: 'bot', direction: 'out',
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1733,7 +1733,7 @@ async function _chatMarkRead(contactId) {
         }).catch(() => {
             // Fallback: пишемо напряму
             firebase.firestore()
-                .doc(`companies/${window.currentCompanyId}/contacts/${contactId}`)
+                .doc(window.currentCompanyId + '/contacts/' + contactId)
                 .update({ unreadCount: 0 }).catch(() => {});
         });
     } catch(e) { /* не критично */ }
@@ -1752,7 +1752,7 @@ async function _chatGetBotToken(ct) {
     // Завантажуємо якщо немає в cache
     try {
         const doc = await firebase.firestore()
-            .doc(`companies/${window.currentCompanyId}/bots/${botId}`).get();
+            .doc(window.currentCompanyId + '/bots/' + botId).get();
         return doc.data()?.token || null;
     } catch { return null; }
 }
@@ -1765,7 +1765,7 @@ function _chatStartUnreadListener() {
 
     // Слухаємо тільки контакти з unreadCount > 0
     chat.contactsUnsub = firebase.firestore()
-        .collection(`companies/${window.currentCompanyId}/contacts`)
+        .collection(window.currentCompanyId + '/contacts')
         .where('unreadCount', '>', 0)
         .onSnapshot(snap => {
             snap.docs.forEach(doc => {
@@ -1828,7 +1828,7 @@ async function renderBroadcastTab() {
     let history = [];
     try {
         const snap = await firebase.firestore()
-            .collection(`companies/${window.currentCompanyId}/broadcasts`)
+            window.companyRef().collection(window.DB_COLS.BROADCASTS)
             .orderBy('createdAt', 'desc').limit(20).get();
         history = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     } catch(e) { console.error('[83-bots-contacts]', e.message); }
@@ -2031,7 +2031,7 @@ window.bcastPreview = async function() {
 
     try {
         let q = firebase.firestore()
-            .collection(`companies/${window.currentCompanyId}/contacts`)
+            .collection(window.currentCompanyId + '/contacts')
             .where('botStatus', '!=', 'blocked');
 
         // Firestore дозволяє один inequality filter — решта фільтруємо на клієнті
@@ -2093,7 +2093,7 @@ window.bpSendBroadcast = async function() {
 
     // Завантажуємо всіх цільових контактів з Firestore (не з bp.contacts)
     let q = firebase.firestore()
-        .collection(`companies/${window.currentCompanyId}/contacts`)
+        .collection(window.currentCompanyId + '/contacts')
         .where('botStatus', '!=', 'blocked');
 
     if (channel) q = q.where('channel', '==', channel);
@@ -2116,7 +2116,7 @@ window.bpSendBroadcast = async function() {
 
     // Отримуємо токен бота
     const compDoc = await firebase.firestore()
-        .collection('companies').doc(window.currentCompanyId).get();
+        window.companyRef().get();
     const botToken = compDoc.data()?.integrations?.telegram?.botToken
         || bp.bots.find(b => b.channel === 'telegram')?.token;
 
@@ -2139,7 +2139,7 @@ window.bpSendBroadcast = async function() {
 
     // Зберігаємо broadcast запис зі статусом 'running'
     const broadcastRef = await firebase.firestore()
-        .collection(`companies/${window.currentCompanyId}/broadcasts`)
+        window.companyRef().collection(window.DB_COLS.BROADCASTS)
         .add({
             text: text || '',
             flowSendId: flowSendId || null,
@@ -2195,7 +2195,7 @@ window.bpSendBroadcast = async function() {
                     // Автоматично позначаємо заблокованих
                     if (data.error_code === 403) {
                         firebase.firestore()
-                            .doc(`companies/${window.currentCompanyId}/contacts/${ct.id}`)
+                            .doc(window.currentCompanyId + '/contacts/' + ct.id)
                             .update({ botStatus: 'blocked' }).catch(() => {});
                     }
                     // Rate limit від Telegram — чекаємо
@@ -2298,7 +2298,7 @@ async function renderSettingsTab() {
     }
 
     const compDoc = await firebase.firestore()
-        .collection('companies').doc(window.currentCompanyId).get();
+        window.companyRef().get();
     const compData = compDoc.data() || {};
     const webhookUrl = `https://test-talko-task-manager-test-production.up.railway.app/api/webhook?companyId=${window.currentCompanyId}&channel=${bot.channel}`;
 
@@ -2517,7 +2517,7 @@ window.bpCheckBotStatus = async function(botId) {
         // Оновлюємо статус в Firestore якщо змінився
         if (me.ok && !bot.connected) {
             await firebase.firestore()
-                .doc(`companies/${window.currentCompanyId}/bots/${botId}`)
+                .doc(window.currentCompanyId + '/bots/' + botId)
                 .update({ connected: true, username: me.result.username });
         }
 
@@ -2554,7 +2554,7 @@ window.bpReinstallWebhook = async function(botId) {
 
         if (data.ok) {
             await firebase.firestore()
-                .doc(`companies/${window.currentCompanyId}/bots/${botId}`)
+                .doc(window.currentCompanyId + '/bots/' + botId)
                 .update({ connected: true, webhookUrl, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             if (result) result.innerHTML = `<div style="color:#22c55e;font-weight:600;">✅ Webhook встановлено</div>`;
             if (typeof showToast === 'function') showToast('Webhook встановлено ✓', 'success');
@@ -2589,7 +2589,7 @@ window.bpReconnectBot = async function(botId) {
         const wh = await whRes.json();
 
         await firebase.firestore()
-            .doc(`companies/${window.currentCompanyId}/bots/${botId}`)
+            .doc(window.currentCompanyId + '/bots/' + botId)
             .update({
                 token, username: me.result.username,
                 connected: wh.ok, webhookUrl,
@@ -2597,7 +2597,7 @@ window.bpReconnectBot = async function(botId) {
             });
 
         // Оновлюємо в integrations для сумісності з webhook.js
-        await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
+        await window.companyRef().update({
             'integrations.telegram.botToken': token,
             'integrations.telegram.botName': me.result.username,
         });
@@ -2622,7 +2622,7 @@ window.settingsSaveApiKey = window.saveBotApiKey = async function(type) {
     try {
         const field = type === 'openai' ? 'openaiApiKey' : 'anthropicApiKey';
         await firebase.firestore()
-            .collection('companies').doc(window.currentCompanyId)
+            window.companyRef()
             .update({ [field]: key, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         if (keyEl) keyEl.value = '•••••' + key.slice(-4);
         if (result) result.innerHTML = `<span style="color:#22c55e;font-weight:600;">✅ Збережено</span>`;
@@ -2641,7 +2641,7 @@ window.settingsToggleNotify = async function(enabled) {
     if (track) track.style.background = enabled ? '#22c55e' : '#d1d5db';
     if (thumb) thumb.style.left = enabled ? '20px' : '2px';
     await firebase.firestore()
-        .collection('companies').doc(window.currentCompanyId)
+        window.companyRef()
         .update({ notifyEnabled: enabled });
 };
 
@@ -2650,7 +2650,7 @@ window.settingsSaveNotify = async function() {
     const result = document.getElementById('notifyResult');
     try {
         await firebase.firestore()
-            .collection('companies').doc(window.currentCompanyId)
+            window.companyRef()
             .update({ notifyTelegramId: tgId, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         if (result) result.innerHTML = `<span style="color:#22c55e;font-weight:600;">✅ Збережено</span>`;
         setTimeout(() => { if (result) result.innerHTML = ''; }, 3000);

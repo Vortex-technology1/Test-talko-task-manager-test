@@ -132,8 +132,8 @@ function _renderBuilderShell() {
 
 async function _loadSite() {
     try {
-        const doc = await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/sites/' + sb.siteId).get();
+        const doc = await window.companyRef()
+            .collection(window.DB_COLS.SITES).doc( + '/sites/' + sb.siteId).get();
         if (!doc.exists) { (window.showToast && showToast('Сайт не знайдено','warning')); window.initSitesModule(); return; }
         sb.site   = { id: doc.id, ...doc.data() };
         sb.blocks = sb.site.blocks || [];
@@ -514,8 +514,8 @@ window.sbSave = async function () {
     const btn = document.querySelector('[onclick="sbSave()"]');
     if (btn) { btn.textContent = 'Зберігаю...'; btn.disabled = true; }
     try {
-        await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/sites/' + sb.siteId)
+        await window.companyRef()
+            .collection(window.DB_COLS.SITES).doc( + '/sites/' + sb.siteId)
             .update({
                 blocks:    sb.blocks,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -665,8 +665,8 @@ window.sbSaveSeo = async function() {
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
     try {
-        await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/sites/' + sb.siteId)
+        await window.companyRef()
+            .collection(window.DB_COLS.SITES).doc( + '/sites/' + sb.siteId)
             .update(updates);
         Object.assign(sb.site, updates);
         if (typeof showToast === 'function') showToast('SEO збережено ✓', 'success');

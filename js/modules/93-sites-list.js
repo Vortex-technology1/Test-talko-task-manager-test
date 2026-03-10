@@ -43,7 +43,7 @@ function _renderShell() {
 
 function _loadSites() {
     if (sl.unsub) sl.unsub();
-    const base = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+    const base = window.companyRef();
     sl.unsub = base.collection('sites').orderBy('createdAt', 'desc')
         .onSnapshot(snap => {
             sl.sites   = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -285,7 +285,7 @@ window.sitesCreate = async function () {
 
     try {
         const db   = firebase.firestore();
-        const ref  = await db.collection('companies').doc(window.currentCompanyId)
+        const ref  = await window.companyRef()
             .collection('sites').add({
                 name, description: desc,
                 niche:    tmpl.niche,
@@ -343,8 +343,8 @@ function _defaultBlock(type, order) {
 window.sitesTogglePublish = async function (siteId, currentStatus) {
     const newStatus = currentStatus === 'published' ? 'draft' : 'published';
     try {
-        await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/sites/' + siteId)
+        await window.companyRef()
+            .collection(window.DB_COLS.SITES).doc( + '/sites/' + siteId)
             .update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         if (typeof showToast === 'function')
             showToast(newStatus === 'published' ? '🚀 Сайт опублікований!' : 'Сайт знято з публікації', 'success');
@@ -356,8 +356,8 @@ window.sitesTogglePublish = async function (siteId, currentStatus) {
 window.sitesDelete = async function (siteId, name) {
     if (!(await (window.showConfirmModal ? showConfirmModal('Видалити сайт "' + name + '"?\nВсі блоки та форми будуть видалені.',{danger:true}) : Promise.resolve(confirm('Видалити сайт "' + name + '"?\nВсі блоки та форми будуть видалені.'))))) return;
     try {
-        await firebase.firestore()
-            .doc('companies/' + window.currentCompanyId + '/sites/' + siteId).delete();
+        await window.companyRef()
+            .collection(window.DB_COLS.SITES).doc( + '/sites/' + siteId).delete();
         if (typeof showToast === 'function') showToast('Сайт видалено', 'success');
     } catch (e) {
         if (typeof showToast === 'function') showToast('Помилка: ' + e.message, 'error');
