@@ -21,26 +21,11 @@ if (!admin.apps.length) {
 const db = initError ? null : admin.firestore();
 
 // ── Основна обробка (запускається асинхронно після 200 OK) ──
-async function processWebhook(req, res) {
-    // ── GET: діагностика ─────────────────────────────────────
-    if (req.method === 'GET') {
-        const diag = { ok: true, initError: initError || null, env: {
-            hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
-            hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
-            hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
-        }};
-        try {
-            if (!db) throw new Error('DB not initialized');
-            await db.collection('companies').limit(1).get();
-            diag.firebase = 'connected';
-        } catch(e) { diag.firebase = 'ERROR: ' + e.message; }
-        return res.status(200).json(diag);
-    }
-
-    if (req.method !== 'POST') return res.status(405).end();
+async function processWebhook(req) {
+    if (req.method !== 'POST') return;
 
     const { companyId, channel } = req.query;
-    if (!companyId || !channel) return res.status(400).json({ error: 'Missing params' });
+    if (!companyId || !channel) return;
 
     try {
         const body = req.body;
@@ -377,19 +362,31 @@ async function processWebhook(req, res) {
 
 // ── Export: відповідаємо Telegram одразу, обробка у фоні ──
 module.exports = async (req, res) => {
-    if (req.method === 'POST') {
-        // Одразу 200 OK — Telegram перестає чекати, зникає "годинник"
-        res.status(200).json({ ok: true });
-        // Vercel тримає функцію живою поки є незавершений Promise
-        // processWebhook робить всю роботу: Firestore + OpenAI + sendMessage
+    if (req.method === 'GET') {
+        // Діагностика — окремо, без processWebhook
+        const diag = { ok: true, env: {
+            hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
+            hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
+            hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+        }};
         try {
-            await processWebhook(req, res);
-        } catch(e) {
-            console.error('[webhook bg error]', e.message, e.stack);
-        }
-    } else {
-        // GET діагностика — звичайний синхронний режим
-        await processWebhook(req, res);
+            if (!db) throw new Error('DB not initialized');
+            await db.collection('companies').limit(1).get();
+            diag.firebase = 'connected';
+        } catch(e) { diag.firebase = 'ERROR: ' + e.message; }
+        return res.status(200).json(diag);
+    }
+
+    if (req.method !== 'POST') return res.status(405).end();
+
+    // Одразу 200 OK — Telegram перестає чекати, зникає "годинник"
+    res.status(200).json({ ok: true });
+
+    // Vercel тримає функцію живою поки await не завершиться
+    try {
+        await processWebhook(req);
+    } catch(e) {
+        console.error('[webhook error]', e.message, e.stack);
     }
 };
 
