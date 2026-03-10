@@ -1519,6 +1519,7 @@
     let trendsSelectedMetrics = [];
     let trendsChartType = 'line';
 
+    window._statsGetFirstMetricId = function() { return typeof statsMetrics !== 'undefined' ? (statsMetrics[0]?.id || '') : ''; };
     window.openTrendsChart = function(metricId) {
         trendsSelectedMetrics = [metricId];
         trendsChartType = 'line';
