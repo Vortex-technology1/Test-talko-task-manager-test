@@ -15,7 +15,7 @@
 
         // Load funnel
         const doc = await firebase.firestore()
-            .collection('companies').doc(window.currentCompanyId)
+            window.companyRef()
             .collection('funnels').doc(funnelId).get();
 
         if (!doc.exists) { if(window.showToast)showToast('Воронку не знайдено','warning'); else alert('Воронку не знайдено'); return; }
@@ -327,7 +327,7 @@
     window.saveFunnelSteps = async function () {
         if (!funnelEditorId) return;
         try {
-            await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+            await window.companyRef()
                 .collection('funnels').doc(funnelEditorId)
                 .update({
                     steps: funnelSteps,

@@ -44,7 +44,7 @@ function _renderShell() {
 async function _loadSettings() {
     try {
         const doc = await firebase.firestore()
-            .collection('companies').doc(window.currentCompanyId).get();
+            window.companyRef().get();
         intg.settings = doc.data() || {};
     } catch(e) {
         intg.settings = {};
@@ -224,7 +224,7 @@ window.intgSave = async function(field, inputId, isSecret = true) {
     const val = document.getElementById(inputId)?.value.trim();
     if (!val) { if (typeof showToast === 'function') showToast('Введіть значення', 'error'); return; }
     try {
-        await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+        await window.companyRef()
             .update({ [field]: val, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         intg.settings[field] = val;
         if (typeof showToast === 'function') showToast('Збережено ✓', 'success');
@@ -239,7 +239,7 @@ window.intgSaveTelegram = async function() {
     const chatId = document.getElementById('intg_tgchat')?.value.trim();
     if (!token) { if (typeof showToast === 'function') showToast('Введіть Bot Token', 'error'); return; }
     try {
-        await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+        await window.companyRef()
             .update({
                 telegramBotToken: token,
                 managerChatId: chatId || '',

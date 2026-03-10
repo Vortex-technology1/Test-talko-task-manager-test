@@ -56,7 +56,7 @@
     // ── Load Data ──────────────────────────────────────────
     async function loadLPData() {
         if (!window.currentCompanyId) return;
-        const base = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+        const base = window.companyRef();
 
         // Live landing pages
         if (lpUnsubscribe) lpUnsubscribe();
@@ -170,7 +170,7 @@
     window.togglePageStatus = async function (pageId, currentStatus) {
         const newStatus = currentStatus === 'active' ? 'draft' : 'active';
         try {
-            await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+            await window.companyRef()
                 .collection('landingPages').doc(pageId)
                 .update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             if (typeof showToast === 'function') showToast(newStatus === 'active' ? 'Лендінг активовано' : 'Лендінг деактивовано', 'success');
@@ -179,7 +179,7 @@
 
     window.confirmDeletePage = async function (pageId) {
         if (!(await (window.showConfirmModal ? showConfirmModal('Видалити лендінг? Це незворотно.',{danger:true}) : Promise.resolve(confirm('Видалити лендінг? Це незворотно.'))))) return;
-        firebase.firestore().collection('companies').doc(window.currentCompanyId)
+        window.companyRef()
             .collection('landingPages').doc(pageId).delete()
             .then(() => { if (typeof showToast === 'function') showToast('Видалено', 'success'); })
             .catch(e => console.error(e));
@@ -306,7 +306,7 @@
         if (btn) { btn.textContent = 'Зберігаємо...'; btn.disabled = true; }
 
         try {
-            const base = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+            const base = window.companyRef();
 
             // Check slug uniqueness (exclude current page)
             const slugCheck = await base.collection('landingPages').where('slug', '==', slug).get();
@@ -317,14 +317,14 @@
             let storageRef = null;
             if (htmlContent) {
                 const storage = firebase.storage();
-                const path = `companies/${window.currentCompanyId}/landingPages/${slug}/index.html`;
+                const path = window.currentCompanyId + '/landingPages/${slug}/index.html';
                 storageRef = storage.ref(path);
                 await storageRef.putString(htmlContent, 'raw', { contentType: 'text/html' });
             }
 
             const data = {
                 name, slug, funnelId: funnelId || null, status,
-                htmlStoragePath: storageRef ? `companies/${window.currentCompanyId}/landingPages/${slug}/index.html` : null,
+                htmlStoragePath: storageRef ? window.currentCompanyId + '/landingPages/${slug}/index.html' : null,
                 htmlContent: htmlContent ? htmlContent.slice(0, 10000) : '', // store preview in firestore, full in storage
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -430,7 +430,7 @@
 
     window.confirmDeleteFunnel = async function (funnelId) {
         if (!(await (window.showConfirmModal ? showConfirmModal('Видалити воронку?',{danger:true}) : Promise.resolve(confirm('Видалити воронку?'))))) return;
-        firebase.firestore().collection('companies').doc(window.currentCompanyId)
+        window.companyRef()
             .collection('funnels').doc(funnelId).delete()
             .then(async () => {
                 lpFunnels = lpFunnels.filter(f => f.id !== funnelId);
@@ -475,7 +475,7 @@
         const name = document.getElementById('newFunnelName')?.value.trim();
         if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
         try {
-            const ref = await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+            const ref = await window.companyRef()
                 .collection('funnels').add({
                     name,
                     calendlyUrl: document.getElementById('newFunnelCalendly')?.value.trim() || null,
@@ -569,7 +569,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
     // ── Load Data ──────────────────────────────────────────
     async function loadLPData() {
         if (!window.currentCompanyId) return;
-        const base = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+        const base = window.companyRef();
 
         // Live landing pages
         if (lpUnsubscribe) lpUnsubscribe();
@@ -683,7 +683,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
     window.togglePageStatus = async function (pageId, currentStatus) {
         const newStatus = currentStatus === 'active' ? 'draft' : 'active';
         try {
-            await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+            await window.companyRef()
                 .collection('landingPages').doc(pageId)
                 .update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             if (typeof showToast === 'function') showToast(newStatus === 'active' ? 'Лендінг активовано' : 'Лендінг деактивовано', 'success');
@@ -692,7 +692,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
 
     window.confirmDeletePage = async function (pageId) {
         if (!(await (window.showConfirmModal ? showConfirmModal('Видалити лендінг? Це незворотно.',{danger:true}) : Promise.resolve(confirm('Видалити лендінг? Це незворотно.'))))) return;
-        firebase.firestore().collection('companies').doc(window.currentCompanyId)
+        window.companyRef()
             .collection('landingPages').doc(pageId).delete()
             .then(() => { if (typeof showToast === 'function') showToast('Видалено', 'success'); })
             .catch(e => console.error(e));
@@ -819,7 +819,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
         if (btn) { btn.textContent = 'Зберігаємо...'; btn.disabled = true; }
 
         try {
-            const base = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+            const base = window.companyRef();
 
             // Check slug uniqueness (exclude current page)
             const slugCheck = await base.collection('landingPages').where('slug', '==', slug).get();
@@ -830,14 +830,14 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
             let storageRef = null;
             if (htmlContent) {
                 const storage = firebase.storage();
-                const path = `companies/${window.currentCompanyId}/landingPages/${slug}/index.html`;
+                const path = window.currentCompanyId + '/landingPages/${slug}/index.html';
                 storageRef = storage.ref(path);
                 await storageRef.putString(htmlContent, 'raw', { contentType: 'text/html' });
             }
 
             const data = {
                 name, slug, funnelId: funnelId || null, status,
-                htmlStoragePath: storageRef ? `companies/${window.currentCompanyId}/landingPages/${slug}/index.html` : null,
+                htmlStoragePath: storageRef ? window.currentCompanyId + '/landingPages/${slug}/index.html' : null,
                 htmlContent: htmlContent ? htmlContent.slice(0, 10000) : '', // store preview in firestore, full in storage
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -943,7 +943,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
 
     window.confirmDeleteFunnel = async function (funnelId) {
         if (!(await (window.showConfirmModal ? showConfirmModal('Видалити воронку?',{danger:true}) : Promise.resolve(confirm('Видалити воронку?'))))) return;
-        firebase.firestore().collection('companies').doc(window.currentCompanyId)
+        window.companyRef()
             .collection('funnels').doc(funnelId).delete()
             .then(async () => {
                 lpFunnels = lpFunnels.filter(f => f.id !== funnelId);
@@ -988,7 +988,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
         const name = document.getElementById('newFunnelName')?.value.trim();
         if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
         try {
-            const ref = await firebase.firestore().collection('companies').doc(window.currentCompanyId)
+            const ref = await window.companyRef()
                 .collection('funnels').add({
                     name,
                     calendlyUrl: document.getElementById('newFunnelCalendly')?.value.trim() || null,

@@ -26,7 +26,7 @@
                     processQuery = processQuery.where('status', '==', 'active');
                 }
                 
-                const TASKS_LOAD_LIMIT = 5000;
+                const TASKS_LOAD_LIMIT = 2000; // P3 FIX: 5000→2000 (cursor pagination TODO)
                 const isEmployeeRole = currentUserData?.role === 'employee';
                 const uid = currentUser.uid;
                 
