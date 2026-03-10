@@ -20,7 +20,8 @@ if (!admin.apps.length) {
 }
 const db = initError ? null : admin.firestore();
 
-module.exports = async (req, res) => {
+// ── Основна обробка (запускається асинхронно після 200 OK) ──
+async function processWebhook(req, res) {
     // ── GET: діагностика ─────────────────────────────────────
     if (req.method === 'GET') {
         const diag = { ok: true, initError: initError || null, env: {
@@ -51,9 +52,9 @@ module.exports = async (req, res) => {
         if (channel === 'telegram') {
             const msg = body?.message;
             const cb = body?.callback_query;
-            if (!msg && !cb) return res.status(200).json({ ok: true, skipped: 'no message' });
+            if (!msg && !cb) return;
             const from = msg?.from || cb?.from;
-            if (!from) return res.status(200).json({ ok: true, skipped: 'no from' });
+            if (!from) return;
             normalized = {
                 senderId: String(from.id),
                 senderName: [from.first_name, from.last_name].filter(Boolean).join(' ') || from.username || '',
@@ -62,11 +63,11 @@ module.exports = async (req, res) => {
             if (cb) callbackQueryId = cb.id;
         } else if (channel === 'facebook' || channel === 'instagram') {
             const messaging = body?.entry?.[0]?.messaging?.[0];
-            if (!messaging) return res.status(200).json({ ok: true, skipped: 'no messaging' });
+            if (!messaging) return;
             normalized = { senderId: messaging.sender?.id || '', senderName: '', text: messaging.message?.text || '' };
         }
 
-        if (!normalized) return res.status(200).json({ ok: true, skipped: 'unsupported channel' });
+        if (!normalized) return;
 
         console.log(`[webhook] ${channel} from ${normalized.senderId}: "${normalized.text}"`);
 
@@ -84,7 +85,7 @@ module.exports = async (req, res) => {
             const compDoc = await compRef.get();
             botToken = compDoc.data()?.integrations?.telegram?.botToken;
         }
-        if (!botToken) return res.status(200).json({ ok: true, skipped: 'no token' });
+        if (!botToken) return;
 
         // Підтверджуємо callback_query одразу (прибирає "годинник" на кнопці)
         if (callbackQueryId && botToken) {
@@ -142,7 +143,7 @@ module.exports = async (req, res) => {
 
         if (!flow) {
             if (isStart) await sendTg(botToken, normalized.senderId, 'Вітаємо! Бот активний ✅');
-            return res.status(200).json({ ok: true, skipped: 'no flow' });
+            return;
         }
 
         // ── Підвантажуємо великі промпти з nodePrompts підколекції ──
@@ -246,7 +247,7 @@ module.exports = async (req, res) => {
 
         if (!nodeId) {
             await sessionRef.set(session, { merge: true });
-            return res.status(200).json({ ok: true });
+            return;
         }
 
         // ── Виконуємо ланцюг вузлів ──────────────────────────
@@ -266,7 +267,7 @@ module.exports = async (req, res) => {
                     Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
                         currentNodeId: nodeId, waitingForInput: nodeId });
                     await sessionRef.set(session, { merge: true });
-                    return res.status(200).json({ ok: true });
+                    return;
                 }
                 nodeId = n.nextNode || null;
 
@@ -317,14 +318,14 @@ module.exports = async (req, res) => {
                         currentNodeId: nodeId, waitingForInput: nodeId,
                         aiHistory: session.aiHistory });
                     await sessionRef.set(session, { merge: true });
-                    return res.status(200).json({ ok: true });
+                    return;
                 }
 
             } else if (n.type === 'pause') {
                 Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
                     currentNodeId: n.nextNode || null, waitingForInput: nodeId });
                 await sessionRef.set(session, { merge: true });
-                return res.status(200).json({ ok: true });
+                return;
 
             } else if (n.type === 'filter') {
                 nodeId = evalFilter(n, session.data) ? n.trueNode : n.falseNode;
@@ -366,13 +367,32 @@ module.exports = async (req, res) => {
         }
         session.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         await sessionRef.set(session, { merge: true });
-        return res.status(200).json({ ok: true });
+        return;
 
     } catch(err) {
         console.error('[webhook] ERROR:', err.message, err.stack);
-        return res.status(200).json({ ok: true }); // завжди 200 щоб Telegram не ретраїв
+        return; // завжди 200 щоб Telegram не ретраїв
+    }
+}
+
+// ── Export: відповідаємо Telegram одразу, обробка у фоні ──
+module.exports = async (req, res) => {
+    if (req.method === 'POST') {
+        // Одразу 200 OK — Telegram перестає чекати, зникає "годинник"
+        res.status(200).json({ ok: true });
+        // Vercel тримає функцію живою поки є незавершений Promise
+        // processWebhook робить всю роботу: Firestore + OpenAI + sendMessage
+        try {
+            await processWebhook(req, res);
+        } catch(e) {
+            console.error('[webhook bg error]', e.message, e.stack);
+        }
+    } else {
+        // GET діагностика — звичайний синхронний режим
+        await processWebhook(req, res);
     }
 };
+
 
 // ── Helpers ───────────────────────────────────────────────
 
