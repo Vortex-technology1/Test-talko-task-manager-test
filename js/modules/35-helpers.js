@@ -119,6 +119,13 @@
         window.toggleMoreTabs = toggleMoreTabs;
         window.closeMoreTabs = closeMoreTabs;
 
+        // ── Tab Handlers Registry (замість chain перехоплень модулів) ──
+        window._tabHandlers = window._tabHandlers || {};
+        window.onSwitchTab = function(tabName, fn) {
+            if (!window._tabHandlers[tabName]) window._tabHandlers[tabName] = [];
+            window._tabHandlers[tabName].push(fn);
+        };
+
         function switchTab(tabName) {
             // Зберігаємо активний таб для відновлення після F5
             try { sessionStorage.setItem('talko_last_tab', tabName); } catch(e) {}
@@ -204,6 +211,12 @@
             }
             
             updateOverdueBadges();
+
+            // ── Зовнішні обробники (замість chain перехоплень) ──
+            if (window._tabHandlers) {
+                var handlers = window._tabHandlers[tabName] || [];
+                handlers.forEach(function(fn) { try { fn(); } catch(e) { console.error('[switchTab handler]', tabName, e); } });
+            }
         }
         
         function updateOverdueBadges() {

@@ -415,7 +415,7 @@
                     window.commentsUnsubscribe();
                     window.commentsUnsubscribe = null;
                 }
-            } catch(e) {}
+            } catch(e) { console.error('[05-auth-functions]', e.message); }
             if (window.timeTrackerInterval) {
                 clearInterval(window.timeTrackerInterval);
                 window.timeTrackerInterval = null;

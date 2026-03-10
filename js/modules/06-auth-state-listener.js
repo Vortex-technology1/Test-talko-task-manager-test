@@ -130,6 +130,9 @@
                     if (hasBizFeature) {
                         const bizBtn = document.getElementById('bizNavBtn');
                         if (bizBtn) bizBtn.style.display = '';
+                        // Інтеграції — доступні завжди якщо є хоча б одна biz feature
+                        const intgBtn = document.getElementById('integrationsNavBtn');
+                        if (intgBtn) intgBtn.style.display = '';
                     }
 
                     // Відновлюємо останній активний таб після F5

@@ -388,21 +388,9 @@ function _esc(s) {
     return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ── switchTab hook ─────────────────────────────────────────
-const _origST = window.switchTab;
-window.switchTab = function (tab) {
-    if (_origST) _origST(tab);
-    if (tab === 'sites') {
-        const btn = document.getElementById('sitesNavBtn');
-        if (btn) btn.style.display = '';
-        if (!sl.sites.length && !sl.loading) {
-            window.initSitesModule();
-        } else {
-            _renderList();
-        }
-    }
-};
-
+window.onSwitchTab && window.onSwitchTab('sites', function() {
+    window.initSitesModule();
+});
 // Показуємо кнопку якщо feature увімкнена
 document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {

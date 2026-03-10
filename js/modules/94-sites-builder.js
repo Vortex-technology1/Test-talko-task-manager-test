@@ -11,6 +11,7 @@ let sb = {
     blocks:   [],
     activeBlockIdx: null,
     saving:   false,
+    panelTab: 'blocks', // blocks | seo
 };
 
 const BLOCK_TYPES = [
@@ -67,6 +68,19 @@ function _renderBuilderShell() {
             <div id="sbPanel" style="width:300px;flex-shrink:0;background:#f9fafb;
                 border-right:1.5px solid #f1f5f9;overflow-y:auto;display:flex;flex-direction:column;">
 
+                <!-- Панель табів -->
+                <div style="display:flex;border-bottom:1px solid #e5e7eb;background:white;flex-shrink:0;">
+                    <button onclick="sbPanelTab('blocks')" id="sbPanelTab_blocks"
+                        style="flex:1;padding:0.5rem;background:none;border:none;border-bottom:2px solid #22c55e;
+                        cursor:pointer;font-size:0.75rem;font-weight:600;color:#22c55e;">Блоки</button>
+                    <button onclick="sbPanelTab('seo')" id="sbPanelTab_seo"
+                        style="flex:1;padding:0.5rem;background:none;border:none;border-bottom:2px solid transparent;
+                        cursor:pointer;font-size:0.75rem;font-weight:500;color:#6b7280;">SEO & Аналітика</button>
+                </div>
+
+                <!-- Панель блоків (blocks tab) -->
+                <div id="sbPanelBlocks" style="display:flex;flex-direction:column;flex:1;">
+
                 <!-- Бібліотека блоків -->
                 <div style="padding:0.6rem 0.75rem;border-bottom:1px solid #e5e7eb;">
                     <div style="font-size:0.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase;margin-bottom:0.4rem;">
@@ -93,9 +107,16 @@ function _renderBuilderShell() {
                     <div id="sbBlockList" style="display:flex;flex-direction:column;gap:0.3rem;"></div>
                 </div>
 
+                </div><!-- /sbPanelBlocks -->
+
                 <!-- Редагування блоку -->
                 <div id="sbBlockEditor" style="padding:0.75rem;border-top:1.5px solid #e5e7eb;display:none;flex:1;"></div>
             </div>
+
+                <!-- SEO & Analytics panel -->
+                <div id="sbPanelSeo" style="display:none;flex-direction:column;flex:1;padding:0.75rem;gap:0.75rem;overflow-y:auto;">
+                    <div id="sbSeoContent"></div>
+                </div>
 
             <!-- Право: прев'ю -->
             <div id="sbPreview" style="flex:1;overflow-y:auto;background:#e5e7eb;padding:1rem;">
@@ -506,6 +527,237 @@ window.sbSave = async function () {
         sb.saving = false;
         if (btn) { btn.textContent = '💾 Зберегти'; btn.disabled = false; }
     }
+};
+
+// ══════════════════════════════════════════════════════════
+// SEO & ANALYTICS PANEL
+// ══════════════════════════════════════════════════════════
+window.sbPanelTab = function(tab) {
+    sb.panelTab = tab;
+    const blocksEl = document.getElementById('sbPanelBlocks');
+    const seoEl    = document.getElementById('sbPanelSeo');
+    const bBtn     = document.getElementById('sbPanelTab_blocks');
+    const sBtn     = document.getElementById('sbPanelTab_seo');
+    if (blocksEl) blocksEl.style.display = tab === 'blocks' ? 'flex' : 'none';
+    if (seoEl)    seoEl.style.display    = tab === 'seo'    ? 'flex' : 'none';
+    if (bBtn) { bBtn.style.borderBottomColor = tab==='blocks'?'#22c55e':'transparent'; bBtn.style.color=tab==='blocks'?'#22c55e':'#6b7280'; bBtn.style.fontWeight=tab==='blocks'?'600':'500'; }
+    if (sBtn) { sBtn.style.borderBottomColor = tab==='seo'?'#22c55e':'transparent'; sBtn.style.color=tab==='seo'?'#22c55e':'#6b7280'; sBtn.style.fontWeight=tab==='seo'?'600':'500'; }
+    if (tab === 'seo') _renderSeoPanel();
+};
+
+function _renderSeoPanel() {
+    const c = document.getElementById('sbSeoContent');
+    if (!c || !sb.site) return;
+    const s = sb.site;
+    const inp  = 'width:100%;padding:0.4rem 0.5rem;border:1px solid #e5e7eb;border-radius:6px;font-size:0.78rem;box-sizing:border-box;font-family:inherit;';
+    const ta   = inp + 'resize:vertical;';
+    const lbl  = 'font-size:0.67rem;font-weight:700;color:#6b7280;text-transform:uppercase;display:block;margin-bottom:0.2rem;letter-spacing:0.03em;';
+    const sec  = 'margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #f1f5f9;';
+    const head = 'font-size:0.78rem;font-weight:700;color:#111827;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.35rem;';
+
+    c.innerHTML = `
+    <style>
+    .seo-section { margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid #f1f5f9; }
+    .seo-section:last-child { border-bottom:none; }
+    </style>
+
+    <!-- SEO Meta -->
+    <div class="seo-section">
+        <div style="${head}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            SEO Meta
+        </div>
+        <div style="margin-bottom:0.5rem;">
+            <label style="${lbl}">Title (заголовок сторінки)</label>
+            <input id="seo_title" value="${_esc(s.seoTitle||s.name||'')}" placeholder="Назва сторінки для Google" style="${inp}">
+        </div>
+        <div style="margin-bottom:0.5rem;">
+            <label style="${lbl}">Description</label>
+            <textarea id="seo_desc" rows="2" placeholder="Опис для пошукових систем..." style="${ta}">${_esc(s.seoDescription||'')}</textarea>
+        </div>
+        <div style="margin-bottom:0.5rem;">
+            <label style="${lbl}">Keywords</label>
+            <input id="seo_keywords" value="${_esc(s.seoKeywords||'')}" placeholder="ключові, слова, через кому" style="${inp}">
+        </div>
+        <div>
+            <label style="${lbl}">OG Image URL (соц мережі)</label>
+            <input id="seo_ogimage" value="${_esc(s.seoOgImage||'')}" placeholder="https://..." style="${inp}">
+        </div>
+    </div>
+
+    <!-- Google Analytics -->
+    <div class="seo-section">
+        <div style="${head}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            Google Analytics / GTM
+        </div>
+        <div style="margin-bottom:0.5rem;">
+            <label style="${lbl}">GA4 Measurement ID</label>
+            <input id="seo_ga4" value="${_esc(s.analyticsGA4||'')}" placeholder="G-XXXXXXXXXX" style="${inp}">
+            <div style="font-size:0.65rem;color:#9ca3af;margin-top:2px;">Google Analytics 4</div>
+        </div>
+        <div>
+            <label style="${lbl}">GTM Container ID</label>
+            <input id="seo_gtm" value="${_esc(s.analyticsGTM||'')}" placeholder="GTM-XXXXXXX" style="${inp}">
+            <div style="font-size:0.65rem;color:#9ca3af;margin-top:2px;">Google Tag Manager</div>
+        </div>
+    </div>
+
+    <!-- Meta Pixel -->
+    <div class="seo-section">
+        <div style="${head}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            Meta (Facebook) Pixel
+        </div>
+        <div>
+            <label style="${lbl}">Pixel ID</label>
+            <input id="seo_fbpixel" value="${_esc(s.analyticsMetaPixel||'')}" placeholder="1234567890123456" style="${inp}">
+        </div>
+    </div>
+
+    <!-- TikTok Pixel -->
+    <div class="seo-section">
+        <div style="${head}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+            TikTok Pixel
+        </div>
+        <div>
+            <label style="${lbl}">TikTok Pixel ID</label>
+            <input id="seo_tiktok" value="${_esc(s.analyticsTikTok||'')}" placeholder="CXXXXXXXXXXXXXXXX" style="${inp}">
+        </div>
+    </div>
+
+    <!-- Custom Head Code -->
+    <div class="seo-section">
+        <div style="${head}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Custom &lt;head&gt; код
+        </div>
+        <div>
+            <label style="${lbl}">Довільний код в &lt;head&gt;</label>
+            <textarea id="seo_headcode" rows="4"
+                placeholder="<!-- Вставте будь-який скрипт, тег або код -->" style="${ta}font-family:monospace;font-size:0.72rem;">${_esc(s.analyticsHeadCode||'')}</textarea>
+            <div style="font-size:0.65rem;color:#9ca3af;margin-top:2px;">
+                Підтримка: Hotjar, Clarity, LiveChat, Intercom, будь-який інший pixel
+            </div>
+        </div>
+    </div>
+
+    <!-- Save -->
+    <button onclick="sbSaveSeo()"
+        style="width:100%;padding:0.5rem;background:#22c55e;color:white;border:none;
+        border-radius:7px;cursor:pointer;font-weight:700;font-size:0.82rem;">
+        Зберегти SEO & Аналітику
+    </button>`;
+}
+
+window.sbSaveSeo = async function() {
+    const updates = {
+        seoTitle:          document.getElementById('seo_title')?.value.trim()    || '',
+        seoDescription:    document.getElementById('seo_desc')?.value.trim()     || '',
+        seoKeywords:       document.getElementById('seo_keywords')?.value.trim() || '',
+        seoOgImage:        document.getElementById('seo_ogimage')?.value.trim()  || '',
+        analyticsGA4:      document.getElementById('seo_ga4')?.value.trim()      || '',
+        analyticsGTM:      document.getElementById('seo_gtm')?.value.trim()      || '',
+        analyticsMetaPixel:document.getElementById('seo_fbpixel')?.value.trim()  || '',
+        analyticsTikTok:   document.getElementById('seo_tiktok')?.value.trim()   || '',
+        analyticsHeadCode: document.getElementById('seo_headcode')?.value        || '',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+    try {
+        await firebase.firestore()
+            .doc('companies/' + window.currentCompanyId + '/sites/' + sb.siteId)
+            .update(updates);
+        Object.assign(sb.site, updates);
+        if (typeof showToast === 'function') showToast('SEO збережено ✓', 'success');
+    } catch(e) {
+        if (typeof showToast === 'function') showToast('Помилка: ' + e.message, 'error');
+    }
+};
+
+// ══════════════════════════════════════════════════════════
+// PUBLIC HTML GENERATOR — вставляє аналітику в <head>
+// ══════════════════════════════════════════════════════════
+window.sbBuildPublicHtml = function(site, blocksHtml) {
+    const s = site || sb.site || {};
+    const ga4     = s.analyticsGA4       || '';
+    const gtm     = s.analyticsGTM       || '';
+    const fbPixel = s.analyticsMetaPixel || '';
+    const tiktok  = s.analyticsTikTok    || '';
+    const custom  = s.analyticsHeadCode  || '';
+
+    const ga4Code = ga4 ? `
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${ga4}"><\/script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${ga4}');
+    <\/script>` : '';
+
+    const gtmCode = gtm ? `
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','${gtm}');<\/script>` : '';
+
+    const fbCode = fbPixel ? `
+    <!-- Meta Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '${fbPixel}');
+    fbq('track', 'PageView');
+    <\/script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=${fbPixel}&ev=PageView&noscript=1"/></noscript>` : '';
+
+    const tiktokCode = tiktok ? `
+    <!-- TikTok Pixel -->
+    <script>
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];
+      ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
+      ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
+      for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+      ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};
+      ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";
+      ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=i;ttq._t=ttq._t||{};ttq._t[e]=+new Date;
+      ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=document.createElement("script");
+      o.type="text/javascript";o.async=!0;o.src=i+"?sdkid="+e+"&lib="+t;
+      var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+      ttq.load('${tiktok}');ttq.page();
+    }(window, document, 'ttq');
+    <\/script>` : '';
+
+    return `<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${_esc(s.seoTitle || s.name || 'Сайт')}</title>
+    ${s.seoDescription ? `<meta name="description" content="${_esc(s.seoDescription)}">` : ''}
+    ${s.seoKeywords    ? `<meta name="keywords"    content="${_esc(s.seoKeywords)}">` : ''}
+    ${s.seoOgImage     ? `<meta property="og:image" content="${_esc(s.seoOgImage)}">` : ''}
+    <meta property="og:title" content="${_esc(s.seoTitle || s.name || '')}">
+    ${s.seoDescription ? `<meta property="og:description" content="${_esc(s.seoDescription)}">` : ''}
+    ${ga4Code}
+    ${gtmCode}
+    ${fbCode}
+    ${tiktokCode}
+    ${custom}
+</head>
+<body>
+    ${gtm ? `<!-- GTM noscript --><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${gtm}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>` : ''}
+    ${blocksHtml || ''}
+</body>
+</html>`;
 };
 
 function _esc(s) {

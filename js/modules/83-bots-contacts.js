@@ -23,6 +23,12 @@ let bp = {
 // ── Init ───────────────────────────────────────────────────
 window.initBotsModule = async function () {
     if (!window.currentCompanyId) return;
+    // Guard: не перемальовувати shell якщо вже ініціалізовано для цієї компанії
+    if (bp._initializedFor === window.currentCompanyId) {
+        if (bp.subTab === 'bots') renderBotsTab();
+        return;
+    }
+    bp._initializedFor = window.currentCompanyId;
     renderShell();
     loadBots();
 };
@@ -43,7 +49,7 @@ function loadBots() {
 // ── Shell ──────────────────────────────────────────────────
 function lcIcons(el) {
     if (window.lucide) {
-        try { lucide.createIcons({ nameAttr: 'data-lucide', attrs: { 'stroke-width': 2 }, nodes: el ? [el] : undefined }); } catch(e) {}
+        try { lucide.createIcons({ nameAttr: 'data-lucide', attrs: { 'stroke-width': 2 }, nodes: el ? [el] : undefined }); } catch(e) { console.error('[83-bots-contacts]', e.message); }
     }
 }
 
@@ -1804,7 +1810,7 @@ async function renderBroadcastTab() {
             (ct.tags || []).forEach(t => { if (t && !allTags.includes(t)) allTags.push(t); });
             if (ct.business_type && !allNiches.includes(ct.business_type)) allNiches.push(ct.business_type);
         });
-    } catch(e) {}
+    } catch(e) { console.error('[83-bots-contacts]', e.message); }
 
     let history = [];
     try {
@@ -1812,7 +1818,7 @@ async function renderBroadcastTab() {
             .collection(`companies/${window.currentCompanyId}/broadcasts`)
             .orderBy('createdAt', 'desc').limit(20).get();
         history = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } catch(e) {}
+    } catch(e) { console.error('[83-bots-contacts]', e.message); }
 
     const sectionStyle = 'background:white;border-radius:14px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);';
     const labelStyle = 'font-size:0.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;display:block;margin-bottom:0.4rem;';
@@ -2680,10 +2686,8 @@ function relTime(d) {
 }
 
 // ── Tab hook ───────────────────────────────────────────────
-const _origST = window.switchTab;
-window.switchTab = function(tab) {
-    if (_origST) _origST(tab);
-    if (tab==='bots' && window.isFeatureEnabled?.('bots')) window.initBotsModule();
-};
+window.onSwitchTab && window.onSwitchTab('bots', function() {
+    if (window.isFeatureEnabled?.('bots')) window.initBotsModule();
+});
 
 })();

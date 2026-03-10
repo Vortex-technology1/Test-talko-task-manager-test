@@ -278,13 +278,9 @@ window.intgTestTelegram = async function() {
     }
 };
 
-// ── switchTab hook ─────────────────────────────────────────
-const _origST = window.switchTab;
-window.switchTab = function(tab) {
-    if (_origST) _origST(tab);
-    if (tab === 'integrations') {
-        window.initIntegrationsModule();
-    }
-};
+// ── Tab hook ───────────────────────────────────────────────
+window.onSwitchTab && window.onSwitchTab('integrations', function() {
+    window.initIntegrationsModule();
+});
 
 })();

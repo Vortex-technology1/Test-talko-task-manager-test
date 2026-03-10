@@ -77,7 +77,7 @@
                     if (compDoc.exists) {
                         window.companyFeatures = compDoc.data().features || {};
                     }
-                } catch(e) {}
+                } catch(e) { console.error('[07-data-loading]', e.message); }
                 window.isFeatureEnabled = window.isFeatureEnabled || function(key) {
                     return !window.companyFeatures || window.companyFeatures[key] !== false;
                 };

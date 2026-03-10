@@ -133,16 +133,7 @@ async function _loadAll() {
     if (!crm.pipelines.length) await _createDefaultPipeline();
     crm.pipeline = crm.pipelines.find(p => p.isDefault) || crm.pipelines[0];
 
-    const dealUnsub = base.collection('crm_deals')
-        .where('pipelineId', '==', crm.pipeline.id)
-        .limit(200)
-        .onSnapshot(snap => {
-            crm.deals = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-                .sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
-            crm.loading = false;
-            if (crm.subTab === 'kanban') _renderKanban();
-        }, err => { console.error('[CRM deals]', err); crm.loading = false; });
-    crm.unsubs.push(dealUnsub);
+    _subscribeDeals(); // централізований — без дублікатів
 
     const clientSnap = await base.collection('crm_clients').limit(100).get();
     crm.clients = clientSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -171,6 +162,8 @@ async function _createDefaultPipeline() {
 // ── Event Bus ──────────────────────────────────────────────
 function _listenEventBus() {
     if (typeof window.TALKO_EVENTS === 'undefined') return;
+    if (crm._eventBusBound) return; // guard — один listener
+    crm._eventBusBound = true;
     window.addEventListener('talko:event', function(e) {
         const ev = e.detail;
         if (ev && ev.type === window.TALKO_EVENTS?.DEAL_CREATED) {
@@ -1024,11 +1017,19 @@ function _renderCRMSettings() {
 
 // ── Pipeline CRUD ──────────────────────────────────────────
 window.crmSelectPipeline = async function(pipelineId) {
+    if (crm.pipeline?.id === pipelineId) { _renderCRMSettings(); return; } // вже вибрана
     crm.pipeline = crm.pipelines.find(p => p.id === pipelineId) || crm.pipeline;
-    // Reload deals for this pipeline
-    crm.loading = true;
+    _subscribeDeals(); // централізований subscribe — без дублікатів
+    _renderCRMSettings();
+    if (typeof showToast === 'function') showToast('Воронку: ' + crm.pipeline.name, 'success');
+};
+
+// Єдина точка підписки на deals — викликати звідусіль
+function _subscribeDeals() {
     crm.unsubs.forEach(u => u && u());
     crm.unsubs = [];
+    crm.loading = true;
+    if (!crm.pipeline) return;
     const dealUnsub = firebase.firestore()
         .collection('companies').doc(window.currentCompanyId).collection('crm_deals')
         .where('pipelineId','==', crm.pipeline.id).limit(200)
@@ -1036,11 +1037,10 @@ window.crmSelectPipeline = async function(pipelineId) {
             crm.deals = snap.docs.map(d => ({id:d.id,...d.data()}))
                 .sort((a,b) => (b.createdAt?.toMillis?.()??0)-(a.createdAt?.toMillis?.()??0));
             crm.loading = false;
-        });
+            if (crm.subTab === 'kanban') _renderKanban();
+        }, err => { console.error('[CRM deals]', err); crm.loading = false; });
     crm.unsubs.push(dealUnsub);
-    _renderCRMSettings();
-    if (typeof showToast === 'function') showToast('Воронку вибрано: ' + crm.pipeline.name, 'success');
-};
+}
 
 window.crmCreatePipeline = function() {
     const name = prompt('Назва нової воронки:');
@@ -1179,14 +1179,10 @@ function _stageLabel(id) {
     return crm.pipeline?.stages?.find(s => s.id === id)?.label || id;
 }
 
-// ── switchTab hook ─────────────────────────────────────────
-const _origST = window.switchTab;
-window.switchTab = function(tab) {
-    if (_origST) _origST(tab);
-    if (tab === 'crm') {
-        if (!crm.pipeline) window.initCRMModule();
-        else if (crm.subTab === 'kanban') _renderKanban();
-    }
-};
+// ── Tab hook (через централізований registry) ──────────────
+window.onSwitchTab && window.onSwitchTab('crm', function() {
+    if (!crm.pipeline) window.initCRMModule();
+    else if (crm.subTab === 'kanban') _renderKanban();
+});
 
 })();
