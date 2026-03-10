@@ -60,12 +60,31 @@ window.openFlowCanvas = async function(flowId, botId) {
     if (!snap.exists) return;
     fc.flowData = {id: snap.id, ...snap.data()};
 
+    // Підвантажуємо великі AI промпти з nodePrompts підколекції
+    const promptsSnap = await flowRef.collection('nodePrompts').get();
+    const nodePromptsMap = {};
+    promptsSnap.forEach(doc => { nodePromptsMap[doc.id] = doc.data().aiSystem || ''; });
+
+    // Функція для відновлення __ref посилань в реальні промпти
+    const restoreNodePrompts = (nodesList) => (nodesList || []).map(n => {
+        const sys = n.config?.aiSystem || n.aiSystem || '';
+        if (sys.startsWith('__ref:')) {
+            const refId = sys.replace('__ref:', '');
+            const realPrompt = nodePromptsMap[refId] || '';
+            const restored = JSON.parse(JSON.stringify(n));
+            if (restored.config?.aiSystem !== undefined) restored.config.aiSystem = realPrompt;
+            if (restored.aiSystem !== undefined) restored.aiSystem = realPrompt;
+            return restored;
+        }
+        return n;
+    });
+
     // Load nodes/edges from stored JSON
     const stored = fc.flowData.canvasData || null;
     if (stored) {
         // canvasData.nodes зберігається як {...config, _x, _y, outputs, id, type}
         // Треба відновити структуру {id, type, x, y, config, outputs}
-        fc.nodes = (stored.nodes || []).map(n => {
+        fc.nodes = restoreNodePrompts(stored.nodes || []).map(n => {
             const nodeType = n.type || 'message';
             return {
                 id: n.id,

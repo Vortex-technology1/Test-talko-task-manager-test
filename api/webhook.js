@@ -397,12 +397,13 @@ async function doAction(node, session) {
         // Використовуємо окремий адмін бот для сповіщень
         const adminToken = process.env.ADMIN_BOT_TOKEN || session._botToken;
         if (chatId && adminToken) {
-            let text = node.config?.notifyText || node.notifyText || '🔔 Новий лід: {{senderName}}';
+            const flowDisplayName = node.config?.notifyFlowName || flow?.name || flow?.title || '';
+        let text = node.config?.notifyText || node.notifyText || '🔔 Новий лід: {{senderName}}';
             text = text
                 .replace(/\{\{senderName\}\}/g, session.senderName || '')
                 .replace(/\{\{senderId\}\}/g, session.senderId || '')
                 .replace(/\{\{channel\}\}/g, session.channel || '')
-                .replace(/\{\{flowName\}\}/g, node.config?.notifyFlowName || flow?.name || flow?.title || session.currentFlowId || '')
+                .replace(/\{\{flowName\}\}/g, flowDisplayName || session.currentFlowId || '')
                 .replace(/\{\{flowId\}\}/g, session.currentFlowId || '')
                 .replace(/\{\{(\w+)\}\}/g, (_, k) => session.data?.[k] || '');
             await sendTg(adminToken, chatId, text).catch(() => {});
