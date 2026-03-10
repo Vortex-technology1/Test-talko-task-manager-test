@@ -1880,82 +1880,387 @@ window.bpSendBroadcast = async function() {
 // ══════════════════════════════════════════════════════════
 // 8. НАЛАШТУВАННЯ БОТА
 // ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// 8. НАЛАШТУВАННЯ БОТА — повна реалізація
+// Секції: Інфо бота → Webhook → Токен → AI ключ → Сповіщення → Danger zone
+// ══════════════════════════════════════════════════════════
 async function renderSettingsTab() {
     const c = document.getElementById('bpViewSettings');
     if (!c) return;
-    const bot = bp.bots.find(b=>b.id===bp.activeBotId);
-    if (!bot) { c.innerHTML = '<div style="padding:1rem;color:#9ca3af;">'+t('botsNoBot')+'</div>'; return; }
+    const bot = bp.bots.find(b => b.id === bp.activeBotId);
+    if (!bot) {
+        c.innerHTML = `
+            <div style="text-align:center;padding:3rem;background:white;border-radius:14px;">
+                <div style="color:#9ca3af;font-size:0.85rem;">Оберіть бота щоб відкрити налаштування</div>
+                <button onclick="bpSwitch('bots')"
+                    style="margin-top:1rem;padding:0.5rem 1.25rem;background:#22c55e;color:white;
+                    border:none;border-radius:9px;cursor:pointer;font-weight:600;font-size:0.82rem;">
+                    ← До списку ботів
+                </button>
+            </div>`;
+        return;
+    }
 
-    const compDoc = await firebase.firestore().collection('companies').doc(window.currentCompanyId).get();
-    const compData = compDoc.data()||{};
+    const compDoc = await firebase.firestore()
+        .collection('companies').doc(window.currentCompanyId).get();
+    const compData = compDoc.data() || {};
+    const webhookUrl = `https://test-talko-task-manager-test-production.up.railway.app/api/webhook?companyId=${window.currentCompanyId}&channel=${bot.channel}`;
+
+    const sectionStyle = 'background:white;border-radius:14px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);';
+    const labelStyle = 'font-size:0.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;display:block;margin-bottom:0.4rem;';
+    const inputStyle = 'width:100%;padding:0.5rem 0.6rem;border:1.5px solid #e5e7eb;border-radius:9px;font-size:0.82rem;box-sizing:border-box;font-family:inherit;outline:none;';
+    const btnGreenStyle = 'padding:0.48rem 0.85rem;background:#22c55e;color:white;border:none;border-radius:9px;cursor:pointer;font-size:0.8rem;font-weight:700;white-space:nowrap;';
+    const btnGrayStyle = 'padding:0.48rem 0.85rem;background:#f9fafb;color:#374151;border:1.5px solid #e5e7eb;border-radius:9px;cursor:pointer;font-size:0.8rem;font-weight:600;white-space:nowrap;';
+
+    const channelIcon = {
+        telegram:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="#3b82f6" stroke="none"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.932z"/></svg>',
+        instagram: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e1306c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>',
+        whatsapp:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366" stroke="none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>',
+    }[bot.channel] || '';
+
+    const notifyTg = compData.notifyTelegramId || '';
+    const notifyEnabled = compData.notifyEnabled !== false;
 
     c.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:0.6rem;">
-            <div style="background:white;border-radius:12px;padding:1rem;box-shadow:var(--shadow);">
-                <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.75rem;">
-                    ${bot.channel==='telegram'?'<i data-lucide="send" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>':'<i data-lucide="camera" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i>'} ${escH(bot.name)}
-                </div>
-                <div style="font-size:0.78rem;color:#6b7280;margin-bottom:0.75rem;">
-                    Username: @${escH(bot.username||'—')}<br>
-                    Вебхук: <span style="color:${bot.connected?'#22c55e':'#ef4444'};">
-                        ${bot.connected?'<i data-lucide="check" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Підключено':'<i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i> Не підключено'}
-                    </span>
-                </div>
+    <div style="display:flex;flex-direction:column;gap:0.75rem;max-width:560px;">
+
+        <!-- Секція 1: Інформація про бота -->
+        <div style="${sectionStyle}">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.85rem;">
+                ${channelIcon}
                 <div>
-                    <label style="font-size:0.72rem;color:#6b7280;font-weight:600;display:block;margin-bottom:0.3rem;">ОНОВИТИ ТОКЕН</label>
-                    <div style="display:flex;gap:0.4rem;">
-                        <input type="password" id="bpSettingsToken"
-                            value="${bot.token ? '•••'+bot.token.slice(-6) : ''}"
-                            placeholder="Новий токен..."
-                            style="flex:1;padding:0.5rem;border:1px solid #e5e7eb;border-radius:7px;font-size:0.82rem;">
-                        <button onclick="bpReconnectBot('${bot.id}')"
-                            style="padding:0.5rem 0.8rem;background:#22c55e;color:white;border:none;border-radius:7px;cursor:pointer;font-size:0.8rem;font-weight:600;">
-                            Переп.
-                        </button>
+                    <div style="font-weight:700;font-size:0.92rem;">${escH(bot.name)}</div>
+                    <div style="font-size:0.72rem;color:#6b7280;">
+                        @${escH(bot.username || '—')} · ${bot.channel}
+                        · <span style="color:${bot.connected?'#22c55e':'#ef4444'};font-weight:600;">
+                            ${bot.connected ? '● Підключено' : '○ Не підключено'}
+                        </span>
                     </div>
                 </div>
-                <button onclick="confirmDeleteBot('${bot.id}')"
-                    style="margin-top:0.75rem;padding:0.45rem 1rem;background:#fee2e2;color:#ef4444;
-                    border:none;border-radius:7px;cursor:pointer;font-size:0.8rem;">
-                    Видалити бота
+                <button onclick="bpCheckBotStatus('${bot.id}')" id="btnCheckStatus"
+                    style="${btnGrayStyle}margin-left:auto;">
+                    Перевірити
                 </button>
             </div>
-            <div style="background:white;border-radius:12px;padding:1rem;box-shadow:var(--shadow);">
-                <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.6rem;"><i data-lucide="bot" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> AI Ключ</div>
-                <div style="display:flex;gap:0.4rem;">
-                    <input type="password" id="botsOpenAIKey"
-                        value="${compData.openaiApiKey?'•••'+compData.openaiApiKey.slice(-4):''}"
-                        placeholder="sk-..."
-                        style="flex:1;padding:0.5rem;border:1px solid #e5e7eb;border-radius:7px;font-size:0.82rem;">
-                    <button onclick="saveBotApiKey('openai')"
-                        style="padding:0.5rem 0.8rem;background:#22c55e;color:white;border:none;border-radius:7px;cursor:pointer;font-size:0.8rem;font-weight:600;">
-                        Зберегти
-                    </button>
+            <div id="settingsStatusResult"></div>
+        </div>
+
+        <!-- Секція 2: Webhook URL -->
+        <div style="${sectionStyle}">
+            <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.75rem;">
+                🔗 Webhook URL
+            </div>
+            <label style="${labelStyle}">URL ДЛЯ TELEGRAM WEBHOOK</label>
+            <div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;">
+                <input readonly value="${escH(webhookUrl)}"
+                    style="${inputStyle}background:#f9fafb;color:#374151;font-size:0.74rem;cursor:text;"
+                    onclick="this.select()">
+                <button onclick="copyLink('${escH(webhookUrl)}')" style="${btnGrayStyle}">
+                    Копіювати
+                </button>
+            </div>
+            <div style="font-size:0.72rem;color:#6b7280;">
+                Цей URL вже встановлений автоматично при підключенні бота.
+                Якщо webhook перестав працювати — натисніть "Перевстановити".
+            </div>
+            <button onclick="bpReinstallWebhook('${bot.id}')" id="btnReinstall"
+                style="margin-top:0.6rem;${btnGreenStyle}">
+                ↺ Перевстановити webhook
+            </button>
+            <div id="webhookResult" style="margin-top:0.5rem;font-size:0.76rem;"></div>
+        </div>
+
+        <!-- Секція 3: Токен бота -->
+        <div style="${sectionStyle}">
+            <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.75rem;">
+                🔑 Токен бота
+            </div>
+            <label style="${labelStyle}">ПОТОЧНИЙ ТОКЕН</label>
+            <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.75rem;">
+                <div style="flex:1;padding:0.5rem 0.6rem;background:#f9fafb;border:1.5px solid #e5e7eb;
+                    border-radius:9px;font-size:0.78rem;color:#6b7280;font-family:monospace;">
+                    ${bot.token ? '•••••••••' + bot.token.slice(-8) : 'Не встановлено'}
                 </div>
             </div>
-        </div>`;
-    lcIcons(c);
+            <label style="${labelStyle}">ЗАМІНИТИ ТОКЕН</label>
+            <div style="display:flex;gap:0.4rem;">
+                <input type="password" id="bpSettingsToken"
+                    placeholder="Новий токен від @BotFather..."
+                    style="${inputStyle}flex:1;">
+                <button onclick="bpReconnectBot('${bot.id}')" style="${btnGreenStyle}">
+                    Замінити
+                </button>
+            </div>
+            <div style="font-size:0.71rem;color:#9ca3af;margin-top:0.35rem;">
+                Токен не починається з бота — він потрібен тільки серверу. Нікому не передавай.
+            </div>
+        </div>
+
+        <!-- Секція 4: AI ключ -->
+        <div style="${sectionStyle}">
+            <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.75rem;">
+                🤖 OpenAI / Claude API ключ
+            </div>
+            <label style="${labelStyle}">OPENAI (GPT-4o-mini, GPT-4o)</label>
+            <div style="display:flex;gap:0.4rem;margin-bottom:0.75rem;">
+                <input type="password" id="settingsOpenAIKey"
+                    value="${compData.openaiApiKey ? '•••••' + compData.openaiApiKey.slice(-4) : ''}"
+                    placeholder="sk-..."
+                    style="${inputStyle}flex:1;">
+                <button onclick="settingsSaveApiKey('openai')" style="${btnGreenStyle}">
+                    Зберегти
+                </button>
+            </div>
+            <label style="${labelStyle}">ANTHROPIC CLAUDE (claude-3-5-haiku)</label>
+            <div style="display:flex;gap:0.4rem;">
+                <input type="password" id="settingsAnthropicKey"
+                    value="${compData.anthropicApiKey ? '•••••' + compData.anthropicApiKey.slice(-4) : ''}"
+                    placeholder="sk-ant-..."
+                    style="${inputStyle}flex:1;">
+                <button onclick="settingsSaveApiKey('anthropic')" style="${btnGreenStyle}">
+                    Зберегти
+                </button>
+            </div>
+            <div id="apiKeyResult" style="margin-top:0.4rem;font-size:0.76rem;"></div>
+        </div>
+
+        <!-- Секція 5: Сповіщення менеджеру -->
+        <div style="${sectionStyle}">
+            <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.75rem;">
+                🔔 Сповіщення менеджеру
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                <div>
+                    <div style="font-size:0.82rem;font-weight:600;">Telegram сповіщення</div>
+                    <div style="font-size:0.72rem;color:#6b7280;">Отримувати сповіщення при новому ліді</div>
+                </div>
+                <label style="position:relative;display:inline-block;width:42px;height:24px;cursor:pointer;">
+                    <input type="checkbox" id="settingsNotifyEnabled"
+                        ${notifyEnabled ? 'checked' : ''}
+                        onchange="settingsToggleNotify(this.checked)"
+                        style="opacity:0;width:0;height:0;">
+                    <span style="position:absolute;inset:0;background:${notifyEnabled?'#22c55e':'#d1d5db'};
+                        border-radius:24px;transition:0.2s;" id="settingsNotifyTrack"></span>
+                    <span style="position:absolute;left:${notifyEnabled?'20':'2'}px;top:2px;
+                        width:20px;height:20px;background:white;border-radius:50%;
+                        transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);" id="settingsNotifyThumb"></span>
+                </label>
+            </div>
+            <label style="${labelStyle}">TELEGRAM ID МЕНЕДЖЕРА</label>
+            <div style="display:flex;gap:0.4rem;margin-bottom:0.35rem;">
+                <input id="settingsNotifyTgId" type="text"
+                    value="${escH(notifyTg)}"
+                    placeholder="Наприклад: 123456789"
+                    style="${inputStyle}flex:1;">
+                <button onclick="settingsSaveNotify()" style="${btnGreenStyle}">
+                    Зберегти
+                </button>
+            </div>
+            <div style="font-size:0.71rem;color:#6b7280;">
+                Щоб дізнатись свій Telegram ID — напиши боту @userinfobot
+            </div>
+            <div id="notifyResult" style="margin-top:0.4rem;font-size:0.76rem;"></div>
+        </div>
+
+        <!-- Секція 6: Небезпечна зона -->
+        <div style="${sectionStyle}border:1.5px solid #fee2e2;">
+            <div style="font-weight:700;font-size:0.85rem;color:#ef4444;margin-bottom:0.6rem;">
+                ⚠️ Небезпечна зона
+            </div>
+            <div style="font-size:0.78rem;color:#6b7280;margin-bottom:0.75rem;">
+                Видалення бота видалить також усі його ланцюги. Контакти і переписка збережуться.
+            </div>
+            <button onclick="confirmDeleteBot('${bot.id}')"
+                style="padding:0.5rem 1rem;background:#fee2e2;color:#ef4444;
+                border:1.5px solid #fecaca;border-radius:9px;cursor:pointer;
+                font-size:0.82rem;font-weight:600;">
+                Видалити бота і ланцюги
+            </button>
+        </div>
+
+    </div>`;
 }
 
+// ─────────────────────────────────────────
+// Перевірити статус бота
+// ─────────────────────────────────────────
+window.bpCheckBotStatus = async function(botId) {
+    const btn = document.getElementById('btnCheckStatus');
+    const result = document.getElementById('settingsStatusResult');
+    if (btn) { btn.textContent = '...'; btn.disabled = true; }
+
+    const bot = bp.bots.find(b => b.id === botId);
+    if (!bot?.token) {
+        if (result) result.innerHTML = `<div style="color:#ef4444;font-size:0.78rem;">Токен не встановлений</div>`;
+        if (btn) { btn.textContent = 'Перевірити'; btn.disabled = false; }
+        return;
+    }
+
+    try {
+        // Перевіряємо бота через Telegram
+        const meRes = await fetch(`https://api.telegram.org/bot${bot.token}/getMe`);
+        const me = await meRes.json();
+
+        // Перевіряємо webhook
+        const whRes = await fetch(`https://api.telegram.org/bot${bot.token}/getWebhookInfo`);
+        const wh = await whRes.json();
+        const whInfo = wh.result || {};
+
+        if (result) result.innerHTML = `
+            <div style="background:#f0fdf4;border-radius:10px;padding:0.65rem;border:1px solid #bbf7d0;">
+                <div style="font-size:0.78rem;display:flex;flex-direction:column;gap:4px;">
+                    <div>✅ Бот: <b>@${me.result?.username || '—'}</b> (${me.result?.first_name || ''})</div>
+                    <div style="color:${whInfo.url ? '#16a34a' : '#ef4444'};">
+                        ${whInfo.url ? '✅' : '❌'} Webhook: ${whInfo.url ? 'встановлено' : 'не встановлено'}
+                    </div>
+                    ${whInfo.last_error_message ? `<div style="color:#ef4444;">⚠️ Остання помилка: ${escH(whInfo.last_error_message)}</div>` : ''}
+                    <div style="color:#6b7280;">Очікуваних оновлень: ${whInfo.pending_update_count || 0}</div>
+                </div>
+            </div>`;
+
+        // Оновлюємо статус в Firestore якщо змінився
+        if (me.ok && !bot.connected) {
+            await firebase.firestore()
+                .doc(`companies/${window.currentCompanyId}/bots/${botId}`)
+                .update({ connected: true, username: me.result.username });
+        }
+
+    } catch(e) {
+        if (result) result.innerHTML = `<div style="color:#ef4444;font-size:0.78rem;">Помилка: ${escH(e.message)}</div>`;
+    }
+
+    if (btn) { btn.textContent = 'Перевірити'; btn.disabled = false; }
+};
+
+// ─────────────────────────────────────────
+// Перевстановити webhook
+// ─────────────────────────────────────────
+window.bpReinstallWebhook = async function(botId) {
+    const btn = document.getElementById('btnReinstall');
+    const result = document.getElementById('webhookResult');
+    if (btn) { btn.textContent = '...'; btn.disabled = true; }
+
+    const bot = bp.bots.find(b => b.id === botId);
+    if (!bot?.token) {
+        if (result) result.innerHTML = `<div style="color:#ef4444;">Спочатку введіть токен</div>`;
+        if (btn) { btn.textContent = '↺ Перевстановити webhook'; btn.disabled = false; }
+        return;
+    }
+
+    try {
+        const webhookUrl = `https://test-talko-task-manager-test-production.up.railway.app/api/webhook?companyId=${window.currentCompanyId}&channel=${bot.channel}`;
+        const res = await fetch(`https://api.telegram.org/bot${bot.token}/setWebhook`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: webhookUrl, allowed_updates: ['message', 'callback_query'] }),
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+            await firebase.firestore()
+                .doc(`companies/${window.currentCompanyId}/bots/${botId}`)
+                .update({ connected: true, webhookUrl, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            if (result) result.innerHTML = `<div style="color:#22c55e;font-weight:600;">✅ Webhook встановлено</div>`;
+            if (typeof showToast === 'function') showToast('Webhook встановлено ✓', 'success');
+        } else {
+            throw new Error(data.description);
+        }
+    } catch(e) {
+        if (result) result.innerHTML = `<div style="color:#ef4444;">❌ ${escH(e.message)}</div>`;
+    }
+
+    if (btn) { btn.textContent = '↺ Перевстановити webhook'; btn.disabled = false; }
+};
+
+// ─────────────────────────────────────────
+// Замінити токен і перепідключити
+// ─────────────────────────────────────────
 window.bpReconnectBot = async function(botId) {
-    const tokenEl = document.getElementById('bpSettingsToken');
-    const token = tokenEl?.value.trim();
+    const token = document.getElementById('bpSettingsToken')?.value.trim();
     if (!token || token.includes('•')) { alert('Введіть новий токен'); return; }
+
     try {
         const meRes = await fetch(`https://api.telegram.org/bot${token}/getMe`);
-        const meData = await meRes.json();
-        if (!meData.ok) throw new Error(meData.description);
-        const webhookUrl = `${location.origin}/api/webhook?companyId=${window.currentCompanyId}&channel=telegram`;
-        await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ url: webhookUrl }),
+        const me = await meRes.json();
+        if (!me.ok) throw new Error(me.description);
+
+        const webhookUrl = `https://test-talko-task-manager-test-production.up.railway.app/api/webhook?companyId=${window.currentCompanyId}&channel=telegram`;
+        const whRes = await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: webhookUrl, allowed_updates: ['message', 'callback_query'] }),
         });
-        await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-            .collection('bots').doc(botId)
-            .update({ token, username: meData.result.username, connected: true, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        if (typeof showToast==='function') showToast('✅ Перепідключено успішно', 'success');
+        const wh = await whRes.json();
+
+        await firebase.firestore()
+            .doc(`companies/${window.currentCompanyId}/bots/${botId}`)
+            .update({
+                token, username: me.result.username,
+                connected: wh.ok, webhookUrl,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            });
+
+        // Оновлюємо в integrations для сумісності з webhook.js
+        await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
+            'integrations.telegram.botToken': token,
+            'integrations.telegram.botName': me.result.username,
+        });
+
+        if (typeof showToast === 'function') showToast(`✅ Токен оновлено, @${me.result.username} підключено`, 'success');
+        document.getElementById('bpSettingsToken').value = '';
         renderSettingsTab();
-    } catch(e) { alert('Помилка: '+e.message); }
+    } catch(e) { alert('Помилка: ' + e.message); }
+};
+
+// ─────────────────────────────────────────
+// Зберегти API ключ
+// ─────────────────────────────────────────
+window.settingsSaveApiKey = window.saveBotApiKey = async function(type) {
+    const keyEl = type === 'openai'
+        ? document.getElementById('settingsOpenAIKey')
+        : document.getElementById('settingsAnthropicKey');
+    const key = keyEl?.value.trim();
+    if (!key || key.includes('•')) { alert('Введіть новий ключ'); return; }
+
+    const result = document.getElementById('apiKeyResult');
+    try {
+        const field = type === 'openai' ? 'openaiApiKey' : 'anthropicApiKey';
+        await firebase.firestore()
+            .collection('companies').doc(window.currentCompanyId)
+            .update({ [field]: key, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        if (keyEl) keyEl.value = '•••••' + key.slice(-4);
+        if (result) result.innerHTML = `<span style="color:#22c55e;font-weight:600;">✅ Збережено</span>`;
+        setTimeout(() => { if (result) result.innerHTML = ''; }, 3000);
+    } catch(e) {
+        if (result) result.innerHTML = `<span style="color:#ef4444;">❌ ${escH(e.message)}</span>`;
+    }
+};
+
+// ─────────────────────────────────────────
+// Сповіщення менеджеру
+// ─────────────────────────────────────────
+window.settingsToggleNotify = async function(enabled) {
+    const track = document.getElementById('settingsNotifyTrack');
+    const thumb = document.getElementById('settingsNotifyThumb');
+    if (track) track.style.background = enabled ? '#22c55e' : '#d1d5db';
+    if (thumb) thumb.style.left = enabled ? '20px' : '2px';
+    await firebase.firestore()
+        .collection('companies').doc(window.currentCompanyId)
+        .update({ notifyEnabled: enabled });
+};
+
+window.settingsSaveNotify = async function() {
+    const tgId = document.getElementById('settingsNotifyTgId')?.value.trim();
+    const result = document.getElementById('notifyResult');
+    try {
+        await firebase.firestore()
+            .collection('companies').doc(window.currentCompanyId)
+            .update({ notifyTelegramId: tgId, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        if (result) result.innerHTML = `<span style="color:#22c55e;font-weight:600;">✅ Збережено</span>`;
+        setTimeout(() => { if (result) result.innerHTML = ''; }, 3000);
+    } catch(e) {
+        if (result) result.innerHTML = `<span style="color:#ef4444;">❌ ${escH(e.message)}</span>`;
+    }
 };
 
 // ── Helpers ────────────────────────────────────────────────
