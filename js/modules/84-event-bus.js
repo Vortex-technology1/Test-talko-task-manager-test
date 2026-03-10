@@ -86,14 +86,14 @@ function onTalkoEvent(eventType, handler) {
 // ПУБЛІКАЦІЯ ПОДІЇ
 // ─────────────────────────────────────────
 async function emitTalkoEvent(eventType, payload = {}, options = {}) {
-    if (!currentUser || !appState.currentCompanyId) return;
+    if (!currentUser || !window.currentCompanyId) return;
 
     const event = {
         type: eventType,
         payload,
         triggeredBy: options.triggeredBy || 'user',   // 'user' | 'bot' | 'system'
         triggeredByUserId: currentUser.uid,
-        companyId: appState.currentCompanyId,
+        companyId: window.currentCompanyId,
         processed: false,
         // TTL: автоматичне видалення через 7 днів (Cloud Function або ручний cleanup)
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
@@ -105,7 +105,7 @@ async function emitTalkoEvent(eventType, payload = {}, options = {}) {
 
     // 2. Зберігаємо в Firestore (для automation engine і аудиту)
     try {
-        const ref = db.collection(`companies/${appState.currentCompanyId}/events`);
+        const ref = db.collection(`companies/${window.currentCompanyId}/events`);
         await ref.add(event);
     } catch (err) {
         console.warn('[EventBus] Failed to persist event:', eventType, err);
@@ -259,7 +259,7 @@ async function _runAutomationRules(event) {
 // Дія: створити клієнта + угоду в CRM
 async function _actionCreateClientAndDeal(event, params = {}) {
     const p = event.payload;
-    const companyId = appState.currentCompanyId;
+    const companyId = window.currentCompanyId;
     const batch = db.batch();
     const now = firebase.firestore.FieldValue.serverTimestamp();
 
@@ -401,7 +401,7 @@ async function _actionCreateClientAndDeal(event, params = {}) {
 // Дія: створити задачу TALKO прив'язану до угоди
 async function _actionCreateTask(event, params = {}) {
     if (!params.title) return;
-    const companyId = appState.currentCompanyId;
+    const companyId = window.currentCompanyId;
 
     const deadline = _calcDeadline(params.deadlineOffset || '+1d');
 
@@ -449,7 +449,7 @@ async function _actionCreateTask(event, params = {}) {
 async function _actionMarkDealWon(event) {
     const { dealId, invoiceId, amount } = event.payload;
     if (!dealId) return;
-    const companyId = appState.currentCompanyId;
+    const companyId = window.currentCompanyId;
     const now = firebase.firestore.FieldValue.serverTimestamp();
     const batch = db.batch();
 
@@ -574,7 +574,7 @@ function _notifyManager(companyId, { title, body, dealId }) {
 
 // Завантаження кастомних правил з Firestore
 async function _loadCustomRules() {
-    if (!appState.currentCompanyId) return [];
+    if (!window.currentCompanyId) return [];
 
     // Кеш на 5 хвилин
     const CACHE_KEY = '_talko_rules_cache';
@@ -583,7 +583,7 @@ async function _loadCustomRules() {
 
     try {
         const snap = await db
-            .collection(`companies/${appState.currentCompanyId}/automation_rules`)
+            .collection(`companies/${window.currentCompanyId}/automation_rules`)
             .where('active', '==', true)
             .get();
 
@@ -647,10 +647,10 @@ onTalkoEvent('*', (e) => {
 // Запускається раз при старті, якщо є права
 // ─────────────────────────────────────────
 async function _cleanupExpiredEvents() {
-    if (!appState.currentCompanyId) return;
+    if (!window.currentCompanyId) return;
     try {
         const snap = await db
-            .collection(`companies/${appState.currentCompanyId}/events`)
+            .collection(`companies/${window.currentCompanyId}/events`)
             .where('expiresAt', '<', new Date())
             .limit(50) // batch по 50 щоб не перевантажити
             .get();
