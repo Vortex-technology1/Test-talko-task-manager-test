@@ -277,7 +277,7 @@ module.exports = async (req, res) => {
                 if (session.aiHistory.length > 20) session.aiHistory = session.aiHistory.slice(-20);
 
                 // Проміжне повідомлення поки AI думає
-                await sendTg(botToken, normalized.senderId, '⏳ Аналізую вашу інформацію...');
+                await sendTg(botToken, normalized.senderId, '⏳ Секунду, готую відповідь...');
 
                 const rawReply = await callAI(n, normalized.text, session, compRef);
 
