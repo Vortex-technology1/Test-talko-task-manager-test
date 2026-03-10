@@ -307,7 +307,9 @@ async function _actionCreateClientAndDeal(event, params = {}) {
 
     // 3. Завантажуємо дефолтну воронку
     const pipeline = await _getDefaultPipeline(companyId);
-    const firstStage = pipeline?.stages?.[0]?.name || 'Новий лід';
+    // stage зберігаємо як ID (не label) — CRM v2.0 очікує id ('new', 'contact', etc.)
+    const firstStageId    = pipeline?.stages?.[0]?.id    || 'new';
+    const firstStageColor = pipeline?.stages?.[0]?.color || '#6b7280';
 
     // 4. Створюємо угоду
     const dealRef = db.collection(`companies/${companyId}/crm_deals`).doc();
@@ -319,8 +321,8 @@ async function _actionCreateClientAndDeal(event, params = {}) {
         clientId,
         clientName: p.senderName || p.name || '',
         clientNiche: p.business_type || '',
-        stage: firstStage,
-        stageColor: pipeline?.stages?.[0]?.color || '#3b82f6',
+        stage: firstStageId,
+        stageColor: firstStageColor,
         status: 'open',
         result: null,
         amount: 0,
@@ -355,7 +357,7 @@ async function _actionCreateClientAndDeal(event, params = {}) {
     const histRef = db.doc(`companies/${companyId}/crm_deals/${dealId}/history/created`);
     batch.set(histRef, {
         type: 'created',
-        stage: firstStage,
+        stage: firstStageId,
         note: event.type === TALKO_EVENTS.FORM_SUBMITTED
             ? 'Угода створена автоматично із форми сайту'
             : 'Угода створена автоматично із Telegram воронки',
@@ -380,7 +382,7 @@ async function _actionCreateClientAndDeal(event, params = {}) {
         clientId,
         clientName: p.senderName || p.name || '',
         dealTitle: `Лід: ${p.senderName || p.name || ''}`,
-        stage: firstStage,
+        stage: firstStageId,
         assignedToId: p.assignedToId || currentUser?.uid,
         assignedToName: p.assignedToName || '',
     }, { triggeredBy: 'system' });
