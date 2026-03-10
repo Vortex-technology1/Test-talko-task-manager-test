@@ -357,11 +357,36 @@ service cloud.firestore {
         allow delete: if isManagerOrOwner(companyId);
       }
 
-      // BOTS — FLOWS
+      // BOTS — підколекція ботів з флоу і промптами
+      match /bots/{botId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+
+        match /flows/{flowId} {
+          allow read: if isCompanyMember(companyId);
+          allow create, update: if isManagerOrOwner(companyId);
+          allow delete: if isManagerOrOwner(companyId);
+
+          // Великі AI промпти зберігаються окремо (обхід ліміту 1MB)
+          match /nodePrompts/{nodeId} {
+            allow read: if isCompanyMember(companyId);
+            allow write: if isManagerOrOwner(companyId);
+          }
+        }
+      }
+
+      // BOTS — FLOWS (root level)
       match /flows/{flowId} {
         allow read: if isCompanyMember(companyId);
         allow create, update: if isManagerOrOwner(companyId);
         allow delete: if isManagerOrOwner(companyId);
+
+        // Великі AI промпти зберігаються окремо (щоб обійти ліміт 1MB)
+        match /nodePrompts/{nodeId} {
+          allow read: if isCompanyMember(companyId);
+          allow write: if isManagerOrOwner(companyId);
+        }
       }
 
       // BOTS — SESSIONS
