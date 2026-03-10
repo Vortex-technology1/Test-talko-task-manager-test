@@ -598,7 +598,7 @@ function buildNodeEl(node) {
                 background:${connected ? portColor : 'white'};
                 border:2.5px solid ${connected ? portColor : '#9ca3af'};
                 cursor:crosshair;transition:all 0.15s;position:relative;z-index:4;"
-                title="${label}"
+                title="${(portId === 'out' || portId === 'btn') ? '' : label}"
                 onmouseenter="this.style.background='${portColor}';this.style.borderColor='${portColor}';this.style.transform='scale(1.3)'"
                 onmouseleave="this.style.background='${connected ? portColor : 'white'}';this.style.borderColor='${connected ? portColor : '#9ca3af'}';this.style.transform='scale(1)'"
             ></div>
@@ -763,22 +763,23 @@ function renderEdges() {
             const btnIdx = parseInt(edge.fromPort.replace('btn_', ''), 10);
             portLabel = fromNode.config?.buttons?.[btnIdx]?.label || `Кнопка ${btnIdx + 1}`;
         }
-        if (portLabel) {
-            // Label на 1/4 шляху від source (не на середині — щоб не заважало)
-            const t = 0.25;
-            // Приблизна точка на кривій (лінійна інтерполяція)
-            const lx = from.x + (to.x - from.x) * t;
-            const ly = from.y + (to.y - from.y) * t;
+        // Показуємо label тільки для значущих портів (не "Продовжити")
+        const showLabel = portLabel && edge.fromPort !== 'out' && edge.fromPort !== 'btn';
+        if (showLabel) {
+            // Label близько до source порту (20% шляху)
+            const t = 0.18;
+            const lx = from.x + (to.x - from.x) * t + 8;
+            const ly = from.y + (to.y - from.y) * t - 10;
             const fontSize = 9;
-            const approxW = portLabel.length * 5.2 + 14;
+            const approxW = portLabel.length * 5.2 + 12;
 
             const pill = document.createElementNS('http://www.w3.org/2000/svg','rect');
             pill.setAttribute('x', lx - approxW/2);
-            pill.setAttribute('y', ly - fontSize - 2);
+            pill.setAttribute('y', ly - fontSize - 1);
             pill.setAttribute('width', approxW);
-            pill.setAttribute('height', fontSize + 7);
-            pill.setAttribute('rx', '5');
-            pill.setAttribute('fill', isError ? '#fff1f2' : '#f0fdf4');
+            pill.setAttribute('height', fontSize + 6);
+            pill.setAttribute('rx', '4');
+            pill.setAttribute('fill', isError ? '#fff1f2' : (edge.fromPort==='yes' ? '#f0fdf4' : '#fff7ed'));
             pill.setAttribute('stroke', color);
             pill.setAttribute('stroke-width', '1');
             pill.style.pointerEvents = 'none';
