@@ -528,28 +528,29 @@ document.addEventListener('mousedown', function(e) {
                     </div>
                 </div>
 
-                <!-- 8. CRM — показується тільки якщо features.crm увімкнено -->
-                <button class="tab-btn" onclick="switchTab('crm')" data-tab="crm" id="crmNavBtn" aria-label="CRM" style="display:none;position:relative;">
-                    <i data-lucide="users" class="icon"></i>
-                    <span>CRM</span>
-                    <span id="crmNavBadge" style="display:none;position:absolute;top:4px;right:4px;background:#ef4444;color:white;border-radius:50%;width:16px;height:16px;font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;"></span>
-                </button>
-
-                <!-- 9. Маркетинг — показується якщо features.marketing увімкнено -->
-                <button class="tab-btn" onclick="switchTab('marketing')" data-tab="marketing" id="marketingNavBtn" aria-label="Маркетинг" style="display:none;">
-                    <i data-lucide="megaphone" class="icon"></i>
-                    <span>Маркетинг</span>
-                </button>
-
-                <!-- 10. Боти — показується якщо features.bots увімкнено -->
-                <button class="tab-btn" onclick="switchTab('bots')" data-tab="bots" id="botsNavBtn" aria-label="Боти" style="display:none;">
-                    <i data-lucide="bot" class="icon"></i>
-                    <span>Боти</span>
-                </button>
-                <button class="tab-btn" onclick="switchTab('sites')" data-tab="sites" id="sitesNavBtn" aria-label="Сайти" style="display:none;">
-                    <i data-lucide="globe" class="icon"></i>
-                    <span>Сайти</span>
-                </button>
+                <!-- 8-11. Бізнес dropdown: CRM / Маркетинг / Боти / Сайти -->
+                <div style="position:relative;display:inline-block;" id="bizTabDropdown">
+                    <button class="tab-btn" onclick="toggleNavDropdown('bizTabMenu','bizTabDropdown',event)" id="bizNavBtn" aria-label="Бізнес" style="display:none;position:relative;">
+                        <i data-lucide="briefcase" class="icon"></i>
+                        <span>Бізнес</span>
+                        <span id="crmNavBadge" style="display:none;position:absolute;top:4px;right:4px;background:#ef4444;color:white;border-radius:50%;width:16px;height:16px;font-size:0.65rem;font-weight:700;align-items:center;justify-content:center;"></span>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.5;flex-shrink:0;margin-left:1px;"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div id="bizTabMenu" style="display:none;position:fixed;z-index:9999;background:white;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.13);min-width:180px;padding:0.35rem;">
+                        <button class="tab-btn _ntab" id="crmNavBtn" onclick="event.stopPropagation();switchTab('crm');closeNavDropdowns();" style="display:none;width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;gap:0.6rem;">
+                            <i data-lucide="users" class="icon icon-sm"></i><span>CRM</span>
+                        </button>
+                        <button class="tab-btn _ntab" id="marketingNavBtn" onclick="event.stopPropagation();switchTab('marketing');closeNavDropdowns();" style="display:none;width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;gap:0.6rem;">
+                            <i data-lucide="megaphone" class="icon icon-sm"></i><span>Маркетинг</span>
+                        </button>
+                        <button class="tab-btn _ntab" id="botsNavBtn" onclick="event.stopPropagation();switchTab('bots');closeNavDropdowns();" style="display:none;width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;gap:0.6rem;">
+                            <i data-lucide="bot" class="icon icon-sm"></i><span>Боти</span>
+                        </button>
+                        <button class="tab-btn _ntab" id="sitesNavBtn" onclick="event.stopPropagation();switchTab('sites');closeNavDropdowns();" style="display:none;width:100%;text-align:left;border-radius:8px;padding:0.5rem 0.75rem;gap:0.6rem;">
+                            <i data-lucide="globe" class="icon icon-sm"></i><span>Сайти</span>
+                        </button>
+                    </div>
+                </div>
 
 
 

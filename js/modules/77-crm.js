@@ -92,9 +92,10 @@ async function _loadAll() {
 
     const dealUnsub = base.collection('crm_deals')
         .where('pipelineId', '==', crm.pipeline.id)
-        .orderBy('createdAt', 'desc').limit(200)
+        .limit(200)
         .onSnapshot(snap => {
-            crm.deals = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            crm.deals = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a,b) => (b.createdAt?.toMillis?.()??0) - (a.createdAt?.toMillis?.()??0));
             crm.loading = false;
             if (crm.subTab === 'kanban') _renderKanban();
             _updateNavBadge();
@@ -102,7 +103,7 @@ async function _loadAll() {
     crm.unsubs.push(dealUnsub);
 
     const clientSnap = await base.collection('crm_clients')
-        .orderBy('createdAt', 'desc').limit(100).get();
+        .limit(100).get();
     crm.clients = clientSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 

@@ -103,24 +103,33 @@
                 // Гарантує що companyFeatures вже встановлені в loadAllData
                 window.addEventListener('talko:featuresLoaded', function _onFeatures() {
                     window.removeEventListener('talko:featuresLoaded', _onFeatures);
+                    // Бізнес dropdown — показуємо якщо є хоча б одна feature
+                    let hasBizFeature = false;
                     if (window.isFeatureEnabled && window.isFeatureEnabled('crm')) {
                         const crmBtn = document.getElementById('crmNavBtn');
                         if (crmBtn) crmBtn.style.display = '';
                         if (typeof initCRMModule === 'function') initCRMModule();
+                        hasBizFeature = true;
                     }
                     if (window.isFeatureEnabled && window.isFeatureEnabled('marketing')) {
                         const mktBtn = document.getElementById('marketingNavBtn');
                         if (mktBtn) mktBtn.style.display = '';
+                        hasBizFeature = true;
                     }
                     if (window.isFeatureEnabled && window.isFeatureEnabled('bots')) {
                         const botsBtn = document.getElementById('botsNavBtn');
                         if (botsBtn) botsBtn.style.display = '';
                         if (typeof initBotsModule === 'function') initBotsModule();
+                        hasBizFeature = true;
                     }
                     if (window.isFeatureEnabled && window.isFeatureEnabled('sites')) {
                         const sitesBtn = document.getElementById('sitesNavBtn');
                         if (sitesBtn) sitesBtn.style.display = '';
-                        if (typeof initSitesModule === 'function') initSitesModule();
+                        hasBizFeature = true;
+                    }
+                    if (hasBizFeature) {
+                        const bizBtn = document.getElementById('bizNavBtn');
+                        if (bizBtn) bizBtn.style.display = '';
                     }
 
                     // Відновлюємо останній активний таб після F5
