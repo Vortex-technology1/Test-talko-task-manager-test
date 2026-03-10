@@ -101,6 +101,27 @@ module.exports = async (req, res) => {
         }
         if (!botToken) return res.status(200).json({ ok: true, skipped: 'no token' });
 
+        // ── Зберігаємо ВСІ вхідні повідомлення від юзера ───
+        // Це робить повну переписку в contacts/{id}/messages/
+        // для перегляду в чаті менеджером (незалежно від стану флоу)
+        const contactId = `${channel}_${normalized.senderId}`;
+        // Не зберігаємо /start і технічні команди
+        if (normalized.text && !normalized.text.startsWith('/start') && normalized.text !== 'start') {
+            try {
+                await db.collection('companies').doc(companyId)
+                    .collection('contacts').doc(contactId)
+                    .collection('messages').add({
+                        text:      normalized.text,
+                        from:      'user',
+                        direction: 'in',
+                        read:      false,
+                        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                    });
+                // lastMessage + unreadCount (тільки якщо не в активному флоу — перевіримо пізніше)
+                // unreadCount оновлюється в saveIncomingMessage якщо флоу завершений
+            } catch(e) { console.error('[saveMsg]', e.message); }
+        }
+
         // Підтверджуємо callback_query одразу (прибирає "годинник" на кнопці)
         if (callbackQueryId && botToken) {
             fetch(`https://api.telegram.org/bot${botToken}/answerCallbackQuery`, {
@@ -165,7 +186,9 @@ module.exports = async (req, res) => {
 
         if (!flow) {
             if (isStart) await sendTg(botToken, normalized.senderId, 'Вітаємо! Бот активний ✅');
-            return res.status(200).json({ ok: true, skipped: 'no flow' });
+            // Немає активного флоу — зберігаємо як вхідне повідомлення для ручного чату
+            await saveIncomingMessage(compRef, channel, normalized, botDocId);
+            return res.status(200).json({ ok: true, saved: 'no-flow-incoming' });
         }
 
         // ── Підвантажуємо canvasData + nodePrompts з підколекцій ──
@@ -299,6 +322,7 @@ module.exports = async (req, res) => {
                 await sendTyping(botToken, normalized.senderId);
                 const btns = n.buttons?.length ? n.buttons : (n.options?.length ? n.options : null);
                 await sendTg(botToken, normalized.senderId, text, btns);
+                await saveBotMessage(compRef, contactId, text);
                 if (btns?.length) {
                     Object.assign(session, { currentFlowId: flow.id, currentBotId: flow.botId,
                         currentNodeId: nodeId, waitingForInput: nodeId });
@@ -361,6 +385,7 @@ module.exports = async (req, res) => {
                         await editTg(botToken, normalized.senderId, thinkingMsgId, cleanReply, aiBtns.length ? aiBtns : null);
                     } else {
                         await sendTg(botToken, normalized.senderId, cleanReply, aiBtns.length ? aiBtns : null);
+                        await saveBotMessage(compRef, contactId, cleanReply);
                     }
                 }
 
@@ -409,7 +434,11 @@ module.exports = async (req, res) => {
                 nodeId = n.nextNode || null;
 
             } else if (n.type === 'end' || n.type === 'finish') {
-                if (n.text) await sendTg(botToken, normalized.senderId, interp(n.text, session.data));
+                if (n.text) {
+                    const endText = interp(n.text, session.data);
+                    await sendTg(botToken, normalized.senderId, endText);
+                    await saveBotMessage(compRef, contactId, endText);
+                }
                 await finish(session, flow, compRef, channel);
                 nodeId = null;
                 break;
@@ -433,6 +462,15 @@ module.exports = async (req, res) => {
         // FIX 3: видаляємо технічні поля перед збереженням
         const { _botToken, ...sessionToSave } = session;
         await sessionRef.set(sessionToSave, { merge: true });
+
+        // Якщо повідомлення прийшло коли флоу вже завершений (не /start, не кнопка)
+        // і воно не було оброблено флоу — зберігаємо для ручного чату менеджера
+        if (!isStart && !session.waitingForInput && sessionToSave.currentFlowId === null) {
+            const wasFlowMessage = session._handledByFlow;
+            if (!wasFlowMessage) {
+                await saveIncomingMessage(compRef, channel, normalized, botDocId || session.currentBotId);
+            }
+        }
         return res.status(200).json({ ok: true });
 
     } catch(err) {
@@ -624,6 +662,27 @@ async function callAI(node, userText, session, compRef, compData) {
     }
 }
 
+// Зберегти повідомлення бота в contacts/{id}/messages/
+async function saveBotMessage(compRef, contactId, text) {
+    if (!compRef || !contactId || !text) return;
+    try {
+        const clean = (text||'').replace(/<[^>]+>/g, '').trim(); // strip HTML теги
+        await compRef.collection('contacts').doc(contactId)
+            .collection('messages').add({
+                text:      clean.slice(0, 2000),
+                from:      'bot',
+                direction: 'out',
+                read:      true,
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            });
+        await compRef.collection('contacts').doc(contactId).set({
+            lastMessage:     clean.slice(0, 100),
+            lastMessageAt:   admin.firestore.FieldValue.serverTimestamp(),
+            lastMessageFrom: 'bot',
+        }, { merge: true });
+    } catch(e) { console.error('[saveBotMsg]', e.message); }
+}
+
 async function sendTg(token, chatId, text, buttons) {
     if (!token || !chatId) return;
     // Конвертуємо markdown bold/italic в HTML для Telegram
@@ -700,6 +759,44 @@ async function editTg(token, chatId, messageId, text, buttons) {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
         });
     } catch(e) { console.error('[editTg]', e.message); }
+}
+
+// ─────────────────────────────────────────
+// Зберегти вхідне повідомлення юзера для ручного чату
+// Викликається коли флоу завершений або відсутній
+// ─────────────────────────────────────────
+async function saveIncomingMessage(compRef, channel, normalized, botId) {
+    try {
+        const contactId = `${channel}_${normalized.senderId}`;
+        const msgData = {
+            text:      normalized.text,
+            from:      'user',
+            direction: 'in',
+            read:      false,
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        };
+
+        // Пишемо в contacts/{id}/messages/
+        await compRef.collection('contacts').doc(contactId)
+            .collection('messages').add(msgData);
+
+        // Оновлюємо контакт: lastMessage + unreadCount++
+        await compRef.collection('contacts').doc(contactId).set({
+            senderId:      normalized.senderId,
+            senderName:    normalized.senderName || '',
+            channel,
+            botId:         botId || null,
+            lastMessage:   normalized.text.slice(0, 100),
+            lastMessageAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastMessageFrom: 'user',
+            unreadCount:   admin.firestore.FieldValue.increment(1),
+            updatedAt:     admin.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true });
+
+        console.log(`[saveIncoming] ${contactId}: "${normalized.text.slice(0, 50)}"`);
+    } catch(e) {
+        console.error('[saveIncoming]', e.message);
+    }
 }
 
 async function finish(session, flow, compRef, channel) {
