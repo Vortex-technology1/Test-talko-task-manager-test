@@ -675,23 +675,40 @@ function renderEdges() {
         line.setAttribute('stroke-width','2.5');
         line.setAttribute('marker-end', `url(#${markerId})`);
 
-        // Port label on edge
+        // Port label on edge — pill з фоном, позиціонується біля порту виходу
         let portLabel = PORT_LABELS[edge.fromPort];
         if (!portLabel && edge.fromPort?.startsWith('btn_')) {
             const btnIdx = parseInt(edge.fromPort.replace('btn_', ''), 10);
             portLabel = fromNode.config?.buttons?.[btnIdx]?.label || `Кнопка ${btnIdx + 1}`;
         }
-        if (portLabel && fromNode.outputs?.length > 1) {
-            const mx = (from.x + to.x) / 2;
-            const my = (from.y + to.y) / 2 - 8;
+        if (portLabel) {
+            const lx = from.x + 16;
+            const ly = from.y - 8;
+            const fontSize = 9;
+            const approxW = portLabel.length * 5.4 + 10;
+
+            const pill = document.createElementNS('http://www.w3.org/2000/svg','rect');
+            pill.setAttribute('x', lx - approxW/2);
+            pill.setAttribute('y', ly - fontSize - 1);
+            pill.setAttribute('width', approxW);
+            pill.setAttribute('height', fontSize + 6);
+            pill.setAttribute('rx', '4');
+            pill.setAttribute('fill', 'white');
+            pill.setAttribute('stroke', color);
+            pill.setAttribute('stroke-width', '1');
+            pill.style.pointerEvents = 'none';
+
             const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
-            txt.setAttribute('x', mx);
-            txt.setAttribute('y', my);
+            txt.setAttribute('x', lx);
+            txt.setAttribute('y', ly);
             txt.setAttribute('text-anchor','middle');
             txt.setAttribute('fill', color);
-            txt.setAttribute('font-size','10');
+            txt.setAttribute('font-size', String(fontSize));
+            txt.setAttribute('font-weight', '600');
             txt.setAttribute('font-family','system-ui,sans-serif');
+            txt.style.pointerEvents = 'none';
             txt.textContent = portLabel;
+            g.appendChild(pill);
             g.appendChild(txt);
         }
 
@@ -723,16 +740,23 @@ function getNodeHeight(node) {
 function bezier(x1, y1, x2, y2) {
     const dx = x2 - x1;
     const dy = y2 - y1;
-    if (dx >= 0) {
-        // Ціль справа — стандартна крива
-        const cp = Math.max(60, dx * 0.55);
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (dx >= 40) {
+        // Ціль справа — стандартна S-крива
+        const cp = Math.max(60, dx * 0.5);
         return `M${x1},${y1} C${x1+cp},${y1} ${x2-cp},${y2} ${x2},${y2}`;
+    } else if (dx >= -40) {
+        // Ціль майже по вертикалі — пряма з невеликим відхиленням
+        const cpY = Math.max(60, absDy * 0.5);
+        return `M${x1},${y1} C${x1},${y1+cpY} ${x2},${y2-cpY} ${x2},${y2}`;
     } else {
-        // Ціль зліва — петля через низ
-        const pad = 60;
-        const midY = Math.max(y1, y2) + pad;
-        const midX = (x1 + x2) / 2;
-        return `M${x1},${y1} C${x1+pad},${y1} ${x1+pad},${midY} ${midX},${midY} C${x2-pad},${midY} ${x2-pad},${y2} ${x2},${y2}`;
+        // Ціль зліва — обгинаємо через зовнішній бік (не через вузли)
+        const offsetX = Math.min(120, absDx * 0.6 + 60);
+        const offsetY = Math.max(80, absDy * 0.3 + 60);
+        // Виходимо вправо від source, заходимо вправо до target
+        return `M${x1},${y1} C${x1+offsetX},${y1} ${x1+offsetX},${y2+offsetY} ${(x1+x2)/2},${y2+offsetY} C${x2-offsetX},${y2+offsetY} ${x2-offsetX},${y2} ${x2},${y2}`;
     }
 }
 

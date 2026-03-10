@@ -173,16 +173,15 @@ module.exports = async (req, res) => {
 
         // Fallback: якщо flow.nodes порожній — беремо з canvasData
         if (runtimeNodes.length === 0 && flow.canvasData?.nodes?.length) {
-            runtimeNodes = flow.canvasData.nodes
-                .filter(n => n.id && n.type !== 'start')
+            runtimeNodes = restorePrompts(flow.canvasData.nodes
+                .filter(n => n.id && n.type !== 'start'))
                 .map(n => ({
                     id: n.id, type: n.type || 'message',
                     text: n.text || '',
                     nextNode: n.nextNode || null,
                     buttons: n.buttons || [],
                     options: n.options || [],
-                    config: n.config || n,  // зберігаємо весь об'єкт як config
-                    // top-level для сумісності
+                    config: n.config || n,
                     aiSystem: n.config?.aiSystem || n.aiSystem || n.systemPrompt || '',
                     aiApiKey: n.config?.aiApiKey || n.aiApiKey || n.apiKey || null,
                     aiModel: n.config?.aiModel || n.aiModel || n.model || 'gpt-4o-mini',
@@ -308,7 +307,12 @@ module.exports = async (req, res) => {
                 nodeId = evalFilter(n, session.data) ? n.trueNode : n.falseNode;
 
             } else if (n.type === 'action') {
-                await doAction(n, session);
+                // Зберігаємо останню AI відповідь в session.data для {{ai_response}}
+                if (session.aiHistory?.length) {
+                    const lastAI = [...session.aiHistory].reverse().find(m => m.role === 'assistant');
+                    if (lastAI) session.data.ai_response = lastAI.content;
+                }
+                await doAction(n, session, flow);
                 nodeId = n.nextNode || null;
 
             } else if (n.type === 'api') {
@@ -372,18 +376,25 @@ function interp(text, data) {
 }
 
 function evalFilter(node, data) {
-    const val = data[node.variable] || '';
-    switch(node.operator) {
-        case 'eq': return val === node.value;
-        case 'neq': return val !== node.value;
-        case 'contains': return String(val).includes(node.value);
-        case 'gt': return parseFloat(val) > parseFloat(node.value);
-        case 'lt': return parseFloat(val) < parseFloat(node.value);
+    // Підтримуємо обидва формати полів: condVar/condOp/condVal і variable/operator/value
+    const varName = node.condVar || node.variable || node.conditionField || '';
+    const op = node.condOp || node.operator || node.conditionOp || 'exists';
+    const expected = node.condVal || node.value || node.conditionValue || '';
+    const val = data[varName] || '';
+    switch(op) {
+        case 'eq': case 'equals': return String(val) === String(expected);
+        case 'neq': return String(val) !== String(expected);
+        case 'contains': return String(val).toLowerCase().includes(String(expected).toLowerCase());
+        case 'gt': return parseFloat(val) > parseFloat(expected);
+        case 'lt': return parseFloat(val) < parseFloat(expected);
+        case 'exists': return !!val;
+        case 'not_exists': return !val;
+        case 'starts_with': return String(val).startsWith(String(expected));
         default: return !!val;
     }
 }
 
-async function doAction(node, session) {
+async function doAction(node, session, flow) {
     if (node.actionType === 'set_var') {
         try {
             const p = typeof node.actionPayload === 'string' ? JSON.parse(node.actionPayload) : node.actionPayload;
@@ -510,12 +521,12 @@ async function sendTg(token, chatId, text, buttons) {
         .replace(/`(.*?)`/g, '<code>$1</code>');
     const payload = { chat_id: chatId, text: safeText, parse_mode: 'HTML' };
     if (buttons?.length) {
-        payload.reply_markup = { inline_keyboard: [
-            buttons.map((b, i) => b.url
+        // Кожна кнопка на окремому рядку (Telegram обрізає довгі рядки)
+        payload.reply_markup = { inline_keyboard: buttons.map((b, i) => [
+            b.url
                 ? { text: b.label || b.text || '?', url: b.url }
                 : { text: b.label || b.text || '?', callback_data: `btn_${i}` }
-            )
-        ]};
+        ])};
     }
     try {
         const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
