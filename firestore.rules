@@ -417,6 +417,135 @@ service cloud.firestore {
       match /cbCache/{cbId} {
         allow read, write: if false;
       }
+
+      // =====================
+      // CRM — CLIENTS
+      // =====================
+      match /crm_clients/{clientId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId);
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+
+      // =====================
+      // CRM — DEALS + підколекція history
+      // =====================
+      match /crm_deals/{dealId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId);
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+
+        // Підколекція: хронологія змін стадій (immutable — тільки create)
+        match /history/{histId} {
+          allow read: if isCompanyMember(companyId);
+          allow create: if isCompanyMember(companyId);
+          allow update, delete: if false;
+        }
+      }
+
+      // =====================
+      // CRM — PIPELINES (стадії воронки)
+      // =====================
+      match /crm_pipeline/{pipelineId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, update, delete: if isManagerOrOwner(companyId);
+      }
+
+      // =====================
+      // CRM — ACTIVITIES (лог дій)
+      // =====================
+      match /crm_activities/{activityId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId);
+        // Тільки автор або менеджер може редагувати нотатку
+        allow update: if isManagerOrOwner(companyId) ||
+          (isCompanyMember(companyId) && resource.data.userId == userId());
+        allow delete: if isManagerOrOwner(companyId);
+      }
+
+      // =====================
+      // CRM — STATS AGGREGATE (read-only для UI, пишуть тільки rules/functions)
+      // =====================
+      match /crm_stats/{docId} {
+        allow read: if isManagerOrOwner(companyId);
+        // Пишеться з фронтенду через batch при зміні угоди
+        allow write: if isCompanyMember(companyId);
+      }
+
+      // =====================
+      // AUTOMATION RULES
+      // =====================
+      match /automation_rules/{ruleId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, update, delete: if isManagerOrOwner(companyId);
+      }
+
+      // =====================
+      // CONTACTS — messages підколекція (чат)
+      // =====================
+      match /contacts/{contactId}/messages/{msgId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId);
+        // Тільки позначення read:true дозволено для member
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+
+      // =====================
+      // BROADCASTS (розсилки)
+      // =====================
+      match /broadcasts/{broadcastId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isManagerOrOwner(companyId);
+        allow update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+
+      // =====================
+      // SITES
+      // =====================
+      match /sites/{siteId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+
+        match /blocks/{blockId} {
+          allow read: if isCompanyMember(companyId);
+          allow write: if isManagerOrOwner(companyId);
+        }
+      }
+
+      // =====================
+      // SITE FORMS + SUBMISSIONS
+      // =====================
+      match /site_forms/{formId} {
+        allow read: if isCompanyMember(companyId);
+        allow create, update: if isManagerOrOwner(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+
+      match /form_submissions/{submissionId} {
+        allow read: if isCompanyMember(companyId);
+        // create: публічно (форма на сайті — без авторизації)
+        allow create: if true;
+        allow update: if isCompanyMember(companyId);
+        allow delete: if isManagerOrOwner(companyId);
+      }
+
+      // =====================
+      // EVENTS (event bus, TTL 7 днів)
+      // =====================
+      match /events/{eventId} {
+        allow read: if isCompanyMember(companyId);
+        allow create: if isCompanyMember(companyId) &&
+          isValidString(request.resource.data.type, 100);
+        // processed:true може виставляти будь-який member (automation engine)
+        allow update: if isCompanyMember(companyId) &&
+          request.resource.data.type == resource.data.type;
+        allow delete: if isSuperAdmin();
+      }
     }
     
     // =====================
