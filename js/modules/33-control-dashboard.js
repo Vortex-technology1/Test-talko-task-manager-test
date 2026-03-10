@@ -95,19 +95,19 @@
                     const d = parseDeadline(t).date;
                     return d && d < today && t.status !== 'done' && t.status !== 'review';
                 });
-                title = '🔴 Прострочені завдання';
+                title = t('dashOverdue');
             } else if (type === 'warning') {
                 filtered = filtered.filter(t => {
                     const d = parseDeadline(t).date;
                     return (d === today || d === tomorrow) && t.status !== 'done' && t.status !== 'review';
                 });
-                title = '🟡 Сьогодні і завтра';
+                title = t('dashTodayTomorrow');
             } else if (type === 'active') {
                 filtered = filtered.filter(t => t.status === 'progress');
-                title = '🔵 В роботі';
+                title = t('dashInProgress');
             } else if (type === 'completed') {
                 filtered = filtered.filter(t => t.status === 'done');
-                title = '🟢 Завершені';
+                title = t('dashDone');
             }
 
             // Підсвічуємо активну картку

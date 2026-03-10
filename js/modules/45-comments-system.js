@@ -184,7 +184,7 @@
 
         // Delete comment
         window.deleteComment = async function(commentId) {
-            const ok = await showConfirmModal('Видалити коментар?', { danger: true });
+            const ok = await showConfirmModal(t('confirmDeleteComment'), { danger: true });
             if (!ok) return;
             try {
                 await db.collection('companies').doc(currentCompany)

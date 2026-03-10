@@ -111,7 +111,7 @@
                     await batch.commit();
                     } catch(err) {
                         console.error('[Batch] commit failed:', err);
-                        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                        showToast && showToast(t('savingError'), 'error');
                     }
                 }
                 

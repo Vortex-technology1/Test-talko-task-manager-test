@@ -669,7 +669,6 @@
                 dateFilter: 'Дата',
                 aiAssistantsConfig: 'Налаштування AI',
                 aiGenerator: 'AI Генератор',
-                aiStructure: 'AI Структура',
                 aiStructureGenerator: 'AI Структура',
                 applyStructure: 'Застосувати',
                 businessDescriptionPh: 'Опишіть ваш бізнес...',
@@ -1118,7 +1117,7 @@
                 botsActionStopFlow: '⏹ Зупинити флоу',
                 botsEndNode: '🔴 Кінець ланцюга',
 },
-            ru: {
+ru: {
                 // Auth
                 authSubtitle: 'Управление задачами для бизнеса',
                 signInGoogle: 'Войти через Google',
@@ -1447,7 +1446,6 @@
                 analytics: 'Аналитика',
                 totalTasks: 'Всего задач',
                 completedTasks: 'Выполнено',
-                completionRate: 'Выполнение %',
                 avgTime: 'Сред. время',
                 byStatus: 'По статусам',
                 topPerformers: 'Топ исполнителей',
@@ -1768,6 +1766,8 @@
                 offlineMode: 'Офлайн режим',
                 result: 'Результат',
                 weeklyActivity: 'Активность за неделю',
+                noData: 'Нет данных',
+                completionRate: 'Выполнение %',
                 createdLabel: 'Создано',
                 doneLabel: 'Выполнено',
                 overdue3days: 'Просрочено 3+ дня',
@@ -1944,7 +1944,6 @@
                 loading: 'Загрузка...',
                 manager: 'Руководитель',
                 no: 'Нет',
-                noData: 'Нет данных',
                 ok: 'ОК',
                 overdueCount: 'Просрочено',
                 owner: 'Владелец',
@@ -2234,7 +2233,7 @@
                 botsActionStopFlow: '⏹ Остановить флоу',
                 botsEndNode: '🔴 Конец цепочки',
 },
-            pl: {
+pl: {
                 // Auth
                 authSubtitle: 'Zarządzanie zadaniami dla biznesu',
                 signInGoogle: 'Zaloguj przez Google',
@@ -3350,7 +3349,7 @@
                 botsActionStopFlow: '⏹ Zatrzymaj sekwencję',
                 botsEndNode: '🔴 Koniec sekwencji',
 },
-            en: {
+en: {
                 // Auth
                 authSubtitle: 'Business task management',
                 signInGoogle: 'Sign in with Google',
@@ -3851,7 +3850,6 @@
 
                 // Analytics
                 analytics: 'Analytics',
-                completionRate: 'Completion rate',
                 weeklyActivity: 'Weekly activity',
                 createdLabel: 'Created',
                 doneLabel: 'Done',
@@ -3989,7 +3987,6 @@
                 offlineMode: 'Offline mode',
                 notAssigned: 'Not assigned',
                 copied: 'Copied',
-                noData: 'No data',
                 moreItems: 'more',
                 showMore: 'Show more',
                 notToday: 'Not today',
@@ -4473,6 +4470,8 @@
                 botsActionStartFlow: '▶ Start flow',
                 botsActionStopFlow: '⏹ Stop flow',
                 botsEndNode: '🔴 End of flow',
+
+
 },
 
             de: {
@@ -5597,6 +5596,8 @@
             botsActionRemoveTag: '🗑 Tag entfernen',
             botsActionStartFlow: '▶ Flow starten',
             botsActionStopFlow: '⏹ Flow stoppen',
+
+
         },
 
         };

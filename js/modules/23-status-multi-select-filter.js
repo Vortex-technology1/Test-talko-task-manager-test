@@ -218,12 +218,12 @@
                 if (isEmptyAll) {
                     c.innerHTML = `<div class="empty-table" style="text-align:center;padding:3rem 1rem;">
                         <div style="margin-bottom:0.75rem;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div>
-                        <h3 style="margin-bottom:0.5rem;">${t('noTasks') || 'Задач ще немає'}</h3>
+                        <h3 style="margin-bottom:0.5rem;">${t('noTasks') || t('noTasksYet')}</h3>
                         <p style="color:#6b7280;margin-bottom:1rem;">${t('createFirstTask') || 'Створіть першу задачу для команди'}</p>
-                        <button class="btn btn-success" onclick="openTaskModal()">+ ${t('newTask') || 'Нова задача'}</button>
+                        <button class="btn btn-success" onclick="openTaskModal()">+ ${t('newTask') || t('newTask')}</button>
                     </div>`;
                 } else {
-                    c.innerHTML = `<div class="empty-table"><h3>${t('noTasksFound') || 'Нічого не знайдено'}</h3><p>${t('changeFilters') || 'Спробуйте змінити фільтри'}</p></div>`;
+                    c.innerHTML = `<div class="empty-table"><h3>${t('noTasksFound') || t('nothingFound')}</h3><p>${t('changeFilters') || t('tryChangeFilters')}</p></div>`;
                 }
                 return;
             }
@@ -383,7 +383,7 @@
                                     if (!taskDeadline) return '';
                                     if (od) {
                                         const daysAgo = Math.floor((new Date(today) - new Date(taskDeadline)) / 86400000);
-                                        const label = daysAgo === 1 ? '1 день тому' : daysAgo < 5 ? daysAgo + ' дні тому' : daysAgo + ' днів тому';
+                                        const label = daysAgo === 1 ? t('daysAgoOne') : daysAgo < 5 ? daysAgo + ' дні тому' : daysAgo + ' днів тому';
                                         return `<span class="mobile-task-deadline-badge overdue">${label}</span>`;
                                     }
                                     if (isToday) return `<span class="mobile-task-deadline-badge today">${task.timeEnd || t('today')}</span>`;

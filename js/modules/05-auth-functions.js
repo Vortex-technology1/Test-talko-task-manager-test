@@ -73,7 +73,7 @@
                 await batch.commit();
                 } catch(err) {
                     console.error('[Batch] commit failed:', err);
-                    showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                    showToast && showToast(t('savingError'), 'error');
                 }
                 
                 // Reload — onAuthStateChanged знайде companyId і зайде
@@ -378,7 +378,7 @@
                     await batch.commit();
                     } catch(err) {
                         console.error('[Batch] commit failed:', err);
-                        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                        showToast && showToast(t('savingError'), 'error');
                     }
                     console.log('[findUserCompany] Batch commit success, role:', inviteData.role);
                     

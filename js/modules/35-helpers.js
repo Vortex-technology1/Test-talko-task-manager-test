@@ -265,18 +265,18 @@
             
             if (tabName === 'tasks' || tabName === 'myday') {
                 fab.style.display = 'flex';
-                fab.setAttribute('aria-label', 'Додати задачу');
-                fab.setAttribute('title', 'Додати задачу');
+                fab.setAttribute('aria-label', t('addTask'));
+                fab.setAttribute('title', t('addTask'));
                 fab.onclick = () => openTaskModal();
             } else if (tabName === 'regular') {
                 fab.style.display = 'flex';
-                fab.setAttribute('aria-label', 'Додати регулярну задачу');
-                fab.setAttribute('title', 'Додати регулярну задачу');
+                fab.setAttribute('aria-label', t('addRegularTask'));
+                fab.setAttribute('title', t('addRegularTask'));
                 fab.onclick = () => openRegularTaskModal();
             } else if (tabName === 'projects') {
                 fab.style.display = 'flex';
-                fab.setAttribute('aria-label', 'Новий проєкт');
-                fab.setAttribute('title', 'Новий проєкт');
+                fab.setAttribute('aria-label', t('newProject'));
+                fab.setAttribute('title', t('newProject'));
                 fab.onclick = () => openProjectModal();
             } else {
                 fab.style.display = 'none';

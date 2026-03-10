@@ -2,7 +2,7 @@
         // FUNCTIONS STRUCTURE VIEW
         // =====================
         let currentFunctionsView = 'cards';
-        const DEFAULT_CATEGORIES = ['Управління', 'Люди', 'Залучення', 'Продаж', 'Фінанси', 'Підготовка', 'Виконання', 'Логістика'];
+        const DEFAULT_CATEGORIES = [t('funcCatManagement'), 'Люди', t('funcCatEngagement'), t('funcCatSales'), t('funcCatFinance'), t('funcCatPrep'), t('funcCatExecution'), t('funcCatLogistics')];
         
         function setFunctionsView(view) {
             currentFunctionsView = view;
@@ -352,7 +352,7 @@
                             await batch.commit();
                             } catch(err) {
                                 console.error('[Batch] commit failed:', err);
-                                showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                                showToast && showToast(t('savingError'), 'error');
                             }
                             batch = db.batch();
                             batchCount = 0;
@@ -374,7 +374,7 @@
                             await batch.commit();
                             } catch(err) {
                                 console.error('[Batch] commit failed:', err);
-                                showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                                showToast && showToast(t('savingError'), 'error');
                             }
                             batch = db.batch();
                             batchCount = 0;
@@ -397,7 +397,7 @@
                     await batch.commit();
                     } catch(err) {
                         console.error('[Batch] commit failed:', err);
-                        showToast && showToast('Помилка збереження. Спробуйте ще раз.', 'error');
+                        showToast && showToast(t('savingError'), 'error');
                     }
                 }
                 
