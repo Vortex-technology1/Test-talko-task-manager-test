@@ -228,26 +228,22 @@ function renderFlowsTab() {
 
     const bot = bp.bots.find(b=>b.id===bp.activeBotId);
     const statusColors = { active:'#22c55e', draft:'#9ca3af', paused:'#f97316' };
-
-    // Deep link base
     const botUsername = bot?.username || '';
     const webhookBase = `${location.origin}/api/webhook?companyId=${window.currentCompanyId}&channel=${bot?.channel||'telegram'}&botId=${bp.activeBotId}&flow=`;
 
     c.innerHTML = `
-        <!-- Bot breadcrumb -->
         <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;
             background:white;border-radius:10px;padding:0.6rem 0.75rem;box-shadow:var(--shadow);">
             <button onclick="bpSwitch('bots')"
-                style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:0.82rem;padding:0;">
-                <i data-lucide="bot" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"></i> Всі боти
+                style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:0.82rem;padding:0;display:flex;align-items:center;gap:4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                Всі боти
             </button>
             <span style="color:#9ca3af;">›</span>
-            <span style="font-weight:700;font-size:0.85rem;color:#374151;">
-                ${escH(bot?.name||'Бот')}
-            </span>
+            <span style="font-weight:700;font-size:0.85rem;color:#374151;">${escH(bot?.name||'Бот')}</span>
             <span style="background:${bot?.connected?'#f0fdf4':'#fee2e2'};
                 color:${bot?.connected?'#22c55e':'#ef4444'};
-                font-size:0.68rem;padding:1px 6px;border-radius:10px;font-weight:600;">
+                font-size:0.68rem;padding:1px 7px;border-radius:10px;font-weight:600;">
                 ${bot?.connected?'● Online':'○ Offline'}
             </span>
         </div>
@@ -255,19 +251,21 @@ function renderFlowsTab() {
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
             <div style="font-weight:700;font-size:0.95rem;">Ланцюги бота</div>
             <button onclick="openCreateFlowModal()"
-                style="padding:0.45rem 0.9rem;background:#22c55e;color:white;border:none;
-                border-radius:9px;cursor:pointer;font-weight:600;font-size:0.82rem;">
-                + Новий ланцюг
+                style="padding:0.42rem 0.85rem;background:#22c55e;color:white;border:none;
+                border-radius:9px;cursor:pointer;font-weight:600;font-size:0.8rem;
+                display:flex;align-items:center;gap:5px;box-shadow:0 1px 4px #22c55e44;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                Новий ланцюг
             </button>
         </div>
 
         ${bp.flows.length === 0 ? `
         <div style="text-align:center;padding:2.5rem;background:white;border-radius:14px;box-shadow:var(--shadow);">
-            <div style="font-size:2.5rem;margin-bottom:0.6rem;"><i data-lucide="link" style="width:15px;height:15px;display:inline-block;vertical-align:middle;"></i></div>
-            <div style="font-weight:600;margin-bottom:0.3rem;">Ланцюгів поки немає</div>
-            <div style="font-size:0.82rem;color:#6b7280;margin-bottom:1rem;">
-                Ланцюг — це сценарій діалогу з користувачем
+            <div style="margin-bottom:0.6rem;color:#9ca3af;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18-6-6 6-6"/><path d="m15 6 6 6-6 6"/></svg>
             </div>
+            <div style="font-weight:600;margin-bottom:0.3rem;">Ланцюгів поки немає</div>
+            <div style="font-size:0.82rem;color:#6b7280;margin-bottom:1rem;">Ланцюг — це сценарій діалогу з користувачем</div>
             <button onclick="openCreateFlowModal()"
                 style="padding:0.55rem 1.25rem;background:#22c55e;color:white;border:none;border-radius:9px;cursor:pointer;font-weight:600;">
                 + Створити ланцюг
@@ -278,65 +276,104 @@ function renderFlowsTab() {
                 const deepLink = botUsername
                     ? `https://t.me/${botUsername}?start=${flow.id}`
                     : webhookBase + flow.id;
+                const statusLabel = flow.status==='active' ? '🟢 active' : flow.status==='paused' ? '⏸ paused' : '⚫ draft';
+                const statusBg   = flow.status==='active' ? '#f0fdf4' : flow.status==='paused' ? '#fff7ed' : '#f9fafb';
+                const statusCol  = statusColors[flow.status]||'#9ca3af';
+                const nodeCount  = flow.nodes?.length||0;
                 return `
-                <div style="background:white;border-radius:12px;padding:0.85rem;
-                    box-shadow:var(--shadow);border-left:3px solid ${statusColors[flow.status]||'#9ca3af'};">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">
-                        <div style="flex:1;min-width:0;">
-                            <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.2rem;">
-                                <span style="font-weight:700;font-size:0.88rem;">${escH(flow.name)}</span>
-                                <span style="font-size:0.68rem;background:${statusColors[flow.status]||'#9ca3af'}18;
-                                    color:${statusColors[flow.status]||'#9ca3af'};padding:1px 6px;border-radius:10px;font-weight:600;">
-                                    ${flow.status||'draft'}
-                                </span>
-                            </div>
-                            <div style="font-size:0.73rem;color:#6b7280;">
-                                Тригер: <code style="background:#f0fdf4;color:#16a34a;padding:1px 4px;border-radius:3px;">${escH(flow.triggerKeyword||'/start')}</code>
-                                · ${(flow.nodes?.length||0)} вузлів · ${flow.sessionCount||0} сесій
-                            </div>
-                            <!-- Deep link -->
-                            <div style="margin-top:0.4rem;display:flex;align-items:center;gap:0.35rem;">
-                                <div style="font-size:0.7rem;color:#6b7280;flex:1;overflow:hidden;
-                                    text-overflow:ellipsis;white-space:nowrap;background:#f9fafb;
-                                    border:1px solid #e5e7eb;border-radius:5px;padding:2px 6px;">
-                                    <i data-lucide="link" style="width:15px;height:15px;display:inline-block;vertical-align:middle;"></i> ${deepLink}
+                <div style="background:white;border-radius:14px;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1.5px solid #f1f5f9;
+                    overflow:hidden;transition:box-shadow 0.18s,border-color 0.18s;"
+                    onmouseenter="this.style.boxShadow='0 6px 20px rgba(0,0,0,0.1)';this.style.borderColor='#e2e8f0';"
+                    onmouseleave="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';this.style.borderColor='#f1f5f9';">
+                    <div style="height:3px;background:linear-gradient(90deg,${statusCol},${statusCol}66);"></div>
+                    <div style="padding:0.85rem 1rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.6rem;">
+                            <div style="flex:1;min-width:0;">
+                                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;flex-wrap:wrap;">
+                                    <span style="font-weight:700;font-size:0.92rem;color:#111827;">${escH(flow.name)}</span>
+                                    <span style="font-size:0.68rem;background:${statusBg};color:${statusCol};
+                                        padding:2px 8px;border-radius:20px;font-weight:700;border:1px solid ${statusCol}30;">
+                                        ${statusLabel}
+                                    </span>
                                 </div>
-                                <button onclick="copyLink('${deepLink}')"
-                                    style="padding:2px 7px;background:#eff6ff;color:#3b82f6;border:none;
-                                    border-radius:4px;cursor:pointer;font-size:0.68rem;white-space:nowrap;flex-shrink:0;">
-                                    Копіювати
-                                </button>
-                                <button onclick="showQR('${encodeURIComponent(deepLink)}')"
-                                    style="padding:2px 7px;background:#f0fdf4;color:#16a34a;border:none;
-                                    border-radius:4px;cursor:pointer;font-size:0.68rem;flex-shrink:0;">
-                                    QR
-                                </button>
+                                <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+                                    <span style="font-size:0.73rem;color:#6b7280;display:flex;align-items:center;gap:3px;">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18-6-6 6-6"/><path d="m15 6 6 6-6 6"/></svg>
+                                        <code style="background:#f0fdf4;color:#16a34a;padding:1px 5px;border-radius:4px;font-size:0.72rem;">${escH(flow.triggerKeyword||'/start')}</code>
+                                    </span>
+                                    <span style="font-size:0.73rem;color:#6b7280;display:flex;align-items:center;gap:3px;">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
+                                        ${nodeCount} вузл${nodeCount===1?'':nodeCount<5?'и':'ів'}
+                                    </span>
+                                    <span style="font-size:0.73rem;color:#6b7280;display:flex;align-items:center;gap:3px;">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                        ${flow.sessionCount||0} сесій
+                                    </span>
+                                </div>
+                                <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.3rem;">
+                                    <div style="font-size:0.69rem;color:#9ca3af;flex:1;overflow:hidden;
+                                        text-overflow:ellipsis;white-space:nowrap;background:#f8fafc;
+                                        border:1px solid #e5e7eb;border-radius:6px;padding:3px 8px;
+                                        display:flex;align-items:center;gap:4px;">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                        ${deepLink}
+                                    </div>
+                                    <button onclick="copyLink('${deepLink}')"
+                                        style="padding:3px 8px;background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;
+                                        border-radius:5px;cursor:pointer;font-size:0.68rem;white-space:nowrap;flex-shrink:0;font-weight:600;"
+                                        onmouseenter="this.style.background='#dbeafe'" onmouseleave="this.style.background='#eff6ff'">
+                                        Копіювати
+                                    </button>
+                                    <button onclick="showQR('${encodeURIComponent(deepLink)}')"
+                                        style="padding:3px 8px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;
+                                        border-radius:5px;cursor:pointer;font-size:0.68rem;flex-shrink:0;font-weight:600;"
+                                        onmouseenter="this.style.background='#dcfce7'" onmouseleave="this.style.background='#f0fdf4'">
+                                        QR
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div style="display:flex;gap:0.3rem;flex-shrink:0;">
-                            <button onclick="editFlow('${flow.id}')"
-                                style="padding:0.38rem 0.65rem;background:#22c55e;color:white;
-                                border:none;border-radius:7px;cursor:pointer;font-size:0.76rem;font-weight:600;">
-                                <i data-lucide="pencil" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> Редагувати
-                            </button>
-                            <button onclick="toggleFlowStatus('${flow.id}','${flow.status}')"
-                                style="padding:0.38rem 0.55rem;background:${flow.status==='active'?'#fee2e2':'#f0fdf4'};
-                                color:${flow.status==='active'?'#ef4444':'#16a34a'};border:none;
-                                border-radius:7px;cursor:pointer;font-size:0.73rem;">
-                                ${flow.status==='active'?'⏸':'▶'}
-                            </button>
-                            <button onclick="deleteFlow('${flow.id}')"
-                                style="padding:0.38rem 0.5rem;background:#fee2e2;color:#ef4444;
-                                border:none;border-radius:7px;cursor:pointer;font-size:0.73rem;">
-                                <i data-lucide="x" style="width:13px;height:13px;display:inline-block;vertical-align:middle;"></i>
-                            </button>
+                            <div style="display:flex;flex-direction:column;gap:0.3rem;flex-shrink:0;min-width:100px;">
+                                <button onclick="editFlow('${flow.id}')"
+                                    style="padding:0.42rem 0.75rem;background:#22c55e;color:white;border:none;
+                                    border-radius:8px;cursor:pointer;font-size:0.76rem;font-weight:600;
+                                    display:flex;align-items:center;justify-content:center;gap:5px;
+                                    box-shadow:0 1px 4px #22c55e44;transition:background 0.15s;"
+                                    onmouseenter="this.style.background='#16a34a'" onmouseleave="this.style.background='#22c55e'">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    Редагувати
+                                </button>
+                                <div style="display:flex;gap:0.25rem;">
+                                    <button onclick="toggleFlowStatus('${flow.id}','${flow.status}')"
+                                        title="${flow.status==='active'?'Пауза':'Активувати'}"
+                                        style="flex:1;padding:0.4rem 0;
+                                        background:${flow.status==='active'?'#fff7ed':'#f0fdf4'};
+                                        color:${flow.status==='active'?'#f97316':'#16a34a'};
+                                        border:1px solid ${flow.status==='active'?'#fed7aa':'#bbf7d0'};
+                                        border-radius:7px;cursor:pointer;
+                                        display:flex;align-items:center;justify-content:center;">
+                                        ${flow.status==='active'
+                                            ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'
+                                            : '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>'}
+                                    </button>
+                                    <button onclick="deleteFlow('${flow.id}')"
+                                        title="Видалити"
+                                        style="flex:1;padding:0.4rem 0;background:#fff5f5;color:#ef4444;
+                                        border:1px solid #fecaca;border-radius:7px;cursor:pointer;
+                                        display:flex;align-items:center;justify-content:center;
+                                        transition:background 0.15s;"
+                                        onmouseenter="this.style.background='#fee2e2'" onmouseleave="this.style.background='#fff5f5'">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/><path d="M9,6V4h6v2"/></svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>`;
-    lcIcons(c); }).join('')}
+            }).join('')}
         </div>`}`;
+    lcIcons(c);
 }
-
 // ══════════════════════════════════════════════════════════
 // 3. CREATE BOT MODAL
 // ══════════════════════════════════════════════════════════

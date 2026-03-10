@@ -178,67 +178,115 @@ function mountCanvas() {
 
     root.innerHTML = `
     <!-- TOOLBAR -->
-    <div id="fcToolbar" style="height:48px;background:#1e293b;display:flex;align-items:center;
-        gap:8px;padding:0 12px;flex-shrink:0;border-bottom:2px solid #334155;z-index:10;">
+    <div id="fcToolbar" style="height:52px;background:#0f172a;display:flex;align-items:center;
+        gap:6px;padding:0 14px;flex-shrink:0;
+        border-bottom:1px solid #1e293b;z-index:10;
+        box-shadow:0 2px 8px rgba(0,0,0,0.3);">
 
+        <!-- Назад -->
         <button id="fcBtnBack" title="${t('botsFlowBack')}"
-            style="padding:6px 12px;background:#334155;border:none;border-radius:8px;color:white;
-            cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;">
-            <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></span> Назад
+            style="padding:6px 12px;background:#1e293b;border:1px solid #334155;border-radius:8px;
+            color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px;
+            font-size:12px;font-weight:600;transition:all 0.15s;white-space:nowrap;"
+            onmouseenter="this.style.background='#334155';this.style.color='white'"
+            onmouseleave="this.style.background='#1e293b';this.style.color='#cbd5e1'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            Назад
         </button>
 
-        <div style="width:1px;height:28px;background:#334155;"></div>
+        <div style="width:1px;height:24px;background:#1e293b;margin:0 4px;"></div>
 
-        <div style="color:white;font-weight:700;font-size:14px;max-width:200px;
-            overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" id="fcFlowTitle"></div>
-        <span id="fcChannelBadge" style="background:#334155;color:#94a3b8;
-            font-size:11px;padding:2px 8px;border-radius:4px;"></span>
+        <!-- Назва флоу -->
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div id="fcFlowTitle" style="color:white;font-weight:700;font-size:14px;
+                max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+            <span id="fcChannelBadge" style="background:#1e293b;color:#64748b;border:1px solid #334155;
+                font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;letter-spacing:0.04em;"></span>
+        </div>
 
         <div style="flex:1;"></div>
 
-        <!-- Undo/Redo -->
-        <button id="fcBtnUndo" title="${t('botsCanvasUndo')}"
-            style="padding:6px 10px;background:#334155;border:none;border-radius:7px;
-            color:#94a3b8;cursor:pointer;font-size:14px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span></button>
-        <button id="fcBtnRedo" title="${t('botsCanvasRedo')}"
-            style="padding:6px 10px;background:#334155;border:none;border-radius:7px;
-            color:#94a3b8;cursor:pointer;font-size:14px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5V17"/></svg></span></button>
+        <!-- Undo/Redo група -->
+        <div style="display:flex;gap:2px;background:#1e293b;border-radius:8px;padding:3px;border:1px solid #334155;">
+            <button id="fcBtnUndo" title="${t('botsCanvasUndo')}"
+                style="padding:5px 9px;background:transparent;border:none;border-radius:6px;
+                color:#64748b;cursor:pointer;display:flex;align-items:center;transition:all 0.15s;"
+                onmouseenter="this.style.background='#334155';this.style.color='#e2e8f0'"
+                onmouseleave="this.style.background='transparent';this.style.color='#64748b'">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+            </button>
+            <button id="fcBtnRedo" title="${t('botsCanvasRedo')}"
+                style="padding:5px 9px;background:transparent;border:none;border-radius:6px;
+                color:#64748b;cursor:pointer;display:flex;align-items:center;transition:all 0.15s;"
+                onmouseenter="this.style.background='#334155';this.style.color='#e2e8f0'"
+                onmouseleave="this.style.background='transparent';this.style.color='#64748b'">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5V17"/></svg>
+            </button>
+        </div>
 
-        <div style="width:1px;height:28px;background:#334155;"></div>
+        <!-- Zoom група -->
+        <div style="display:flex;align-items:center;gap:2px;background:#1e293b;border-radius:8px;padding:3px;border:1px solid #334155;">
+            <button id="fcBtnZoomOut"
+                style="padding:5px 9px;background:transparent;border:none;border-radius:6px;
+                color:#94a3b8;cursor:pointer;font-size:15px;font-weight:300;line-height:1;transition:all 0.15s;"
+                onmouseenter="this.style.background='#334155';this.style.color='white'"
+                onmouseleave="this.style.background='transparent';this.style.color='#94a3b8'">−</button>
+            <span id="fcZoomPct" style="color:#64748b;font-size:11px;min-width:38px;text-align:center;font-weight:600;">100%</span>
+            <button id="fcBtnZoomIn"
+                style="padding:5px 9px;background:transparent;border:none;border-radius:6px;
+                color:#94a3b8;cursor:pointer;font-size:15px;font-weight:300;line-height:1;transition:all 0.15s;"
+                onmouseenter="this.style.background='#334155';this.style.color='white'"
+                onmouseleave="this.style.background='transparent';this.style.color='#94a3b8'">+</button>
+            <button id="fcBtnFit" title="${t('botsCanvasFit')}"
+                style="padding:5px 9px;background:transparent;border:none;border-radius:6px;
+                color:#64748b;cursor:pointer;display:flex;align-items:center;transition:all 0.15s;"
+                onmouseenter="this.style.background='#334155';this.style.color='#e2e8f0'"
+                onmouseleave="this.style.background='transparent';this.style.color='#64748b'">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            </button>
+        </div>
 
-        <!-- Zoom -->
-        <button id="fcBtnZoomOut" style="padding:6px 10px;background:#334155;border:none;
-            border-radius:7px;color:white;cursor:pointer;font-size:16px;">−</button>
-        <span id="fcZoomPct" style="color:#94a3b8;font-size:12px;min-width:40px;text-align:center;">100%</span>
-        <button id="fcBtnZoomIn" style="padding:6px 10px;background:#334155;border:none;
-            border-radius:7px;color:white;cursor:pointer;font-size:16px;">+</button>
-        <button id="fcBtnFit" title="${t('botsCanvasFit')}" style="padding:6px 10px;background:#334155;
-            border:none;border-radius:7px;color:white;cursor:pointer;font-size:12px;">⤢</button>
+        <div style="width:1px;height:24px;background:#1e293b;margin:0 2px;"></div>
 
-        <div style="width:1px;height:28px;background:#334155;"></div>
-
+        <!-- Статус -->
         <button id="fcBtnToggleStatus"
-            style="padding:7px 14px;background:#334155;border:none;border-radius:8px;
-            color:#94a3b8;cursor:pointer;font-weight:600;font-size:12px;">
+            style="padding:6px 13px;background:#1e293b;border:1px solid #334155;border-radius:8px;
+            color:#64748b;cursor:pointer;font-weight:700;font-size:11px;
+            letter-spacing:0.05em;text-transform:uppercase;transition:all 0.15s;"
+            onmouseenter="this.style.borderColor='#22c55e';this.style.color='#22c55e'"
+            onmouseleave="this.style.borderColor='#334155';this.style.color='#64748b'">
             draft
         </button>
+
+        <!-- Save -->
         <button id="fcBtnSave"
-            style="padding:7px 18px;background:#22c55e;border:none;border-radius:8px;
-            color:white;cursor:pointer;font-weight:700;font-size:13px;">
+            style="padding:7px 20px;background:linear-gradient(135deg,#22c55e,#16a34a);
+            border:none;border-radius:8px;color:white;cursor:pointer;font-weight:700;
+            font-size:13px;box-shadow:0 2px 8px rgba(34,197,94,0.4);transition:all 0.15s;
+            display:flex;align-items:center;gap:6px;"
+            onmouseenter="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(34,197,94,0.5)'"
+            onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 8px rgba(34,197,94,0.4)'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
             Зберегти
         </button>
+
+        <!-- Close -->
         <button id="fcBtnClose" title="Закрити"
-            style="padding:6px 10px;background:#334155;border:none;border-radius:7px;
-            color:#94a3b8;cursor:pointer;font-size:18px;line-height:1;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button>
+            style="padding:6px 9px;background:transparent;border:none;border-radius:7px;
+            color:#475569;cursor:pointer;display:flex;align-items:center;transition:all 0.15s;margin-left:2px;"
+            onmouseenter="this.style.background='#ef444420';this.style.color='#ef4444'"
+            onmouseleave="this.style.background='transparent';this.style.color='#475569'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
     </div>
 
     <!-- BODY -->
     <div style="flex:1;display:flex;min-height:0;overflow:hidden;">
 
         <!-- LEFT SIDEBAR -->
-        <div id="fcSidebar" style="width:72px;background:#1e293b;border-right:1px solid #334155;
+        <div id="fcSidebar" style="width:76px;background:#0f172a;border-right:1px solid #1e293b;
             overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;
-            align-items:center;padding:8px 0;gap:4px;z-index:5;">
+            align-items:center;padding:8px 0;gap:2px;z-index:5;">
         </div>
 
         <!-- CANVAS AREA -->
@@ -271,12 +319,17 @@ function mountCanvas() {
         </div>
 
         <!-- RIGHT PANEL -->
-        <div id="fcRightPanel" style="width:300px;background:#1e293b;border-left:1px solid #334155;
+        <div id="fcRightPanel" style="width:300px;background:#0f172a;border-left:1px solid #1e293b;
             overflow-y:auto;flex-shrink:0;z-index:5;">
-            <div id="fcPropPanel" style="padding:16px;">
-                <div style="text-align:center;padding:48px 16px;color:#475569;">
-                    <div style="font-size:32px;margin-bottom:8px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19V5"/><path d="m5 12 7-7 7 7"/></svg></span></div>
-                    <div style="font-size:13px;">Клікніть на вузол<br>для редагування</div>
+            <div id="fcPropPanel" style="padding:14px;">
+                <div style="text-align:center;padding:48px 16px;color:#334155;">
+                    <div style="margin-bottom:12px;display:flex;justify-content:center;">
+                        <div style="width:48px;height:48px;border-radius:14px;background:#1e293b;
+                            border:1px solid #334155;display:flex;align-items:center;justify-content:center;">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:#475569;line-height:1.6;">Клікніть на вузол<br>для редагування</div>
                 </div>
             </div>
         </div>
@@ -352,14 +405,14 @@ function buildSidebar() {
     const sb = document.getElementById('fcSidebar');
     if (!sb) return;
 
-    // Apple-style: кольорові іконки в SF-style квадратах
-    sb.style.width = '72px';
-    sb.style.minWidth = '72px';
-    sb.style.background = '#ffffff';
-    sb.style.borderRight = '1px solid #e5e7eb';
+    // Dark sidebar matching toolbar
+    sb.style.width = '76px';
+    sb.style.minWidth = '76px';
+    sb.style.background = '#0f172a';
+    sb.style.borderRight = '1px solid #1e293b';
     sb.style.padding = '8px 6px';
     sb.style.gap = '2px';
-    sb.style.boxShadow = '2px 0 8px rgba(0,0,0,0.04)';
+    sb.style.boxShadow = 'none';
 
     const items = [
         ['message', '#3b82f6', `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`, 'Повідом.'],
@@ -377,13 +430,13 @@ function buildSidebar() {
 
     // AI Воронка — окрема кнопка внизу сайдбара
     const aiFunnelBtn = `
-        <div style="margin-top:8px;border-top:1px solid #e5e7eb;padding-top:8px;">
+        <div style="margin-top:8px;border-top:1px solid #1e293b;padding-top:8px;">
             <div onclick="fcOpenAiFunnelModal()"
                 title="AI Асистент воронки"
                 style="width:60px;display:flex;flex-direction:column;align-items:center;
                 gap:4px;padding:6px 4px;border-radius:10px;cursor:pointer;
                 transition:background 0.12s;"
-                onmouseenter="this.style.background='#f0fdf4'"
+                onmouseenter="this.style.background='#1e293b'"
                 onmouseleave="this.style.background='transparent'">
                 <div style="width:36px;height:36px;border-radius:9px;
                     background:linear-gradient(135deg,#22c55e,#8b5cf6);
@@ -402,20 +455,21 @@ function buildSidebar() {
     sb.innerHTML = items.map(([type, color, svg, label]) => `
         <div draggable="true" data-sbtype="${type}"
             title="${NODES[type]?.label || label}"
-            style="width:60px;display:flex;flex-direction:column;align-items:center;
-            gap:4px;padding:6px 4px;border-radius:10px;cursor:grab;
-            transition:all 0.12s;"
-            onmouseenter="this.style.background='#f8fafc';this.style.transform='translateY(-1px)'"
-            onmouseleave="this.style.background='transparent';this.style.transform='translateY(0)'">
-            <div style="width:36px;height:36px;border-radius:10px;background:${color};
-                display:flex;align-items:center;justify-content:center;flex-shrink:0;
-                box-shadow:0 2px 6px ${color}60;">
+            style="width:62px;display:flex;flex-direction:column;align-items:center;
+            gap:3px;padding:6px 4px;border-radius:10px;cursor:grab;
+            transition:all 0.15s;"
+            onmouseenter="this.style.background='#1e293b'"
+            onmouseleave="this.style.background='transparent'">
+            <div style="width:38px;height:38px;border-radius:10px;background:${color};
+                display:flex;align-items:center;justify-content:center;
+                box-shadow:0 2px 10px ${color}55;transition:transform 0.15s;"
+                onmouseenter="this.style.transform='scale(1.1)'"
+                onmouseleave="this.style.transform='scale(1)'">
                 ${svg}
             </div>
-            <div style="font-size:9.5px;color:#6b7280;text-align:center;
-                line-height:1.2;font-weight:500;">${label}</div>
-        </div>`
-    ).join('') + aiFunnelBtn;
+            <div style="font-size:9px;color:#64748b;font-weight:600;
+                text-align:center;line-height:1.2;">${label}</div>
+        </div>`).join('') + aiFunnelBtn;
 
     // Drag from sidebar → canvas
     sb.querySelectorAll('[data-sbtype]').forEach(el => {
@@ -1228,9 +1282,14 @@ function renderPropPanel() {
     if (!panel) return;
 
     if (!fc.selected) {
-        panel.innerHTML = `<div style="text-align:center;padding:48px 16px;color:#475569;">
-            <div style="font-size:32px;margin-bottom:8px;"><span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19V5"/><path d="m5 12 7-7 7 7"/></svg></span></div>
-            <div style="font-size:13px;">Клікніть на вузол<br>для редагування</div>
+        panel.innerHTML = `<div style="text-align:center;padding:48px 16px;color:#334155;">
+            <div style="display:flex;justify-content:center;margin-bottom:12px;">
+                <div style="width:48px;height:48px;border-radius:14px;background:#1e293b;
+                    border:1px solid #334155;display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </div>
+            </div>
+            <div style="font-size:12px;color:#475569;line-height:1.6;">Клікніть на вузол<br>для редагування</div>
         </div>`;
         return;
     }
@@ -1247,20 +1306,21 @@ function renderPropPanel() {
             ${html}
         </div>`;
 
+    const iS = "width:100%;padding:8px 10px;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:12px;box-sizing:border-box;outline:none;transition:border-color 0.15s;";
     const inp = (id, val, ph='') => `<input id="fcp_${id}"
         value="${escAttr(val||'')}" placeholder="${ph}"
-        style="width:100%;padding:8px;background:#0f172a;border:1px solid #334155;
-        border-radius:7px;color:white;font-size:12px;box-sizing:border-box;">`;
+        style="${iS}"
+        onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#334155'">`;
 
     const ta = (id, val, ph='', rows=4) => `<textarea id="fcp_${id}"
         placeholder="${ph}" rows="${rows}"
-        style="width:100%;padding:8px;background:#0f172a;border:1px solid #334155;
-        border-radius:7px;color:white;font-size:12px;box-sizing:border-box;resize:vertical;"
+        style="${iS}resize:vertical;"
+        onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#334155'"
         >${esc(val||'')}</textarea>`;
 
     const sel = (id, options, cur) => `<select id="fcp_${id}"
-        style="width:100%;padding:8px;background:#0f172a;border:1px solid #334155;
-        border-radius:7px;color:white;font-size:12px;box-sizing:border-box;">
+        style="${iS}cursor:pointer;"
+        onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#334155'">
         ${options.map(([v,l])=>`<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('')}
     </select>`;
 
@@ -1519,27 +1579,39 @@ function renderPropPanel() {
 
     panel.innerHTML = `
         <div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;
-                padding-bottom:12px;border-bottom:1px solid #334155;">
-                <div style="width:36px;height:36px;border-radius:8px;background:${cfg.color};
-                    display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;
+                padding:10px 12px;border-radius:12px;
+                background:linear-gradient(135deg,${cfg.color}22,${cfg.border}11);
+                border:1px solid ${cfg.color}33;">
+                <div style="width:38px;height:38px;border-radius:10px;background:${cfg.color};
+                    display:flex;align-items:center;justify-content:center;
+                    flex-shrink:0;box-shadow:0 2px 8px ${cfg.color}55;">
                     ${cfg.icon}
                 </div>
                 <div>
                     <div style="color:white;font-weight:700;font-size:14px;">${cfg.label}</div>
-                    <div style="color:#475569;font-size:10px;">${node.id}</div>
+                    <div style="color:#475569;font-size:10px;margin-top:1px;font-family:monospace;">${node.id}</div>
                 </div>
             </div>
             ${fields}
             <button onclick="fcApplyNodeData('${node.id}')"
-                style="width:100%;padding:10px;background:#22c55e;border:none;border-radius:8px;
-                color:white;cursor:pointer;font-weight:700;font-size:13px;margin-top:4px;">
-                <span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Застосувати
+                style="width:100%;padding:10px;background:linear-gradient(135deg,#22c55e,#16a34a);
+                border:none;border-radius:9px;color:white;cursor:pointer;font-weight:700;
+                font-size:13px;margin-top:4px;box-shadow:0 2px 8px rgba(34,197,94,0.35);
+                transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px;"
+                onmouseenter="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(34,197,94,0.45)'"
+                onmouseleave="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(34,197,94,0.35)'">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Застосувати
             </button>
             ${node.type !== 'start' ? `
             <button onclick="fcDeleteNode('${node.id}')"
                 style="width:100%;padding:8px;background:transparent;border:1px solid #334155;
-                border-radius:8px;color:#ef4444;cursor:pointer;font-size:12px;margin-top:6px;">
+                border-radius:8px;color:#64748b;cursor:pointer;font-size:12px;margin-top:6px;
+                transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:5px;"
+                onmouseenter="this.style.borderColor='#ef4444';this.style.color='#ef4444'"
+                onmouseleave="this.style.borderColor='#334155';this.style.color='#64748b'">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/><path d="M9,6V4h6v2"/></svg>
                 Видалити вузол
             </button>` : ''}
         </div>`;
