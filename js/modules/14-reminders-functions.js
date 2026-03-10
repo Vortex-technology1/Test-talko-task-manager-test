@@ -227,10 +227,11 @@
                 
                 let newDocRef = null;
                 let _prevProjectId = '';
+                // FIX: existingTask оголошуємо поза if-блоком щоб бути доступним після нього
+                const existingTask = currentEditingId ? tasks.find(t => t.id === currentEditingId) : null;
                 
                 if (currentEditingId) {
                     // Update existing task
-                    const existingTask = tasks.find(t => t.id === currentEditingId);
                     // Permission check: employee can only edit own tasks
                     if (existingTask && !canEditTask(existingTask)) {
                         showToast(t('noPermissionTask'), 'error');

@@ -25,7 +25,18 @@ let crm = {
 window.initCRMModule = async function () {
     if (!window.currentCompanyId) return;
     _renderShell();
-    await _loadAll();
+    try {
+        await _loadAll();
+    } catch(e) {
+        console.error('[CRM] loadAll error:', e.message);
+        const c = document.getElementById('crmViewKanban');
+        if (c) c.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#ef4444;font-size:0.82rem;">' +
+            'Помилка завантаження CRM: ' + e.message + '<br>' +
+            '<button onclick="window.initCRMModule()" style="margin-top:0.5rem;padding:0.4rem 0.8rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;">Повторити</button>' +
+            '</div>';
+        crm.loading = false;
+        return;
+    }
     _listenEventBus();
 };
 
@@ -74,7 +85,7 @@ async function _loadAll() {
     crm.unsubs.forEach(u => u && u());
     crm.unsubs = [];
 
-    const pipSnap = await base.collection('crm_pipeline').orderBy('createdAt').get();
+    const pipSnap = await base.collection('crm_pipeline').get(); // no orderBy — index may not exist yet
     crm.pipelines = pipSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     if (crm.pipelines.length === 0) await _createDefaultPipeline();
     crm.pipeline = crm.pipelines.find(p => p.isDefault) || crm.pipelines[0];
