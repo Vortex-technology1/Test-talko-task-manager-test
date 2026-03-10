@@ -354,6 +354,7 @@ function buildSidebar() {
     sb.style.borderRight = '1px solid #e5e7eb';
     sb.style.padding = '8px 6px';
     sb.style.gap = '2px';
+    sb.style.boxShadow = '2px 0 8px rgba(0,0,0,0.04)';
 
     const items = [
         ['message', '#3b82f6', `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`, 'Повідом.'],
@@ -398,11 +399,12 @@ function buildSidebar() {
             title="${NODES[type]?.label || label}"
             style="width:60px;display:flex;flex-direction:column;align-items:center;
             gap:4px;padding:6px 4px;border-radius:10px;cursor:grab;
-            transition:background 0.12s;"
-            onmouseenter="this.style.background='#f3f4f6'"
-            onmouseleave="this.style.background='transparent'">
-            <div style="width:36px;height:36px;border-radius:9px;background:${color};
-                display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            transition:all 0.12s;"
+            onmouseenter="this.style.background='#f8fafc';this.style.transform='translateY(-1px)'"
+            onmouseleave="this.style.background='transparent';this.style.transform='translateY(0)'">
+            <div style="width:36px;height:36px;border-radius:10px;background:${color};
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;
+                box-shadow:0 2px 6px ${color}60;">
                 ${svg}
             </div>
             <div style="font-size:9.5px;color:#6b7280;text-align:center;
@@ -494,9 +496,9 @@ function buildNodeEl(node) {
         `border-radius:12px`,
         `background:white`,
         `border:2px solid ${isSelected ? cfg.color : '#e5e7eb'}`,
-        `box-shadow:${isSelected ? `0 0 0 3px ${cfg.color}25,` : ''}0 2px 10px rgba(0,0,0,0.10)`,
+        `box-shadow:${isSelected ? `0 0 0 3px ${cfg.color}30,0 8px 24px rgba(0,0,0,0.12)` : '0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.06)'}`,
         `cursor:pointer`,
-        `transition:border-color 0.15s,box-shadow 0.15s`,
+        `transition:border-color 0.15s,box-shadow 0.15s,transform 0.1s`,
         `overflow:visible`,
         `font-family:system-ui,sans-serif`,
     ].join(';');
@@ -544,14 +546,15 @@ function buildNodeEl(node) {
 
     // ── Body content ───────────────────────────────────────
     const btnsHTML = buttons.length ? `
-        <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;">
-            ${buttons.map(b => `
-                <div style="padding:5px 10px;background:#f9fafb;border:1.5px solid #e5e7eb;
-                    border-radius:7px;font-size:10.5px;color:#374151;font-weight:500;
-                    display:flex;align-items:center;gap:5px;">
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:3px;">
+            ${buttons.slice(0,4).map(b => `
+                <div style="padding:4px 9px;background:white;border:1.5px solid #e5e7eb;
+                    border-radius:6px;font-size:10px;color:#374151;font-weight:500;
+                    display:flex;align-items:center;gap:5px;box-shadow:0 1px 2px rgba(0,0,0,0.04);">
+                    <div style="width:5px;height:5px;border-radius:50%;background:${cfg.color};flex-shrink:0;"></div>
                     <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(b.label||'Кнопка')}</span>
                 </div>`).join('')}
+            ${buttons.length > 4 ? `<div style="font-size:9.5px;color:#9ca3af;padding:2px 9px;">+${buttons.length-4} ще...</div>` : ''}
         </div>` : '';
 
     const aiSnippet = node.type === 'ai' && node.config?.systemPrompt ? `
@@ -562,13 +565,19 @@ function buildNodeEl(node) {
             ${esc(node.config.systemPrompt.slice(0,90))}
         </div>` : '';
 
+    const nodeName = node.config?.name || node.name || '';
     el.innerHTML = `
         ${inPortHTML}
-        <div style="background:${cfg.color};border-radius:10px 10px 0 0;
+        <div style="background:linear-gradient(135deg,${cfg.color} 0%,${cfg.color}dd 100%);border-radius:10px 10px 0 0;
             padding:9px 13px;display:flex;align-items:center;gap:8px;">
-            <span style="display:flex;align-items:center;color:white;">${cfg.icon}</span>
-            <span style="font-weight:600;font-size:12.5px;color:white;flex:1;
-                overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${cfg.label}</span>
+            <span style="display:flex;align-items:center;color:white;flex-shrink:0;
+                background:rgba(255,255,255,0.2);border-radius:6px;padding:4px;">${cfg.icon}</span>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:12px;color:white;letter-spacing:0.01em;
+                    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${cfg.label}</div>
+                ${nodeName ? `<div style="font-size:10px;color:rgba(255,255,255,0.75);
+                    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;">${esc(nodeName)}</div>` : ''}
+            </div>
             <div data-del="${node.id}" title="Видалити"
                 style="width:20px;height:20px;border-radius:5px;background:rgba(0,0,0,0.18);
                 display:flex;align-items:center;justify-content:center;cursor:pointer;
@@ -578,12 +587,14 @@ function buildNodeEl(node) {
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </div>
         </div>
-        <div style="padding:10px 13px 12px;min-height:42px;">
+        <div style="padding:10px 13px 12px;min-height:44px;background:#fafafa;border-radius:0 0 10px 10px;">
             ${preview
-                ? `<div style="font-size:11px;color:#4b5563;line-height:1.5;
+                ? `<div style="font-size:11px;color:#374151;line-height:1.55;
                     overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;
                     -webkit-box-orient:vertical;">${esc(preview)}</div>`
-                : `<div style="font-size:11px;color:#9ca3af;font-style:italic;">Клікніть для налаштування</div>`
+                : `<div style="font-size:11px;color:#9ca3af;font-style:italic;display:flex;align-items:center;gap:4px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                    Клікніть для налаштування</div>`
             }
             ${node.type === 'ai' ? aiSnippet : btnsHTML}
         </div>
@@ -643,10 +654,11 @@ function renderEdges() {
         const to = getInPortPos(toNode);
 
         const isSelected = fc.selected === edge.fromNode || fc.selected === edge.toNode;
-        const portColor = (edge.fromPort === 'no' || edge.fromPort === 'err') ? '#ef4444' : '#3b82f6';
-        const color = isSelected ? portColor : '#3b82f6';
+        const isError = (edge.fromPort === 'no' || edge.fromPort === 'err');
+        const portColor = isError ? '#ef4444' : (isSelected ? '#22c55e' : '#64748b');
+        const color = portColor;
         const markerId = isSelected
-            ? (portColor === '#22c55e' ? 'arrowHeadGreen' : 'arrowHeadBlue')
+            ? (isError ? 'arrowHead' : 'arrowHeadGreen')
             : 'arrowHead';
 
         const path = bezier(from.x, from.y, to.x, to.y);
@@ -680,7 +692,9 @@ function renderEdges() {
         line.setAttribute('d', path);
         line.setAttribute('fill','none');
         line.setAttribute('stroke', color);
-        line.setAttribute('stroke-width','2.5');
+        line.setAttribute('stroke-width', isSelected ? '2.5' : '1.8');
+        line.setAttribute('stroke-dasharray', isSelected ? 'none' : 'none');
+        line.setAttribute('opacity', isSelected ? '1' : '0.7');
         line.setAttribute('marker-end', `url(#${markerId})`);
 
         // Port label on edge — pill з фоном, позиціонується біля порту виходу
@@ -779,7 +793,9 @@ function drawBg() {
     cnv.height = rect.height;
     const ctx = cnv.getContext('2d');
     ctx.clearRect(0,0,cnv.width,cnv.height);
-    ctx.fillStyle = '#d1d5db';
+    ctx.fillStyle = '#f1f5f9';
+    ctx.fillRect(0, 0, cnv.width, cnv.height);
+    ctx.fillStyle = '#cbd5e1';
     const spacing = 24 * fc.scale;
     const offsetX = fc.pan.x % spacing;
     const offsetY = fc.pan.y % spacing;

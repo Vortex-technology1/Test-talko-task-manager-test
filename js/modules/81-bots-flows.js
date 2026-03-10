@@ -8,6 +8,7 @@
     let botsFlows = [];
     let botsUnsubscribe = null;
     let botsCurrentFlowId = null;
+    let botsCurrentBotId = null; // FIX: track botId for correct Firestore path
     let botsFlowNodes = [];
     let botsSelectedNodeId = null;
     let botsSubTab = 'list'; // list | editor | sessions
@@ -64,12 +65,31 @@
         if (!window.currentCompanyId) return;
         const base = firebase.firestore().collection('companies').doc(window.currentCompanyId);
         if (botsUnsubscribe) botsUnsubscribe();
-        botsUnsubscribe = base.collection('flows')
-            .orderBy('createdAt', 'desc').limit(100)
-            .onSnapshot(snap => {
-                botsFlows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                if (botsSubTab === 'list') renderBotsListView();
-            });
+
+        // FIX: спочатку знаходимо бот документ, потім читаємо flows з правильного шляху
+        try {
+            const botsSnap = await base.collection('bots').limit(5).get();
+            if (!botsSnap.empty) {
+                botsCurrentBotId = botsSnap.docs[0].id;
+                window._currentBotId = botsCurrentBotId;
+                botsUnsubscribe = base.collection('bots').doc(botsCurrentBotId).collection('flows')
+                    .orderBy('createdAt', 'desc').limit(100)
+                    .onSnapshot(snap => {
+                        botsFlows = snap.docs.map(d => ({ id: d.id, botId: botsCurrentBotId, ...d.data() }));
+                        if (botsSubTab === 'list') renderBotsListView();
+                    });
+            } else {
+                // Fallback: старий плоский шлях
+                botsUnsubscribe = base.collection('flows')
+                    .orderBy('createdAt', 'desc').limit(100)
+                    .onSnapshot(snap => {
+                        botsFlows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        if (botsSubTab === 'list') renderBotsListView();
+                    });
+            }
+        } catch(e) {
+            console.error('[loadBotsData]', e);
+        }
     }
 
     // ── List View ──────────────────────────────────────────
@@ -142,17 +162,23 @@
 
     window.toggleFlowStatus = async function (flowId, currentStatus) {
         const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-        await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-            .collection('flows').doc(flowId)
-            .update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        const compRef = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+        // FIX: correct path
+        const ref = botsCurrentBotId
+            ? compRef.collection('bots').doc(botsCurrentBotId).collection('flows').doc(flowId)
+            : compRef.collection('flows').doc(flowId);
+        await ref.update({ status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         if (typeof showToast === 'function') showToast(newStatus === 'active' ? '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Бота активовано' : '⏸ Бота на паузі', 'success');
     };
 
     window.confirmDeleteFlow = function (flowId) {
         if (!confirm('Видалити бота? Активні сесії будуть зупинені.')) return;
-        firebase.firestore().collection('companies').doc(window.currentCompanyId)
-            .collection('flows').doc(flowId).delete()
-            .then(() => { if (typeof showToast === 'function') showToast('Видалено', 'success'); });
+        const compRef = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+        // FIX: correct path
+        const ref = botsCurrentBotId
+            ? compRef.collection('bots').doc(botsCurrentBotId).collection('flows').doc(flowId)
+            : compRef.collection('flows').doc(flowId);
+        ref.delete().then(() => { if (typeof showToast === 'function') showToast('Видалено', 'success'); });
     };
 
     // ── Create Flow Modal ──────────────────────────────────
@@ -200,35 +226,61 @@
         const name = document.getElementById('newFlowName')?.value.trim();
         if (!name) { alert('Введіть назву'); return; }
         try {
-            const ref = await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-                .collection('flows').add({
-                    name,
-                    channel: document.getElementById('newFlowChannel')?.value || 'telegram',
-                    triggerKeyword: document.getElementById('newFlowTrigger')?.value.trim() || '/start',
-                    status: 'draft',
-                    nodes: [],
-                    sessionCount: 0,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            const db = firebase.firestore();
+            const compRef = db.collection('companies').doc(window.currentCompanyId);
+            const channel = document.getElementById('newFlowChannel')?.value || 'telegram';
+
+            // FIX: якщо немає botId — створюємо бот документ
+            if (!botsCurrentBotId) {
+                const botDoc = await compRef.collection('bots').add({
+                    channel,
+                    token: '',
+                    status: 'active',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                botsCurrentBotId = botDoc.id;
+                window._currentBotId = botsCurrentBotId;
+            }
+
+            const ref = await compRef.collection('bots').doc(botsCurrentBotId).collection('flows').add({
+                name,
+                channel,
+                triggerKeyword: document.getElementById('newFlowTrigger')?.value.trim() || '/start',
+                status: 'draft',
+                nodes: [],
+                sessionCount: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
             document.getElementById('botsCreateOverlay')?.remove();
             if (typeof showToast === 'function') showToast('Бота створено ✓', 'success');
-            openFlowEditor(ref.id);
+            openFlowEditor(ref.id, botsCurrentBotId);
         } catch (err) { alert('Помилка: ' + err.message); }
     };
 
     // ── Flow Node Editor (slide-in panel) ──────────────────
-    window.openFlowEditor = async function (flowId) {
+    window.openFlowEditor = async function (flowId, botId) {
         botsCurrentFlowId = flowId;
         botsSelectedNodeId = null;
+        const resolvedBotId = botId || botsCurrentBotId || window._currentBotId || null;
 
-        const doc = await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-            .collection('flows').doc(flowId).get();
-        if (!doc.exists) return;
-        const flowData = { id: doc.id, ...doc.data() };
+        // FIX: читаємо з правильного шляху
+        const db = firebase.firestore();
+        const compRef = db.collection('companies').doc(window.currentCompanyId);
+        let docSnap = null;
+        if (resolvedBotId) {
+            docSnap = await compRef.collection('bots').doc(resolvedBotId).collection('flows').doc(flowId).get();
+        }
+        if (!docSnap || !docSnap.exists) {
+            // Fallback: плоский шлях
+            docSnap = await compRef.collection('flows').doc(flowId).get();
+        }
+        if (!docSnap.exists) return;
+        const flowData = { id: docSnap.id, ...docSnap.data() };
         botsFlowNodes = JSON.parse(JSON.stringify(flowData.nodes || []));
 
-        openFlowCanvas(flowData.id);
+        window._currentBotId = resolvedBotId;
+        openFlowCanvas(flowData.id, resolvedBotId);
     };
 
     function renderFlowEditorPanel(flowData) {
@@ -518,9 +570,12 @@
     window.saveFlowNodes = async function () {
         if (!botsCurrentFlowId) return;
         try {
-            await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-                .collection('flows').doc(botsCurrentFlowId)
-                .update({ nodes: botsFlowNodes, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            const compRef = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+            // FIX: correct path
+            const ref = botsCurrentBotId
+                ? compRef.collection('bots').doc(botsCurrentBotId).collection('flows').doc(botsCurrentFlowId)
+                : compRef.collection('flows').doc(botsCurrentFlowId);
+            await ref.update({ nodes: botsFlowNodes, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             if (typeof showToast === 'function') showToast('Збережено ✓', 'success');
         } catch (e) { alert('Помилка: ' + e.message); }
     };
@@ -533,7 +588,7 @@
 
         try {
             const snap = await firebase.firestore().collection('companies').doc(window.currentCompanyId)
-                .collection('sessions').orderBy('lastActivity', 'desc').limit(100).get();
+                .collection('sessions').orderBy('updatedAt', 'desc').limit(100).get();
             const sessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
             container.innerHTML = `
@@ -758,14 +813,31 @@
             const meData = await meRes.json();
             const botName = meData.result?.username || 'bot';
 
-            // Зберігаємо в Firestore
-            await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
+            // Зберігаємо в Firestore — integrations + bots підколекція
+            const compRef = firebase.firestore().collection('companies').doc(window.currentCompanyId);
+            await compRef.update({
                 'integrations.telegram.botToken': token,
                 'integrations.telegram.botName': botName,
                 'integrations.telegram.webhookUrl': webhookUrl,
                 'integrations.telegram.connected': true,
                 'integrations.telegram.connectedAt': firebase.firestore.FieldValue.serverTimestamp(),
             });
+
+            // FIX: створюємо/оновлюємо документ в bots підколекції
+            const botsSnap2 = await compRef.collection('bots').where('channel', '==', 'telegram').limit(1).get();
+            if (botsSnap2.empty) {
+                const newBot = await compRef.collection('bots').add({
+                    channel: 'telegram', token, botName,
+                    webhookUrl, status: 'active',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                botsCurrentBotId = newBot.id;
+                window._currentBotId = newBot.id;
+            } else {
+                botsCurrentBotId = botsSnap2.docs[0].id;
+                window._currentBotId = botsCurrentBotId;
+                await compRef.collection('bots').doc(botsCurrentBotId).update({ token, botName, webhookUrl });
+            }
 
             if (typeof showToast === 'function') showToast(`Telegram @${botName} підключено!`, 'success');
             renderBotsSettingsView();
