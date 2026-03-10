@@ -69,7 +69,7 @@
     }
     
     async function addAiAssistant() {
-        const name = prompt(t('assistantName'));
+        const name = await (window.showInputModal ? showInputModal(t('assistantName'), '', {placeholder: 'Назва асистента'}) : (async()=>prompt(t('assistantName')))());
         if (!name) return;
         
         await db.collection('settings').doc('ai')

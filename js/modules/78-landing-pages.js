@@ -177,8 +177,8 @@
         } catch (e) { console.error(e); }
     };
 
-    window.confirmDeletePage = function (pageId) {
-        if (!confirm('Видалити лендінг? Це незворотно.')) return;
+    window.confirmDeletePage = async function (pageId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити лендінг? Це незворотно.',{danger:true}) : Promise.resolve(confirm('Видалити лендінг? Це незворотно.'))))) return;
         firebase.firestore().collection('companies').doc(window.currentCompanyId)
             .collection('landingPages').doc(pageId).delete()
             .then(() => { if (typeof showToast === 'function') showToast('Видалено', 'success'); })
@@ -294,13 +294,13 @@
         const funnelId = document.getElementById('lpPageFunnel')?.value || null;
         const status = document.getElementById('lpPageStatus')?.value || 'draft';
 
-        if (!name) { alert('Введіть назву'); return; }
-        if (!slug) { alert('Введіть slug'); return; }
-        if (!/^[a-z0-9-]+$/.test(slug)) { alert('Slug: тільки латиниця, цифри, дефіс'); return; }
+        if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
+        if (!slug) { if(window.showToast)showToast('Введіть slug','warning'); else alert('Введіть slug'); return; }
+        if (!/^[a-z0-9-]+$/.test(slug)) { if(window.showToast)showToast('Slug: тільки латиниця, цифри, дефіс','warning'); else alert('Slug: тільки латиниця, цифри, дефіс'); return; }
 
         // Check HTML size
         const htmlBytes = new Blob([htmlContent || '']).size;
-        if (htmlBytes > 500 * 1024) { alert('HTML занадто великий (максимум 500KB)'); return; }
+        if (htmlBytes > 500 * 1024) { if(window.showToast)showToast('HTML занадто великий (максимум 500KB)','warning'); else alert('HTML занадто великий (максимум 500KB)'); return; }
 
         const btn = document.querySelector('#lpPageOverlay button[onclick*="saveLandingPage"]');
         if (btn) { btn.textContent = 'Зберігаємо...'; btn.disabled = true; }
@@ -311,7 +311,7 @@
             // Check slug uniqueness (exclude current page)
             const slugCheck = await base.collection('landingPages').where('slug', '==', slug).get();
             const conflict = slugCheck.docs.find(d => d.id !== existingId);
-            if (conflict) { alert('Такий slug вже зайнятий'); if (btn) { btn.textContent = '✓ Зберегти'; btn.disabled = false; } return; }
+            if (conflict) { if(window.showToast)showToast('Такий slug вже зайнятий','warning'); else alert('Такий slug вже зайнятий'); if(btn) { btn.textContent = '✓ Зберегти'; btn.disabled = false; } return; }
 
             // Save HTML to Firebase Storage
             let storageRef = null;
@@ -341,7 +341,7 @@
             if (typeof showToast === 'function') showToast(existingId ? 'Лендінг оновлено ✓' : 'Лендінг створено ✓', 'success');
         } catch (err) {
             console.error('saveLandingPage error:', err);
-            alert('Помилка: ' + err.message);
+            if(window.showToast)showToast('Помилка: '+err.message,'error'); else alert('Помилка: '+err.message);
             if (btn) { btn.textContent = '✓ Зберегти'; btn.disabled = false; }
         }
     };
@@ -428,8 +428,8 @@
             </div>`;
     }
 
-    window.confirmDeleteFunnel = function (funnelId) {
-        if (!confirm('Видалити воронку?')) return;
+    window.confirmDeleteFunnel = async function (funnelId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити воронку?',{danger:true}) : Promise.resolve(confirm('Видалити воронку?'))))) return;
         firebase.firestore().collection('companies').doc(window.currentCompanyId)
             .collection('funnels').doc(funnelId).delete()
             .then(async () => {
@@ -473,7 +473,7 @@
 
     window.saveNewFunnel = async function () {
         const name = document.getElementById('newFunnelName')?.value.trim();
-        if (!name) { alert('Введіть назву'); return; }
+        if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
         try {
             const ref = await firebase.firestore().collection('companies').doc(window.currentCompanyId)
                 .collection('funnels').add({
@@ -489,18 +489,14 @@
             lpFunnels.unshift(newFunnel);
             openFunnelEditor(ref.id);
             if (typeof showToast === 'function') showToast('Воронку створено ✓', 'success');
-        } catch (err) {
-            alert('Помилка: ' + err.message);
-        }
+        } catch (err) { if(window.showToast)showToast('Помилка: ' + err.message,'error'); else alert('Помилка: ' + err.message); }
     };
 
     // ── Funnel Editor → module 79 ──────────────────────────
     window.openFunnelEditor = function (funnelId) {
         if (typeof openFunnelEditorModule === 'function') {
             openFunnelEditorModule(funnelId);
-        } else {
-            alert('Редактор воронок завантажується... Спробуйте ще раз.');
-        }
+        } else { if(window.showToast)showToast('Редактор воронок завантажується... Спробуйте ще раз.','info'); else alert('Редактор воронок завантажується... Спробуйте ще раз.'); }
     };
 
     // ── Utilities ──────────────────────────────────────────
@@ -694,8 +690,8 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
         } catch (e) { console.error(e); }
     };
 
-    window.confirmDeletePage = function (pageId) {
-        if (!confirm('Видалити лендінг? Це незворотно.')) return;
+    window.confirmDeletePage = async function (pageId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити лендінг? Це незворотно.',{danger:true}) : Promise.resolve(confirm('Видалити лендінг? Це незворотно.'))))) return;
         firebase.firestore().collection('companies').doc(window.currentCompanyId)
             .collection('landingPages').doc(pageId).delete()
             .then(() => { if (typeof showToast === 'function') showToast('Видалено', 'success'); })
@@ -811,13 +807,13 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
         const funnelId = document.getElementById('lpPageFunnel')?.value || null;
         const status = document.getElementById('lpPageStatus')?.value || 'draft';
 
-        if (!name) { alert('Введіть назву'); return; }
-        if (!slug) { alert('Введіть slug'); return; }
-        if (!/^[a-z0-9-]+$/.test(slug)) { alert('Slug: тільки латиниця, цифри, дефіс'); return; }
+        if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
+        if (!slug) { if(window.showToast)showToast('Введіть slug','warning'); else alert('Введіть slug'); return; }
+        if (!/^[a-z0-9-]+$/.test(slug)) { if(window.showToast)showToast('Slug: тільки латиниця, цифри, дефіс','warning'); else alert('Slug: тільки латиниця, цифри, дефіс'); return; }
 
         // Check HTML size
         const htmlBytes = new Blob([htmlContent || '']).size;
-        if (htmlBytes > 500 * 1024) { alert('HTML занадто великий (максимум 500KB)'); return; }
+        if (htmlBytes > 500 * 1024) { if(window.showToast)showToast('HTML занадто великий (максимум 500KB)','warning'); else alert('HTML занадто великий (максимум 500KB)'); return; }
 
         const btn = document.querySelector('#lpPageOverlay button[onclick*="saveLandingPage"]');
         if (btn) { btn.textContent = 'Зберігаємо...'; btn.disabled = true; }
@@ -828,7 +824,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
             // Check slug uniqueness (exclude current page)
             const slugCheck = await base.collection('landingPages').where('slug', '==', slug).get();
             const conflict = slugCheck.docs.find(d => d.id !== existingId);
-            if (conflict) { alert('Такий slug вже зайнятий'); if (btn) { btn.textContent = '✓ Зберегти'; btn.disabled = false; } return; }
+            if (conflict) { if(window.showToast)showToast('Такий slug вже зайнятий','warning'); else alert('Такий slug вже зайнятий'); if(btn) { btn.textContent = '✓ Зберегти'; btn.disabled = false; } return; }
 
             // Save HTML to Firebase Storage
             let storageRef = null;
@@ -858,7 +854,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
             if (typeof showToast === 'function') showToast(existingId ? 'Лендінг оновлено ✓' : 'Лендінг створено ✓', 'success');
         } catch (err) {
             console.error('saveLandingPage error:', err);
-            alert('Помилка: ' + err.message);
+            if(window.showToast)showToast('Помилка: '+err.message,'error'); else alert('Помилка: '+err.message);
             if (btn) { btn.textContent = '✓ Зберегти'; btn.disabled = false; }
         }
     };
@@ -945,8 +941,8 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
             </div>`;
     }
 
-    window.confirmDeleteFunnel = function (funnelId) {
-        if (!confirm('Видалити воронку?')) return;
+    window.confirmDeleteFunnel = async function (funnelId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити воронку?',{danger:true}) : Promise.resolve(confirm('Видалити воронку?'))))) return;
         firebase.firestore().collection('companies').doc(window.currentCompanyId)
             .collection('funnels').doc(funnelId).delete()
             .then(async () => {
@@ -990,7 +986,7 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
 
     window.saveNewFunnel = async function () {
         const name = document.getElementById('newFunnelName')?.value.trim();
-        if (!name) { alert('Введіть назву'); return; }
+        if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
         try {
             const ref = await firebase.firestore().collection('companies').doc(window.currentCompanyId)
                 .collection('funnels').add({
@@ -1006,18 +1002,14 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
             lpFunnels.unshift(newFunnel);
             openFunnelEditor(ref.id);
             if (typeof showToast === 'function') showToast('Воронку створено ✓', 'success');
-        } catch (err) {
-            alert('Помилка: ' + err.message);
-        }
+        } catch (err) { if(window.showToast)showToast('Помилка: ' + err.message,'error'); else alert('Помилка: ' + err.message); }
     };
 
     // ── Funnel Editor → module 79 ──────────────────────────
     window.openFunnelEditor = function (funnelId) {
         if (typeof openFunnelEditorModule === 'function') {
             openFunnelEditorModule(funnelId);
-        } else {
-            alert('Редактор воронок завантажується... Спробуйте ще раз.');
-        }
+        } else { if(window.showToast)showToast('Редактор воронок завантажується... Спробуйте ще раз.','info'); else alert('Редактор воронок завантажується... Спробуйте ще раз.'); }
     };
 
     // ── Utilities ──────────────────────────────────────────

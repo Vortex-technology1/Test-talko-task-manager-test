@@ -585,7 +585,7 @@
     window.deleteCoord = async function(coordId) {
         const ok = window.showConfirmModal
             ? await window.showConfirmModal('Видалити координацію?',{danger:true})
-            : confirm('Видалити?');
+            : (window.showConfirmModal ? await showConfirmModal('Видалити?',{danger:true}) : confirm('Видалити?'));
         if (!ok) return;
         try { await col('coordinations').doc(coordId).delete(); toast('Видалено'); }
         catch(e) { toast('Помилка видалення','error'); }

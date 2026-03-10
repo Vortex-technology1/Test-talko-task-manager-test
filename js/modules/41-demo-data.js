@@ -21,7 +21,7 @@
             if (!currentCompany) return;
             
             const confirmText = t('deleteAllConfirmText');
-            const input = prompt(`Введіть "${confirmText}" щоб підтвердити повне видалення всіх даних компанії (крім користувачів):`);
+            const input = await (window.showInputModal ? showInputModal(`Введіть "${confirmText}" щоб підтвердити повне видалення всіх даних компанії (крім користувачів):`, '', {placeholder: confirmText}) : (async()=>prompt(`Введіть "${confirmText}" щоб підтвердити повне видалення всіх даних компанії (крім користувачів):`))());
             if (input !== confirmText) {
                 if (input !== null) showToast(t('textMismatch'), 'error');
                 return;
@@ -1148,7 +1148,7 @@
             if (!currentCompany) return;
             
             const confirmText = t('deleteAllConfirmText');
-            const input = prompt(`Введіть "${confirmText}" щоб підтвердити повне видалення всіх даних компанії (крім користувачів):`);
+            const input = await (window.showInputModal ? showInputModal(`Введіть "${confirmText}" щоб підтвердити повне видалення всіх даних компанії (крім користувачів):`, '', {placeholder: confirmText}) : (async()=>prompt(`Введіть "${confirmText}" щоб підтвердити повне видалення всіх даних компанії (крім користувачів):`))());
             if (input !== confirmText) {
                 if (input !== null) showToast(t('textMismatch'), 'error');
                 return;

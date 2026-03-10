@@ -50,9 +50,9 @@
             window.timeTrackerStart = null;
         }
         
-        function addManualTime() {
+        async function addManualTime() {
             if (!editingId) return;
-            const minutes = prompt(t('howManyMinutes'));
+            const minutes = await (window.showInputModal ? showInputModal(t('howManyMinutes'), '', {placeholder: 'Наприклад: 30'}) : (async()=>prompt(t('howManyMinutes')))());
             if (minutes === null) return;
             const mins = parseInt(minutes);
             if (isNaN(mins) || mins <= 0) return;

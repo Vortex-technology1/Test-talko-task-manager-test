@@ -18,7 +18,7 @@
             .collection('companies').doc(window.currentCompanyId)
             .collection('funnels').doc(funnelId).get();
 
-        if (!doc.exists) { alert('Воронку не знайдено'); return; }
+        if (!doc.exists) { if(window.showToast)showToast('Воронку не знайдено','warning'); else alert('Воронку не знайдено'); return; }
         funnelEditorData = { id: doc.id, ...doc.data() };
         funnelSteps = JSON.parse(JSON.stringify(funnelEditorData.steps || []));
 
@@ -155,8 +155,8 @@
         selectFunnelStep(id);
     };
 
-    window.deleteFunnelStep = function (stepId) {
-        if (!confirm('Видалити крок?')) return;
+    window.deleteFunnelStep = async function (stepId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити крок?',{danger:true}) : Promise.resolve(confirm('Видалити крок?'))))) return;
         funnelSteps = funnelSteps.filter(s => s.id !== stepId);
         if (selectedStepId === stepId) {
             selectedStepId = null;
@@ -335,9 +335,7 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             if (typeof showToast === 'function') showToast('Воронку збережено ✓', 'success');
-        } catch (err) {
-            alert('Помилка збереження: ' + err.message);
-        }
+        } catch (err) { if(window.showToast)showToast('Помилка збереження: ' + err.message,'error'); else alert('Помилка збереження: ' + err.message); }
     };
 
     // ── Test Preview ────────────────────────────────────────

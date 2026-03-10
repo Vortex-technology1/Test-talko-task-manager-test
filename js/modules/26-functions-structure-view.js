@@ -148,8 +148,8 @@
             draggedFuncId = null;
         }
         
-        function addCategory() {
-            const name = prompt(t('categoryName'));
+        async function addCategory() {
+            const name = await (window.showInputModal ? showInputModal(t('categoryName'), '', {placeholder: 'Назва категорії'}) : (async()=>prompt(t('categoryName')))());
             if (!name || !name.trim()) return;
             const cats = getStructureCategories();
             if (cats.includes(name.trim())) { showToast(t('categoryExists'), 'warning'); return; }

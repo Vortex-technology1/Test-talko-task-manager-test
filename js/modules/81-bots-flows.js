@@ -171,8 +171,8 @@
         if (typeof showToast === 'function') showToast(newStatus === 'active' ? '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Бота активовано' : '⏸ Бота на паузі', 'success');
     };
 
-    window.confirmDeleteFlow = function (flowId) {
-        if (!confirm('Видалити бота? Активні сесії будуть зупинені.')) return;
+    window.confirmDeleteFlow = async function (flowId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити бота? Активні сесії будуть зупинені.',{danger:true}) : Promise.resolve(confirm('Видалити бота? Активні сесії будуть зупинені.'))))) return;
         const compRef = firebase.firestore().collection('companies').doc(window.currentCompanyId);
         // FIX: correct path
         const ref = botsCurrentBotId
@@ -224,7 +224,7 @@
 
     window.saveNewFlow = async function () {
         const name = document.getElementById('newFlowName')?.value.trim();
-        if (!name) { alert('Введіть назву'); return; }
+        if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
         try {
             const db = firebase.firestore();
             const compRef = db.collection('companies').doc(window.currentCompanyId);
@@ -255,7 +255,7 @@
             document.getElementById('botsCreateOverlay')?.remove();
             if (typeof showToast === 'function') showToast('Бота створено ✓', 'success');
             openFlowEditor(ref.id, botsCurrentBotId);
-        } catch (err) { alert('Помилка: ' + err.message); }
+        } catch (err) { if(window.showToast)showToast('Помилка: ' + err.message,'error'); else alert('Помилка: ' + err.message); }
     };
 
     // ── Flow Node Editor (slide-in panel) ──────────────────
@@ -389,8 +389,8 @@
         selectFlowNode(id);
     };
 
-    window.deleteFlowNode = function (nodeId) {
-        if (!confirm('Видалити вузол?')) return;
+    window.deleteFlowNode = async function (nodeId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити вузол?',{danger:true}) : Promise.resolve(confirm('Видалити вузол?'))))) return;
         botsFlowNodes = botsFlowNodes.filter(n => n.id !== nodeId);
         if (botsSelectedNodeId === nodeId) {
             botsSelectedNodeId = null;
@@ -577,7 +577,7 @@
                 : compRef.collection('flows').doc(botsCurrentFlowId);
             await ref.update({ nodes: botsFlowNodes, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             if (typeof showToast === 'function') showToast('Збережено ✓', 'success');
-        } catch (e) { alert('Помилка: ' + e.message); }
+        } catch (e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
     };
 
     // ── Sessions View ──────────────────────────────────────
@@ -872,7 +872,7 @@
 
     // ── Disconnect Channel ────────────────────────────────────
     window.botsDisconnectChannel = async function(channel) {
-        if (!confirm(`Відключити ${channel}?`)) return;
+        if (!(await (window.showConfirmModal ? showConfirmModal(`Відключити ${channel}?`,{danger:true}) : Promise.resolve(confirm(`Відключити ${channel}?`))))) return;
         try {
             await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
                 [`integrations.${channel}.connected`]: false,
@@ -894,7 +894,7 @@
                 .update({ [field]: key });
             if (typeof showToast === 'function') showToast('Ключ збережено ✓', 'success');
             document.getElementById(inputId).value = '••••••••' + key.slice(-4);
-        } catch (e) { alert('Помилка: ' + e.message); }
+        } catch (e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
     };
 
     // ── Helpers ────────────────────────────────────────────
@@ -1084,8 +1084,8 @@ window.onSwitchTab && window.onSwitchTab('flows', function() {
         if (typeof showToast === 'function') showToast(newStatus === 'active' ? '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Бота активовано' : '⏸ Бота на паузі', 'success');
     };
 
-    window.confirmDeleteFlow = function (flowId) {
-        if (!confirm('Видалити бота? Активні сесії будуть зупинені.')) return;
+    window.confirmDeleteFlow = async function (flowId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити бота? Активні сесії будуть зупинені.',{danger:true}) : Promise.resolve(confirm('Видалити бота? Активні сесії будуть зупинені.'))))) return;
         const compRef = firebase.firestore().collection('companies').doc(window.currentCompanyId);
         // FIX: correct path
         const ref = botsCurrentBotId
@@ -1137,7 +1137,7 @@ window.onSwitchTab && window.onSwitchTab('flows', function() {
 
     window.saveNewFlow = async function () {
         const name = document.getElementById('newFlowName')?.value.trim();
-        if (!name) { alert('Введіть назву'); return; }
+        if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
         try {
             const db = firebase.firestore();
             const compRef = db.collection('companies').doc(window.currentCompanyId);
@@ -1168,7 +1168,7 @@ window.onSwitchTab && window.onSwitchTab('flows', function() {
             document.getElementById('botsCreateOverlay')?.remove();
             if (typeof showToast === 'function') showToast('Бота створено ✓', 'success');
             openFlowEditor(ref.id, botsCurrentBotId);
-        } catch (err) { alert('Помилка: ' + err.message); }
+        } catch (err) { if(window.showToast)showToast('Помилка: ' + err.message,'error'); else alert('Помилка: ' + err.message); }
     };
 
     // ── Flow Node Editor (slide-in panel) ──────────────────
@@ -1302,8 +1302,8 @@ window.onSwitchTab && window.onSwitchTab('flows', function() {
         selectFlowNode(id);
     };
 
-    window.deleteFlowNode = function (nodeId) {
-        if (!confirm('Видалити вузол?')) return;
+    window.deleteFlowNode = async function (nodeId) {
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити вузол?',{danger:true}) : Promise.resolve(confirm('Видалити вузол?'))))) return;
         botsFlowNodes = botsFlowNodes.filter(n => n.id !== nodeId);
         if (botsSelectedNodeId === nodeId) {
             botsSelectedNodeId = null;
@@ -1490,7 +1490,7 @@ window.onSwitchTab && window.onSwitchTab('flows', function() {
                 : compRef.collection('flows').doc(botsCurrentFlowId);
             await ref.update({ nodes: botsFlowNodes, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
             if (typeof showToast === 'function') showToast('Збережено ✓', 'success');
-        } catch (e) { alert('Помилка: ' + e.message); }
+        } catch (e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
     };
 
     // ── Sessions View ──────────────────────────────────────
@@ -1785,7 +1785,7 @@ window.onSwitchTab && window.onSwitchTab('flows', function() {
 
     // ── Disconnect Channel ────────────────────────────────────
     window.botsDisconnectChannel = async function(channel) {
-        if (!confirm(`Відключити ${channel}?`)) return;
+        if (!(await (window.showConfirmModal ? showConfirmModal(`Відключити ${channel}?`,{danger:true}) : Promise.resolve(confirm(`Відключити ${channel}?`))))) return;
         try {
             await firebase.firestore().collection('companies').doc(window.currentCompanyId).update({
                 [`integrations.${channel}.connected`]: false,
@@ -1807,7 +1807,7 @@ window.onSwitchTab && window.onSwitchTab('flows', function() {
                 .update({ [field]: key });
             if (typeof showToast === 'function') showToast('Ключ збережено ✓', 'success');
             document.getElementById(inputId).value = '••••••••' + key.slice(-4);
-        } catch (e) { alert('Помилка: ' + e.message); }
+        } catch (e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
     };
 
     // ── Helpers ────────────────────────────────────────────

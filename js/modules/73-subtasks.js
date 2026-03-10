@@ -234,13 +234,13 @@
             }
         } catch(err) {
             console.error('saveSubtask error:', err);
-            alert('Помилка збереження: ' + err.message);
+            if(window.showToast)showToast('Помилка збереження: '+err.message,'error'); else alert('Помилка збереження: '+err.message);
         }
     };
 
     // ---- ВИДАЛЕННЯ підзавдання ----
     window.deleteSubtask = async function(subtaskId, parentId) {
-        if (!confirm('Видалити підзавдання?')) return;
+        if (!(await (window.showConfirmModal ? showConfirmModal('Видалити підзавдання?',{danger:true}) : Promise.resolve(confirm('Видалити підзавдання?'))))) return;
         const cid = currentUserData?.companyId || currentCompany;
         try {
             await firebase.firestore()

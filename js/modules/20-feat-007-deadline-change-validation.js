@@ -75,6 +75,37 @@
         }
         window.showAlertModal = showAlertModal;
         window.showConfirmModal = showConfirmModal;
+        window.showToast = window.showToast || showToast; // глобальний доступ для всіх модулів
+        // ── showInputModal: замінник prompt() — повертає Promise<string|null> ──
+        function showInputModal(message, defaultValue = '', { placeholder = '', multiline = false } = {}) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10050;display:flex;align-items:center;justify-content:center;padding:1rem;';
+                const inputHtml = multiline
+                    ? `<textarea id="_inputVal" rows="3" placeholder="${placeholder}" style="width:100%;padding:0.6rem 0.75rem;border:1.5px solid #e5e7eb;border-radius:8px;font-size:0.9rem;resize:vertical;outline:none;font-family:inherit;">${defaultValue}</textarea>`
+                    : `<input id="_inputVal" type="text" value="${defaultValue}" placeholder="${placeholder}" style="width:100%;padding:0.6rem 0.75rem;border:1.5px solid #e5e7eb;border-radius:8px;font-size:0.9rem;outline:none;">`;
+                overlay.innerHTML = `
+                    <div style="background:white;border-radius:16px;padding:1.5rem;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                        <p style="margin:0 0 0.9rem;font-size:0.95rem;color:#374151;line-height:1.5;">${message.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+                        ${inputHtml}
+                        <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem;">
+                            <button id="_inputCancel" style="padding:0.5rem 1.1rem;border:1px solid #e5e7eb;border-radius:8px;background:white;cursor:pointer;font-size:0.9rem;color:#6b7280;">Скасувати</button>
+                            <button id="_inputOk" style="padding:0.5rem 1.25rem;border:none;border-radius:8px;background:#22c55e;color:white;cursor:pointer;font-size:0.9rem;font-weight:600;">OK</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(overlay);
+                const inputEl = overlay.querySelector('#_inputVal');
+                setTimeout(() => inputEl.focus(), 50);
+                const ok = () => { const v = inputEl.value.trim(); overlay.remove(); resolve(v || null); };
+                const cancel = () => { overlay.remove(); resolve(null); };
+                overlay.querySelector('#_inputOk').onclick = ok;
+                overlay.querySelector('#_inputCancel').onclick = cancel;
+                overlay.onclick = (e) => { if (e.target === overlay) cancel(); };
+                inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !multiline) ok(); if (e.key === 'Escape') cancel(); });
+            });
+        }
+        window.showInputModal = showInputModal;
+
         
         // Listener для завдань на перевірці (сповіщення постановнику)
         let reviewTasksUnsubscribe = null;

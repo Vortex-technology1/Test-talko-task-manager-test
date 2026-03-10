@@ -120,7 +120,7 @@
             // Друге підтвердження для безпеки
             const confirmMsg2 = t('deleteCompanyConfirm2').replace('{name}', companyName);
             
-            const userInput = prompt(confirmMsg2);
+            const userInput = await (window.showInputModal ? showInputModal(confirmMsg2, '', {placeholder: 'Введіть текст підтвердження'}) : (async()=>prompt(confirmMsg2))());
             const yesVariants = ['ua','ru','en','de','pl'].map(l => (translations[l]?.confirmYes || '').toLowerCase()).filter(Boolean); if (!yesVariants.includes(userInput?.toLowerCase())) {
                 return;
             }

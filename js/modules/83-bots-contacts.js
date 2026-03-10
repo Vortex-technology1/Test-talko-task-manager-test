@@ -462,8 +462,8 @@ window.createAndConnectBot = async function() {
     const name = document.getElementById('bpNewBotName')?.value.trim();
     const token = document.getElementById('bpNewBotToken')?.value.trim();
     const channel = document.getElementById('bpNewBotChannel')?.value || 'telegram';
-    if (!name) { alert('Введіть назву бота'); return; }
-    if (!token) { alert('Введіть токен'); return; }
+    if (!name) { if(window.showToast)showToast('Введіть назву бота','warning'); else alert('Введіть назву бота'); return; }
+    if (!token) { if(window.showToast)showToast('Введіть токен','warning'); else alert('Введіть токен'); return; }
 
     const btn = document.querySelector('[onclick="createAndConnectBot()"]');
     if (btn) { btn.textContent = t('botsLoading'); }
@@ -520,7 +520,7 @@ window.createAndConnectBot = async function() {
         openBot(botRef.id);
     } catch(e) {
         if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Підключити';
-        alert('Помилка: ' + e.message);
+        if(window.showToast)showToast('Помилка: '+e.message,'error'); else alert('Помилка: '+e.message);
     }
 };
 
@@ -530,8 +530,8 @@ window.openBotSettings = async function(botId) {
     bpSwitch('settings');
 };
 
-window.confirmDeleteBot = function(botId) {
-    if (!confirm('Видалити бота і всі його ланцюги?')) return;
+window.confirmDeleteBot = async function(botId) {
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити бота і всі його ланцюги?',{danger:true}) : Promise.resolve(confirm('Видалити бота і всі його ланцюги?'))))) return;
     firebase.firestore().collection('companies').doc(window.currentCompanyId)
         .collection('bots').doc(botId).delete()
         .then(() => { if (typeof showToast === 'function') showToast('Бота видалено', 'success'); });
@@ -577,7 +577,7 @@ window.openCreateFlowModal = function() {
 
 window.saveNewFlow = async function() {
     const name = document.getElementById('bpFlowName')?.value.trim();
-    if (!name) { alert('Введіть назву'); return; }
+    if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
     const bot = bp.bots.find(b=>b.id===bp.activeBotId);
     try {
         const ref = await firebase.firestore()
@@ -601,7 +601,7 @@ window.saveNewFlow = async function() {
         document.getElementById('bpCreateFlow')?.remove();
         if (typeof showToast === 'function') showToast('Ланцюг створено ✓', 'success');
         editFlow(ref.id);
-    } catch(e) { alert('Помилка: ' + e.message); }
+    } catch(e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
 };
 
 window.editFlow = function(flowId) {
@@ -619,8 +619,8 @@ window.toggleFlowStatus = async function(flowId, status) {
     if (typeof showToast === 'function') showToast(newStatus==='active'?'▶ Активовано':'⏸ Пауза', 'success');
 };
 
-window.deleteFlow = function(flowId) {
-    if (!confirm('Видалити ланцюг?')) return;
+window.deleteFlow = async function(flowId) {
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити ланцюг?',{danger:true}) : Promise.resolve(confirm('Видалити ланцюг?'))))) return;
     firebase.firestore().collection('companies').doc(window.currentCompanyId)
         .collection('bots').doc(bp.activeBotId)
         .collection('flows').doc(flowId).delete()
@@ -1180,7 +1180,7 @@ window.ctsAddToCRM = async function(contactId) {
 // ВИДАЛЕННЯ КОНТАКТУ
 // ─────────────────────────────────────────
 window.ctsDeleteContact = async function(contactId) {
-    if (!confirm('Видалити контакт? Цю дію не можна скасувати.')) return;
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити контакт? Цю дію не можна скасувати.',{danger:true}) : Promise.resolve(confirm('Видалити контакт? Цю дію не можна скасувати.'))))) return;
     try {
         await firebase.firestore()
             .doc(`companies/${window.currentCompanyId}/contacts/${contactId}`)
@@ -2089,10 +2089,7 @@ window.bpSendBroadcast = async function() {
     const niche   = document.getElementById('bcastNiche')?.value || '';
     const tag     = document.getElementById('bcastTag')?.value || '';
 
-    if (!text && !flowSendId) {
-        alert('Введіть текст або оберіть ланцюг для запуску');
-        return;
-    }
+    if (!text && !flowSendId) { if(window.showToast)showToast('Введіть текст або оберіть ланцюг для запуску','warning'); else alert('Введіть текст або оберіть ланцюг для запуску'); return; }
 
     // Завантажуємо всіх цільових контактів з Firestore (не з bp.contacts)
     let q = firebase.firestore()
@@ -2113,12 +2110,9 @@ window.bpSendBroadcast = async function() {
     // Тільки Telegram (поки)
     targets = targets.filter(ct => ct.channel === 'telegram' || ct.source === 'telegram');
 
-    if (targets.length === 0) {
-        alert('Немає контактів для розсилки з обраними фільтрами');
-        return;
-    }
+    if (targets.length === 0) { if(window.showToast)showToast('Немає контактів для розсилки з обраними фільтрами','warning'); else alert('Немає контактів для розсилки з обраними фільтрами'); return; }
 
-    if (!confirm(`Надіслати розсилку ${targets.length} контактам?`)) return;
+    if (!(await (window.showConfirmModal ? showConfirmModal(`Надіслати розсилку ${targets.length} контактам?`) : Promise.resolve(confirm(`Надіслати розсилку ${targets.length} контактам?`))))) return;
 
     // Отримуємо токен бота
     const compDoc = await firebase.firestore()
@@ -2126,10 +2120,7 @@ window.bpSendBroadcast = async function() {
     const botToken = compDoc.data()?.integrations?.telegram?.botToken
         || bp.bots.find(b => b.channel === 'telegram')?.token;
 
-    if (!botToken) {
-        alert('Не знайдено токен Telegram бота. Перевірте налаштування.');
-        return;
-    }
+    if (!botToken) { if(window.showToast)showToast('Не знайдено токен Telegram бота. Перевірте налаштування.','warning'); else alert('Не знайдено токен Telegram бота. Перевірте налаштування.'); return; }
 
     // ── Запускаємо відправку ──
     bcast.running   = true;
@@ -2276,9 +2267,9 @@ window.bpSendBroadcast = async function() {
 // ─────────────────────────────────────────
 // СКАСУВАННЯ
 // ─────────────────────────────────────────
-window.bcastCancel = function() {
+window.bcastCancel = async function() {
     if (!bcast.running) return;
-    if (!confirm('Зупинити розсилку? Вже надіслані повідомлення не відкличуться.')) return;
+    if (!(await (window.showConfirmModal ? showConfirmModal('Зупинити розсилку? Вже надіслані повідомлення не відкличуться.',{danger:true}) : Promise.resolve(confirm('Зупинити розсилку? Вже надіслані повідомлення не відкличуться.'))))) return;
     bcast.cancelled = true;
 };
 
@@ -2582,7 +2573,7 @@ window.bpReinstallWebhook = async function(botId) {
 // ─────────────────────────────────────────
 window.bpReconnectBot = async function(botId) {
     const token = document.getElementById('bpSettingsToken')?.value.trim();
-    if (!token || token.includes('•')) { alert('Введіть новий токен'); return; }
+    if (!token || token.includes('•')) { if(window.showToast)showToast('Введіть новий токен','warning'); else alert('Введіть новий токен'); return; }
 
     try {
         const meRes = await fetch(`https://api.telegram.org/bot${token}/getMe`);
@@ -2614,7 +2605,7 @@ window.bpReconnectBot = async function(botId) {
         if (typeof showToast === 'function') showToast(`✅ Токен оновлено, @${me.result.username} підключено`, 'success');
         document.getElementById('bpSettingsToken').value = '';
         renderSettingsTab();
-    } catch(e) { alert('Помилка: ' + e.message); }
+    } catch(e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
 };
 
 // ─────────────────────────────────────────
@@ -2625,7 +2616,7 @@ window.settingsSaveApiKey = window.saveBotApiKey = async function(type) {
         ? document.getElementById('settingsOpenAIKey')
         : document.getElementById('settingsAnthropicKey');
     const key = keyEl?.value.trim();
-    if (!key || key.includes('•')) { alert('Введіть новий ключ'); return; }
+    if (!key || key.includes('•')) { if(window.showToast)showToast('Введіть новий ключ','warning'); else alert('Введіть новий ключ'); return; }
 
     const result = document.getElementById('apiKeyResult');
     try {

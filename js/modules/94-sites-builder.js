@@ -134,7 +134,7 @@ async function _loadSite() {
     try {
         const doc = await firebase.firestore()
             .doc('companies/' + window.currentCompanyId + '/sites/' + sb.siteId).get();
-        if (!doc.exists) { alert('Сайт не знайдено'); window.initSitesModule(); return; }
+        if (!doc.exists) { (window.showToast && showToast('Сайт не знайдено','warning')); window.initSitesModule(); return; }
         sb.site   = { id: doc.id, ...doc.data() };
         sb.blocks = sb.site.blocks || [];
         _updateHeader();
@@ -306,8 +306,8 @@ window.sbMoveBlock = function (idx, dir) {
     _renderPreview();
 };
 
-window.sbRemoveBlock = function (idx) {
-    if (!confirm('Видалити блок?')) return;
+window.sbRemoveBlock = async function (idx) {
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити блок?',{danger:true}) : Promise.resolve(confirm('Видалити блок?'))))) return;
     sb.blocks.splice(idx, 1);
     if (sb.activeBlockIdx >= sb.blocks.length) sb.activeBlockIdx = sb.blocks.length - 1;
     _renderBlockList();

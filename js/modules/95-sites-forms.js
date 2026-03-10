@@ -203,7 +203,7 @@ window.sfOpenCreate = function () {
 
 window.sfCreate = async function () {
     const name = document.getElementById('sfc_name')?.value.trim();
-    if (!name) { alert("Введіть назву форми"); return; }
+    if (!name) { if(window.showToast)showToast("Введіть назву форми",'warning'); else alert("Введіть назву форми"); return; }
 
     const fields = ['name','phone','email','message','telegram']
         .filter(k => document.getElementById('sfc_' + k)?.checked);
@@ -227,9 +227,7 @@ window.sfCreate = async function () {
         sf.forms.unshift({ id: ref.id, name, fields, crmIntegration, telegramNotify, submissionsCount: 0 });
         if (typeof showToast === 'function') showToast('Форму створено ✓', 'success');
         sfOpenEditor(ref.id);
-    } catch(e) {
-        alert('Помилка: ' + e.message);
-    }
+    } catch(e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
 };
 
 // ── Редактор форми ─────────────────────────────────────────
@@ -365,7 +363,7 @@ function _sfUpdatePreview() {
 
 window.sfSaveForm = async function (formId) {
     const name     = document.getElementById('sfe_name')?.value.trim();
-    if (!name) { alert('Введіть назву'); return; }
+    if (!name) { if(window.showToast)showToast('Введіть назву','warning'); else alert('Введіть назву'); return; }
     const fields = ['name','phone','email','message','telegram']
         .filter(k => document.getElementById('sfe_field_' + k)?.checked);
     const data = {
@@ -457,7 +455,7 @@ window.sfOpenSubmissions = async function (formId) {
 
 // ── Видалення форми ────────────────────────────────────────
 window.sfDelete = async function (formId, name) {
-    if (!confirm('Видалити форму "' + name + '"?\nВсі заявки будуть видалені.')) return;
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити форму "' + name + '"?\nВсі заявки будуть видалені.',{danger:true}) : Promise.resolve(confirm('Видалити форму "' + name + '"?\nВсі заявки будуть видалені.'))))) return;
     try {
         await firebase.firestore()
             .doc('companies/' + window.currentCompanyId + '/sites/' + sf.siteId + '/forms/' + formId).delete();

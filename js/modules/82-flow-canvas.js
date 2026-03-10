@@ -365,7 +365,7 @@ function mountCanvas() {
                 statusBtn.style.background = next === 'active' ? '#dcfce7' : '#334155';
                 statusBtn.style.color = next === 'active' ? '#16a34a' : '#94a3b8';
                 if (typeof showToast === 'function') showToast(next === 'active' ? '🟢 Флоу активовано' : '⚫ Флоу на паузі', 'success');
-            } catch(e) { alert('Помилка: ' + e.message); }
+            } catch(e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
         };
     }
     document.getElementById('fcBtnZoomIn').onclick = () => doZoom(0.15);
@@ -675,7 +675,7 @@ function buildNodeEl(node) {
         delEl.addEventListener('mousedown', e => {
             e.stopPropagation();
             e.preventDefault();
-            if (confirm(`Видалити вузол "${cfg.label}"?`)) {
+            if (await (window.showConfirmModal ? showConfirmModal(`Видалити вузол "${cfg.label}"?`,{danger:true}) : Promise.resolve(confirm(`Видалити вузол "${cfg.label}"?`)))) {
                 pushHistory();
                 fc.nodes = fc.nodes.filter(n => n.id !== node.id);
                 fc.edges = fc.edges.filter(ed => ed.fromNode !== node.id && ed.toNode !== node.id);
@@ -1218,7 +1218,7 @@ window.fcOpenAiFunnelModal = function() {
 
 window.fcRunAiFunnel = async function(mode) {
     const input = document.getElementById('fcAiFunnelInput')?.value?.trim();
-    if (!input) return alert('Опишіть бізнес');
+    if (!input) { if(window.showToast)showToast('Опишіть бізнес','warning'); else alert('Опишіть бізнес'); return; }
     document.getElementById('fcAiFunnelLoader').style.display = 'block';
     document.getElementById('fcAiFunnelResult').style.display = 'none';
 
@@ -1764,8 +1764,8 @@ window.fcApplyNodeData = function(nodeId) {
     saveFlow();
 };
 
-window.fcDeleteNode = function(nodeId) {
-    if (!confirm('Видалити вузол?')) return;
+window.fcDeleteNode = async function(nodeId) {
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити вузол?',{danger:true}) : Promise.resolve(confirm('Видалити вузол?'))))) return;
     pushHistory();
     fc.nodes = fc.nodes.filter(n=>n.id!==nodeId);
     fc.edges = fc.edges.filter(e=>e.fromNode!==nodeId&&e.toNode!==nodeId);
@@ -1895,7 +1895,7 @@ async function saveFlow() {
         renderAll();
     } catch(e) {
         if (btn) btn.textContent = 'Зберегти';
-        alert('Помилка: ' + e.message);
+        if(window.showToast)showToast('Помилка: '+e.message,'error'); else alert('Помилка: '+e.message);
     }
 }
 

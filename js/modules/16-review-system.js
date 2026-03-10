@@ -146,7 +146,7 @@
                 return;
             }
             
-            const reason = prompt(t('rejectReasonPlaceholder'));
+            const reason = await (window.showInputModal ? showInputModal(t('rejectReasonPlaceholder'), '', {placeholder: 'Причина відхилення', multiline: true}) : (async()=>prompt(t('rejectReasonPlaceholder')))());
             if (reason === null) return;
             
             const taskIndex = tasks.findIndex(t => t.id === taskId);

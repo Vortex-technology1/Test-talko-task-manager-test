@@ -266,7 +266,7 @@ window.sitesSelectNiche = function (key) {
 
 window.sitesCreate = async function () {
     const name = document.getElementById('sc_name')?.value.trim();
-    if (!name) { alert('Введіть назву сайту'); return; }
+    if (!name) { if(window.showToast)showToast('Введіть назву сайту','warning'); else alert('Введіть назву сайту'); return; }
     const desc = document.getElementById('sc_desc')?.value.trim() || '';
 
     const nicheTemplates = {
@@ -304,9 +304,7 @@ window.sitesCreate = async function () {
 
         // Одразу відкриваємо редактор
         sitesOpenBuilder(ref.id);
-    } catch (e) {
-        alert('Помилка: ' + e.message);
-    }
+    } catch (e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
 };
 
 function _defaultBlock(type, order) {
@@ -356,7 +354,7 @@ window.sitesTogglePublish = async function (siteId, currentStatus) {
 };
 
 window.sitesDelete = async function (siteId, name) {
-    if (!confirm('Видалити сайт "' + name + '"?\nВсі блоки та форми будуть видалені.')) return;
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити сайт "' + name + '"?\nВсі блоки та форми будуть видалені.',{danger:true}) : Promise.resolve(confirm('Видалити сайт "' + name + '"?\nВсі блоки та форми будуть видалені.'))))) return;
     try {
         await firebase.firestore()
             .doc('companies/' + window.currentCompanyId + '/sites/' + siteId).delete();

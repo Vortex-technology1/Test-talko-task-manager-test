@@ -555,7 +555,7 @@ window.crmSaveDeal = async function(dealId) {
 };
 
 window.crmDeleteDeal = async function(dealId) {
-    if (!confirm('Видалити угоду?')) return;
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити угоду?',{danger:true}) : Promise.resolve(confirm('Видалити угоду?'))))) return;
     try {
         await firebase.firestore().doc(`companies/${window.currentCompanyId}/crm_deals/${dealId}`).delete();
         crmCloseDeal();
@@ -790,7 +790,7 @@ window.crmCreateDeal = async function() {
     const stage  = document.getElementById('nd_stage')?.value || 'new';
     const amount = parseFloat(document.getElementById('nd_amount')?.value) || 0;
     const niche  = document.getElementById('nd_niche')?.value.trim();
-    if (!title && !client) { alert("Введіть назву або ім'я клієнта"); return; }
+    if (!title && !client) { if(window.showToast)showToast("Введіть назву або ім'я клієнта",'warning'); else alert("Введіть назву або ім'я клієнта"); return; }
     try {
         const ref = await firebase.firestore()
             .collection(`companies/${window.currentCompanyId}/crm_deals`).add({
@@ -806,7 +806,7 @@ window.crmCreateDeal = async function() {
         if (typeof emitTalkoEvent === 'function' && window.TALKO_EVENTS) {
             emitTalkoEvent(window.TALKO_EVENTS.DEAL_CREATED, { dealId:ref.id, clientName:client||title, stage, amount });
         }
-    } catch(e) { alert('Помилка: ' + e.message); }
+    } catch(e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
 };
 
 // ══════════════════════════════════════════════════════════
@@ -1057,8 +1057,8 @@ function _subscribeDeals() {
     crm.unsubs.push(dealUnsub);
 }
 
-window.crmCreatePipeline = function() {
-    const name = prompt('Назва нової воронки:');
+window.crmCreatePipeline = async function() {
+    const name = await (window.showInputModal ? showInputModal('Назва нової воронки:', '', {placeholder: 'Введіть назву'}) : (async()=>prompt('Назва нової воронки:'))());
     if (!name?.trim()) return;
     _doCreatePipeline(name.trim());
 };
@@ -1078,13 +1078,11 @@ async function _doCreatePipeline(name) {
         crm.pipelines.push({ id:ref.id, name, isDefault:false, stages });
         if (typeof showToast === 'function') showToast('Воронку створено', 'success');
         _renderCRMSettings();
-    } catch(e) {
-        alert('Помилка: ' + e.message);
-    }
+    } catch(e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
 }
 
 window.crmDeletePipeline = async function(pipelineId, name) {
-    if (!confirm(`Видалити воронку "${name}"?\nВсі угоди в ній залишаться.`)) return;
+    if (!(await (window.showConfirmModal ? showConfirmModal(`Видалити воронку "${name}"?\nВсі угоди в ній залишаться.`,{danger:true}) : Promise.resolve(confirm(`Видалити воронку "${name}"?\nВсі угоди в ній залишаться.`))))) return;
     try {
         await firebase.firestore()
             .doc('companies/' + window.currentCompanyId + '/crm_pipeline/' + pipelineId).delete();
@@ -1094,9 +1092,7 @@ window.crmDeletePipeline = async function(pipelineId, name) {
         }
         if (typeof showToast === 'function') showToast('Видалено', 'success');
         _renderCRMSettings();
-    } catch(e) {
-        alert('Помилка: ' + e.message);
-    }
+    } catch(e) { if(window.showToast)showToast('Помилка: ' + e.message,'error'); else alert('Помилка: ' + e.message); }
 };
 
 // ── Stage CRUD ─────────────────────────────────────────────
@@ -1119,8 +1115,8 @@ window.crmUpdateStageColor = function(stageId, color) {
     if (s) { s.color = color; _renderCRMSettings(); }
 };
 
-window.crmRemoveStage = function(stageId) {
-    if (!confirm('Видалити стадію? Угоди залишаться.')) return;
+window.crmRemoveStage = async function(stageId) {
+    if (!(await (window.showConfirmModal ? showConfirmModal('Видалити стадію? Угоди залишаться.',{danger:true}) : Promise.resolve(confirm('Видалити стадію? Угоди залишаться.'))))) return;
     if (!crm.pipeline) return;
     crm.pipeline.stages = crm.pipeline.stages.filter(s => s.id !== stageId);
     _renderCRMSettings();
