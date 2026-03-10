@@ -501,6 +501,7 @@ function buildNodeEl(node) {
         `transition:border-color 0.15s,box-shadow 0.15s,transform 0.1s`,
         `overflow:visible`,
         `font-family:system-ui,sans-serif`,
+        `z-index:${isSelected ? 10 : 2}`,
     ].join(';');
 
     // ── IN port ────────────────────────────────────────────
@@ -528,15 +529,16 @@ function buildNodeEl(node) {
         const topPct = totalPorts === 1 ? 50 : 20 + (i / (totalPorts - 1)) * 60;
         return `
         <div style="position:absolute;right:-7px;top:${topPct}%;transform:translateY(-50%);z-index:3;display:flex;align-items:center;">
-            ${totalPorts > 1 ? `<span style="position:absolute;right:17px;top:18px;font-size:9px;
+            ${totalPorts > 1 ? `<span style="position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:9px;
                 color:${isErr ? '#ef4444' : '#6b7280'};white-space:nowrap;font-weight:500;
                 background:white;padding:1px 5px;border-radius:4px;
-                border:1px solid ${isErr ? '#fca5a5' : '#e5e7eb'};pointer-events:none;">${label}</span>` : ''}
+                border:1px solid ${isErr ? '#fca5a5' : '#e5e7eb'};
+                pointer-events:none;user-select:none;">${label}</span>` : ''}
             <div data-port-out="${node.id}" data-port-id="${portId}"
                 style="width:14px;height:14px;border-radius:50%;
                 background:${connected ? portColor : 'white'};
                 border:2.5px solid ${connected ? portColor : '#9ca3af'};
-                cursor:crosshair;transition:all 0.15s;"
+                cursor:crosshair;transition:all 0.15s;position:relative;z-index:4;"
                 title="${label}"
                 onmouseenter="this.style.background='${portColor}';this.style.borderColor='${portColor}';this.style.transform='scale(1.3)'"
                 onmouseleave="this.style.background='${connected ? portColor : 'white'}';this.style.borderColor='${connected ? portColor : '#9ca3af'}';this.style.transform='scale(1)'"
