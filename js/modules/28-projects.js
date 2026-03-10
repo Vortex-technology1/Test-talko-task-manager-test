@@ -1,6 +1,7 @@
 // =====================
         // PROJECTS
         // =====================
+'use strict';
         let currentProjectView = 'grid';
         let openProjectId = null;
         

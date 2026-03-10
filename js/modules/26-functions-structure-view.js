@@ -1,6 +1,7 @@
 // =====================
         // FUNCTIONS STRUCTURE VIEW
         // =====================
+'use strict';
         let currentFunctionsView = 'cards';
         const DEFAULT_CATEGORIES = [t('funcCatManagement'), 'Люди', t('funcCatEngagement'), t('funcCatSales'), t('funcCatFinance'), t('funcCatPrep'), t('funcCatExecution'), t('funcCatLogistics')];
         

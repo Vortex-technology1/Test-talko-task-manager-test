@@ -1,6 +1,7 @@
 // =====================
         // SWIPE BETWEEN TABS
         // =====================
+'use strict';
         const mobileTabs = ['tasks', 'projects', 'control', 'regular', 'users'];
         let tabSwipeStartX = 0;
         let tabSwipeStartY = 0;

@@ -2,6 +2,7 @@
 // MODULE 74 — BULK SELECT + DUPLICATE TASK
 // =============================================
 (function() {
+    'use strict';
     let selectedTaskIds = new Set();
     let bulkModeActive = false;
 

@@ -3,6 +3,7 @@
         // =====================
         
         // Open task form with pre-filled date and time
+'use strict';
         function openTaskAtTime(dateStr, hour) {
             editingId = null;
             document.getElementById('taskModalTitle').textContent = t('addTask');

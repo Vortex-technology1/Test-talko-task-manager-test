@@ -1,6 +1,7 @@
 // =====================
     // TEAM DASHBOARD — manager overview
     // =====================
+'use strict';
     function renderTeamDashboard() {
         const container = document.getElementById('teamDashboard');
         if (!container) return;

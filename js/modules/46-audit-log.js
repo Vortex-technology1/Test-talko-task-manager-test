@@ -2,6 +2,7 @@
         // AUDIT LOG — Логування змін задач
         // =============================================
         
+'use strict';
         const AUDIT_FIELD_LABELS = {
             title: t('auditFieldTitle'), status: t('auditFieldStatus'), assigneeId: t('auditFieldAssignee'),
             deadlineDate: t('auditFieldDeadline'), deadlineTime: t('auditFieldTime'), priority: t('auditFieldPriority'),

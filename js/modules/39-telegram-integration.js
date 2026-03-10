@@ -1,6 +1,7 @@
 // =====================
         // TELEGRAM INTEGRATION
         // =====================
+'use strict';
         const TELEGRAM_BOT_USERNAME = 'talko_tasks_bot';
         
         function generateTelegramCode() {
@@ -114,7 +115,7 @@
                 tokenClient.callback = (response) => {
                     tokenClient.callback = origCallback;
                     if (response.error) { 
-                        console.log('Token refresh failed:', response.error);
+                        dbg('Token refresh failed:', response.error);
                         googleAccessToken = null;
                         resolve(false); 
                         return; 
@@ -136,7 +137,7 @@
         // Create event in Google Calendar
         async function createCalendarEvent(task) {
             if (!googleAccessToken) {
-                console.log('No Google Calendar token, skipping sync');
+                dbg('No Google Calendar token, skipping sync');
                 return null;
             }
             
@@ -176,7 +177,7 @@
                 
                 if (response.status === 401) {
                     // Token expired, try silent refresh
-                    console.log('Google token expired, refreshing...');
+                    dbg('Google token expired, refreshing...');
                     const refreshed = await refreshGoogleToken();
                     if (refreshed) {
                         // Retry with new token
@@ -190,7 +191,7 @@
                         });
                         if (retry.ok) {
                             const result = await retry.json();
-                            console.log('Calendar event created (after refresh):', result.id);
+                            dbg('Calendar event created (after refresh):', result.id);
                             return result.id;
                         }
                     }
@@ -203,7 +204,7 @@
                 }
                 
                 const result = await response.json();
-                console.log('Calendar event created:', result.id);
+                dbg('Calendar event created:', result.id);
                 return result.id;
             } catch (err) {
                 console.error('Error creating calendar event:', err);
@@ -259,7 +260,7 @@
                     throw new Error('Failed to update event');
                 }
                 
-                console.log('Calendar event updated:', eventId);
+                dbg('Calendar event updated:', eventId);
                 return true;
             } catch (err) {
                 console.error('Error updating calendar event:', err);
@@ -283,7 +284,7 @@
                 
                 // 204 = success, 404/410 = already deleted (ok)
                 if (response.ok || response.status === 404 || response.status === 410) {
-                    console.log('Calendar event deleted:', eventId);
+                    dbg('Calendar event deleted:', eventId);
                     return true;
                 }
                 

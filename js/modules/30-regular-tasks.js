@@ -1,6 +1,7 @@
 // =====================
         // REGULAR TASKS
         // =====================
+'use strict';
         function toggleRegularTimeMode() {
             const mode = document.getElementById('regularTaskTimeMode').value;
             const endInput = document.getElementById('regularTaskTimeEnd');

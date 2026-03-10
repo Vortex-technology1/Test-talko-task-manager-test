@@ -2,6 +2,7 @@
         // FILE ATTACHMENTS
         // =====================
         
+'use strict';
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
         const ALLOWED_EXTENSIONS = ['pdf','doc','docx','xls','xlsx','png','jpg','jpeg','gif','webp','zip','txt','csv'];
         

@@ -1,6 +1,7 @@
 // =====================
         // USER CHECKBOXES (co-executors, observers)
         // =====================
+'use strict';
         function renderUserCheckboxes(containerId, selectedIds = []) {
             const container = document.getElementById(containerId);
             if (!container) return;

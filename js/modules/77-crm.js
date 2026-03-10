@@ -36,6 +36,7 @@ let crm = {
     deals: [], clients: [], pipeline: null, pipelines: [],
     stats: null, unsubs: [], subTab: 'kanban',
     activeDealId: null, dragDealId: null, loading: true,
+    saving: false,  // guard проти подвійного submit
 };
 
 // ── Init ───────────────────────────────────────────────────
@@ -524,6 +525,8 @@ window.crmCloseDeal = function() {
 };
 
 window.crmSaveDeal = async function(dealId) {
+    if (crm.saving) return;  // guard: подвійний click/submit
+    crm.saving = true;
     const deal = crm.deals.find(d => d.id === dealId);
     if (!deal) return;
     const title  = document.getElementById('dd_title')?.value.trim();
@@ -545,6 +548,9 @@ window.crmSaveDeal = async function(dealId) {
         if (typeof showToast === 'function') showToast('Збережено', 'success');
     } catch(e) {
         if (typeof showToast === 'function') showToast('Помилка: ' + e.message, 'error');
+        console.error('[CRM] crmSaveDeal error:', e.message);
+    } finally {
+        crm.saving = false;  // завжди скидаємо guard
     }
 };
 
@@ -679,29 +685,38 @@ async function _loadAITab(deal) {
 window.crmRunAI = async function(dealId) {
     const deal    = crm.deals.find(d => d.id === dealId);
     if (!deal) return;
-    const content = document.getElementById('crmDealContent');
-    if (content) content.innerHTML = '<div style="text-align:center;padding:2rem;color:#6b7280;font-size:0.82rem;">Аналізую угоду...</div>';
+    const contentEl = document.getElementById('crmDealContent');
+    if (contentEl) contentEl.innerHTML = '<div style="text-align:center;padding:2rem;color:#6b7280;font-size:0.82rem;">Аналізую угоду...</div>';
     try {
-        const compDoc  = await firebase.firestore().collection('companies').doc(window.currentCompanyId).get();
-        const apiKey   = compDoc.data()?.anthropicApiKey || compDoc.data()?.openaiApiKey;
-        if (!apiKey) {
-            if (content) content.innerHTML = '<div style="color:#ef4444;padding:1rem;text-align:center;font-size:0.82rem;">API ключ не встановлений</div>';
-            return;
-        }
-        const prompt = `Ти CRM аналітик. Проаналізуй угоду:\nКлієнт: ${deal.clientName||'—'}\nНіша: ${deal.clientNiche||'—'}\nСтадія: ${_stageLabel(deal.stage)}\nСума: ${deal.amount ? _fmt(deal.amount) : 'не вказана'}\n${deal.leadData?.mainProblem ? 'Проблема: ' + deal.leadData.mainProblem + '\n' : ''}${deal.leadData?.mainGoal ? 'Ціль: ' + deal.leadData.mainGoal + '\n' : ''}Нотатка: ${deal.note||'—'}\n\nДай: 1) Ймовірність закриття % 2) Ключовий ризик 3) Наступний конкретний крок 4) Рекомендований текст повідомлення\nВідповідь: лаконічно, 150-200 слів, українською.`;
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:600, messages:[{role:'user',content:prompt}] }),
+        // ── Отримуємо Firebase ID token (ніколи не передаємо API key у браузері) ──
+        const idToken = await firebase.auth().currentUser?.getIdToken();
+        if (!idToken) throw new Error('Не авторизований');
+
+        const response = await fetch('/api/ai-crm', {
+            method: 'POST',
+            headers: {
+                'Content-Type':  'application/json',
+                'Authorization': 'Bearer ' + idToken,
+            },
+            body: JSON.stringify({
+                dealId:    dealId,
+                companyId: window.currentCompanyId,
+            }),
         });
-        const data     = await response.json();
-        const analysis = data.content?.[0]?.text || 'Не вдалось отримати аналіз';
-        await firebase.firestore().doc(`companies/${window.currentCompanyId}/crm_deals/${dealId}`)
-            .update({ aiAnalysis:analysis, aiAnalyzedAt:firebase.firestore.FieldValue.serverTimestamp() });
-        deal.aiAnalysis = analysis;
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'Помилка сервера ' + response.status);
+        }
+
+        const analysis = data.analysis || 'Не вдалось отримати аналіз';
+        // deal в Firestore вже оновлено сервером — тільки local state
+        deal.aiAnalysis   = analysis;
+        deal.aiAnalyzedAt = new Date();
         _loadAITab(deal);
     } catch(e) {
-        if (content) content.innerHTML = `<div style="color:#ef4444;padding:1rem;font-size:0.8rem;">Помилка: ${_esc(e.message)}</div>`;
+        if (contentEl) contentEl.innerHTML = `<div style="color:#ef4444;padding:1rem;font-size:0.8rem;">Помилка: ${_esc(e.message)}</div>`;
+        console.error('[CRM] crmRunAI error:', e.message);
     }
 };
 

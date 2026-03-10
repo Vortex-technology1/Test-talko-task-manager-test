@@ -1,6 +1,7 @@
 // =====================
         // CHECKLIST
         // =====================
+'use strict';
         let checklistCounter = 0;
         
         function addChecklistItem(text = '', checked = false) {

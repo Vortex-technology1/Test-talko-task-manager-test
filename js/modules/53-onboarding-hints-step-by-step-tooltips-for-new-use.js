@@ -1,6 +1,7 @@
 // =====================
     // ONBOARDING HINTS — step-by-step tooltips for new users
     // =====================
+'use strict';
     const ONBOARDING_HINTS = [
         {
             target: '#nextTaskBtn',

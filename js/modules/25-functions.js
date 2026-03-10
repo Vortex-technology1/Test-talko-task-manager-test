@@ -1,6 +1,7 @@
 // =====================
         // FUNCTIONS
         // =====================
+'use strict';
         function openFunctionModal(id = null) {
             if (!isManagerOrAbove()) {
                 showToast(t('noPermissionTask'), 'error');

@@ -352,7 +352,7 @@ service cloud.firestore {
 
       // MARKETING — FUNNELS
       match /funnels/{funnelId} {
-        allow read: if isCompanyMember(companyId) || true; // public read for widget
+        allow read: if isCompanyMember(companyId); // public read for embedded widget — companyMember only
         allow create, update: if isManagerOrOwner(companyId);
         allow delete: if isManagerOrOwner(companyId);
       }
@@ -529,7 +529,9 @@ service cloud.firestore {
       match /form_submissions/{submissionId} {
         allow read: if isCompanyMember(companyId);
         // create: публічно (форма на сайті — без авторизації)
-        allow create: if true;
+        // Обмеження: тільки якщо є submittedAt і розмір даних <= 10KB
+        allow create: if request.resource.data.keys().hasAll(['submittedAt', 'formId'])
+                      && request.resource.data.size() < 10240;
         allow update: if isCompanyMember(companyId);
         allow delete: if isManagerOrOwner(companyId);
       }

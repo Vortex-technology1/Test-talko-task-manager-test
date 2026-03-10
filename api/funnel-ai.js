@@ -43,13 +43,35 @@ function checkRateLimit(ip) {
 }
 
 module.exports = async function handler(req, res) {
-    // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // ── CORS — тільки наш домен ─────────────────────────────
+    const ALLOWED_ORIGINS = [
+        'https://test-talko-task.vercel.app',
+        'http://localhost:5500',
+        'http://localhost:3000',
+        'http://127.0.0.1:5500',
+    ];
+    const origin = req.headers.origin || '';
+    if (ALLOWED_ORIGINS.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Vary', 'Origin');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+    // ── Firebase Auth: перевіряємо ID token ──────────────────
+    const authHeader = req.headers.authorization || '';
+    if (!authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized: missing Bearer token' });
+    }
+    let decodedToken;
+    try {
+        decodedToken = await admin.auth().verifyIdToken(authHeader.slice(7));
+    } catch(e) {
+        return res.status(401).json({ error: 'Unauthorized: invalid token' });
+    }
 
     // Rate limit
     const clientIp = req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || 'unknown';

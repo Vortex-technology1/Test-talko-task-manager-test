@@ -1,6 +1,7 @@
 // =====================
         // AUTH STATE LISTENER
         // =====================
+'use strict';
         auth.onAuthStateChanged(async (user) => {
             try {
             if (user) {
@@ -149,7 +150,7 @@
                                 switchTab(lastTab);
                             }
                         }
-                    } catch(e) {}
+                    } catch(e) { console.error('[06-auth]', e.message); }
                 });
 
                 // Show FAB (було окремим onAuthStateChanged — об'єднано)

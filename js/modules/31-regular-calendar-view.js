@@ -2,6 +2,7 @@
         // REGULAR CALENDAR VIEW
         // =====================
         
+'use strict';
         let currentRegularView = 'week'; // week, list
         
         function setRegularView(view) {

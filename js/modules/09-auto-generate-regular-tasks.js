@@ -1,6 +1,7 @@
 // =====================
         // AUTO-GENERATE REGULAR TASKS
         // =====================
+'use strict';
         let myDayPopupShown = false;
         
         // Хелпер: перевірка чи регулярне завдання заплановане на певний день

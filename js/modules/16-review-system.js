@@ -3,6 +3,7 @@
         // =====================
         
         // Визначаємо чи потрібна перевірка постановником
+'use strict';
         function shouldSendForReview(task) {
             // Якщо постановник = виконавець — одразу done, без перевірки
             if (!task) return false;

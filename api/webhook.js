@@ -23,6 +23,12 @@ const db = initError ? null : admin.firestore();
 module.exports = async (req, res) => {
     // ── GET: діагностика ─────────────────────────────────────
     if (req.method === 'GET') {
+        // Diagnostic endpoint — захищений токеном (DIAG_TOKEN в env)
+        const diagToken = process.env.DIAG_TOKEN;
+        const reqToken  = req.headers['x-diag-token'] || req.query?.token;
+        if (!diagToken || reqToken !== diagToken) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
         const diag = { ok: true, initError: initError || null, env: {
             hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
             hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,

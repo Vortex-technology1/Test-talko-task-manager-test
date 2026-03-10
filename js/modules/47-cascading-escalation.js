@@ -2,6 +2,7 @@
         // CASCADING ESCALATION — Каскадна ескалація
         // =============================================
         
+'use strict';
         const ESCALATION_LEVELS = [
             { days: 1, level: 1, label: t('overdue1day'), target: 'assignee', color: '#92400e' },
             { days: 3, level: 2, label: t('overdue3days'), target: 'manager', color: '#9a3412' },

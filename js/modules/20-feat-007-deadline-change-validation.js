@@ -1,6 +1,7 @@
 // =====================
         // FEAT-007: Deadline change validation
         // =====================
+'use strict';
         function canEditDeadline(task) {
             if (!task) return true;
             // Постановник завжди може

@@ -1,6 +1,7 @@
 // =====================
     // NEXT TASK — AI-like task prioritization
     // =====================
+'use strict';
     function getNextTask() {
         const todayStr = getLocalDateStr(new Date());
         const uid = currentUser?.uid;

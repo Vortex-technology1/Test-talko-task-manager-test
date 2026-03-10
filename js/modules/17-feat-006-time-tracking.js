@@ -1,6 +1,7 @@
 // =====================
         // FEAT-006: TIME TRACKING
         // =====================
+'use strict';
         window.timeTrackerInterval = null;
         window.timeTrackerStart = null;
         let timeTrackerTaskId = null;

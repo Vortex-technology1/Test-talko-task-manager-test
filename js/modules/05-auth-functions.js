@@ -1,6 +1,7 @@
 // =====================
         // AUTH FUNCTIONS
         // =====================
+'use strict';
         function showAuthMessage(msg, type = 'info') {
             const el = document.getElementById('authMessage');
             el.textContent = msg;
@@ -218,10 +219,10 @@
                 
                 // КРОК 1: Спочатку створюємо Auth акаунт
                 // (потрібен для доступу до Firestore — invites вимагають авторизацію)
-                console.log('[Register] Creating auth account...');
+                dbg('[Register] Creating auth account...');
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
-                console.log('[Register] Auth account created.');
+                dbg('[Register] Auth account created.');
                 
                 // КРОК 2: Тепер авторизовані — шукаємо invite
                 // (onAuthStateChanged спрацює автоматично і викличе findUserCompany,
@@ -237,7 +238,7 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
                 currentInviteData = null;
                 
-                console.log('[Register] Success! Waiting for onAuthStateChanged...');
+                dbg('[Register] Success! Waiting for onAuthStateChanged...');
                 showAuthMessage(t('registerSuccess'), 'success');
                 
             } catch (e) {
@@ -275,7 +276,7 @@
         auth.getRedirectResult().then((result) => {
             if (result.user) {
                 // Користувач увійшов через redirect
-                console.log('Redirect login success');
+                dbg('Redirect login success');
             }
         }).catch((e) => {
             if (e.code) {
@@ -380,7 +381,7 @@
                         console.error('[Batch] commit failed:', err);
                         showToast && showToast(t('savingError'), 'error');
                     }
-                    console.log('[findUserCompany] Batch commit success, role:', inviteData.role);
+                    dbg('[findUserCompany] Batch commit success, role:', inviteData.role);
                     
                     return companyId;
                 }

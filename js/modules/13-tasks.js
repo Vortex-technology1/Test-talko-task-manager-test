@@ -1,6 +1,7 @@
 // =====================
         // TASKS
         // =====================
+'use strict';
         function openTaskModal(id = null) {
             document.getElementById('taskModal').style.display = 'block';
             // ГЛЮК FIX: скидаємо isSaving при кожному відкритті — захист від зависання spinner

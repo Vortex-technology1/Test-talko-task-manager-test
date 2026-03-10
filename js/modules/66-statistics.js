@@ -2209,7 +2209,7 @@
             if (preview) preview.textContent = AUTO_SOURCES[source]?.label || '';
             // Підставляємо одиницю виміру
             const unit = AUTO_SOURCES[source]?.unit;
-            if (unit) { try { selectMetricUnit(unit); } catch(e){} }
+            if (unit) { try { selectMetricUnit(unit); } catch(e){ console.error('[66-stats] selectMetricUnit:', e.message); } }
         } else {
             autoBlock.style.display = 'none';
             autoBlock.dataset.autoSource = '';

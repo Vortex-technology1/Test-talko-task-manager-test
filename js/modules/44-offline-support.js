@@ -1,6 +1,7 @@
 // =====================
         // OFFLINE SUPPORT
         // =====================
+'use strict';
         let offlineData = {
             tasks: [],
             functions: [],

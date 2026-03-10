@@ -1,6 +1,7 @@
 // =====================
     // MORNING START — auto-start day
     // =====================
+'use strict';
     function checkMorningStart() {
         // Morning modal disabled
         return;

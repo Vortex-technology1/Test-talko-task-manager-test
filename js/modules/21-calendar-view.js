@@ -2,6 +2,7 @@
         // CALENDAR VIEW
         // =====================
         
+'use strict';
         let currentCalendarView = 'day'; // day, week, month, list
         let calendarDate = new Date(); // Currently displayed date
         

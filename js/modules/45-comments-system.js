@@ -2,6 +2,7 @@
         // COMMENTS SYSTEM
         // =====================
         
+'use strict';
         let currentTaskIdForComments = null;
         window.commentsUnsubscribe = null;
         

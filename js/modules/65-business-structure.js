@@ -6,6 +6,7 @@
 // iframe listens ONLY to functionConnections/ in Firestore (not functions/)
 // ============================================================
 
+'use strict';
 let _bizIframeReady = false;
 
 function showBizStructureTab() {
@@ -38,16 +39,16 @@ function hideBizStructureTab() {}
 function sendFunctionsToIframe() {
     var f = document.getElementById("bizIframe");
     if (!f || !f.contentWindow) {
-        console.log('[BIZ-BRIDGE] sendFunctionsToIframe: iframe not found in DOM');
+        dbg('[BIZ-BRIDGE] sendFunctionsToIframe: iframe not found in DOM');
         return;
     }
     
     if (!_bizIframeReady) {
-        console.log('[BIZ-BRIDGE] sendFunctionsToIframe: iframe not ready yet');
+        dbg('[BIZ-BRIDGE] sendFunctionsToIframe: iframe not ready yet');
         return;
     }
     
-    console.log('[BIZ-BRIDGE] Sending', functions.length, 'functions to iframe');
+    dbg('[BIZ-BRIDGE] Sending', functions.length, 'functions to iframe');
     
     try {
         f.contentWindow.postMessage({
@@ -69,7 +70,7 @@ function sendFunctionsToIframe() {
             })),
             companyId: currentCompany
         }, '*');
-        console.log('[BIZ-BRIDGE] postMessage sent successfully');
+        dbg('[BIZ-BRIDGE] postMessage sent successfully');
     } catch (e) {
         console.error('[BIZ-BRIDGE] postMessage error:', e);
     }
@@ -85,14 +86,14 @@ window.addEventListener('message', async function(event) {
     
     // Log all biz-related messages
     if (msg.type.startsWith('BIZ_') || msg.type.startsWith('CANVAS_') || msg.type.startsWith('FUNCTION_')) {
-        console.log('[BIZ-BRIDGE] Received message:', msg.type);
+        dbg('[BIZ-BRIDGE] Received message:', msg.type);
     }
     
     switch (msg.type) {
         
         case 'BIZ_IFRAME_READY':
             _bizIframeReady = true;
-            console.log('[BIZ-BRIDGE] iframe ready! functions available:', functions.length);
+            dbg('[BIZ-BRIDGE] iframe ready! functions available:', functions.length);
             sendFunctionsToIframe();
             break;
             

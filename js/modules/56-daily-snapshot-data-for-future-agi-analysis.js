@@ -1,6 +1,7 @@
 // =====================
     // DAILY SNAPSHOT — data for future AGI analysis
     // =====================
+'use strict';
     async function saveDailySnapshot() {
         if (!currentCompany || !currentUser) return;
         const todayStr = getLocalDateStr();

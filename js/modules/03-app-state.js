@@ -1,6 +1,7 @@
 // =====================
 
         // DEBUG flag — встановити true в DevTools: window.DEBUG = true
+'use strict';
         window.DEBUG = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         const dbg = (...args) => window.DEBUG && console.log('[TALKO]', ...args);
         window.dbg = dbg;

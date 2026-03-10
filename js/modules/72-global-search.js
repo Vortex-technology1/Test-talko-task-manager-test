@@ -3,6 +3,7 @@
 // =============================================
 
 (function() {
+    'use strict';
     let activeIndex = -1;
     let currentResults = [];
 

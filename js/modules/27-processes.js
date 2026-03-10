@@ -1,6 +1,7 @@
 // =====================
         // PROCESSES (Направляючі форми)
         // =====================
+'use strict';
         let processTemplates = [];
         let processes = [];
         let showCompletedProcesses = false;

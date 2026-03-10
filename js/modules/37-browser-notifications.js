@@ -1,6 +1,7 @@
 // =====================
         // BROWSER NOTIFICATIONS
         // =====================
+'use strict';
         let notificationsEnabled = localStorage.getItem('notificationsEnabled') === 'true';
         let notificationCheckInterval = null;
         let notifiedTasks = new Set(JSON.parse(localStorage.getItem('notifiedTasks') || '[]'));

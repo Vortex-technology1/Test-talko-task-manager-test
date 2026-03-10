@@ -1,6 +1,7 @@
 // =====================
         // ADMIN FUNCTIONS
         // =====================
+'use strict';
         async function renderAdminPanel() {
             // Автоматично завантажуємо список при відкритті вкладки
             loadAdminCompanies();

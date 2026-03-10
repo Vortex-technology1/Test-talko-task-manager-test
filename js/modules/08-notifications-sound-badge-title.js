@@ -1,6 +1,7 @@
 // =====================
         // NOTIFICATIONS (Sound, Badge, Title)
         // =====================
+'use strict';
         window.tasksUnsubscribe = null;
         let lastTaskCount = 0;
         

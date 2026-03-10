@@ -1,6 +1,7 @@
 // =====================
     // AI STRUCTURE GENERATOR + IMPORT + ASSISTANTS CONFIG
     // =====================
+'use strict';
     let generatedStructure = null;
     
     function openAiGeneratorModal() {

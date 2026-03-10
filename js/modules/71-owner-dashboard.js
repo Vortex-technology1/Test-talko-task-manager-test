@@ -2,6 +2,7 @@
 // MODULE 71 — OWNER DASHBOARD (Панель власника)
 // =============================================
 
+'use strict';
 window.renderOwnerDashboard = function(targetEl) {
     const el = targetEl || document.getElementById('ownerDashboardContent');
     if (!el) return;

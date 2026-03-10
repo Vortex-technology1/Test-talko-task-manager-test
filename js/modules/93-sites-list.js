@@ -405,14 +405,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── Register in TALKO namespace ──────────────────────────
     if (window.TALKO) {
-        window.TALKO.sites = {
+        window.TALKO.sites = Object.assign(window.TALKO.sites || {}, {
             init: window.initSitesModule,
             create: window.sitesCreate,
             delete: window.sitesDelete,
             openBuilder: window.sitesOpenBuilder,
             openForms: window.sitesOpenForms,
             togglePublish: window.sitesTogglePublish,
-        };
+        });
     }
 
 })();

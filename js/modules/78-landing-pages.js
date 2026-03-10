@@ -509,9 +509,13 @@
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+
+})();
 window.onSwitchTab && window.onSwitchTab('landing', function() {
     if (typeof initLandingPages === 'function') initLandingPages();
-}); ============================================================
+});
+
+// ============================================================
 // 78-landing-pages.js — TALKO Landing Pages Manager v1.0
 // Менеджер лендінгів: збереження HTML, slug, прив'язка воронки
 // ============================================================
@@ -1022,20 +1026,6 @@ window.onSwitchTab && window.onSwitchTab('landing', function() {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // ── Tab switch hook ────────────────────────────────────
-    const _origST = window.switchTab;
-    window.switchTab = function (tab) {
-        if (_origST) _origST(tab);
-        if (tab === 'marketing') {
-            if (window.isFeatureEnabled && window.isFeatureEnabled('marketing')) {
-                if (typeof initLandingPagesModule === 'function' && lpPages.length === 0 && lpFunnels.length === 0) {
-                    initLandingPagesModule();
-                } else {
-                    renderPagesView();
-                }
-            }
-        }
-    };
 
     window.destroyLandingPagesModule = function () {
         if (lpUnsubscribe) lpUnsubscribe();

@@ -1,6 +1,7 @@
 // =====================
         // AUTO-ARCHIVE DONE TASKS (> 30 days)
         // =====================
+'use strict';
         async function autoArchiveDoneTasks() {
             if (!currentCompany) return;
             

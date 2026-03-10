@@ -1,6 +1,7 @@
 // =====================
         // USERS & INVITES
         // =====================
+'use strict';
         function openInviteModal() {
             document.getElementById('inviteModal').style.display = 'block';
             document.getElementById('inviteForm').reset();

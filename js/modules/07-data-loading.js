@@ -1,11 +1,12 @@
 // =====================
         // DATA LOADING
         // =====================
+'use strict';
         async function loadAllData() {
 
             if (!currentCompany) return;
             if (isLoading) {
-                console.log('loadAllData: already loading, skipping...');
+                dbg('loadAllData: already loading, skipping...');
                 return;
             }
             
@@ -89,11 +90,11 @@
                     console.warn(`[loadAllData] Task limit reached: ${taskCount}/${TASKS_LOAD_LIMIT}`);
                     showToast(t('taskLimitWarning').replace('{n}', TASKS_LOAD_LIMIT), 'warning');
                 }
-                console.log(`[loadAllData] ${isEmployeeRole ? 'Employee' : 'Manager'} mode: ${taskCount} tasks`);
+                dbg(`[loadAllData] ${isEmployeeRole ? 'Employee' : 'Manager'} mode: ${taskCount} tasks`);
                 
                 // Перевіряємо чи це ще актуальний запит
                 if (thisLoadVersion !== loadingVersion) {
-                    console.log('loadAllData: newer load started, discarding results');
+                    dbg('loadAllData: newer load started, discarding results');
                     return;
                 }
                 
@@ -182,10 +183,10 @@
                     // (tasks[] вже оновлений всередині autoArchiveDoneTasks)
                 }).catch(() => {});
                 
-                console.log(`[loadAllData] Done in ${Math.round(performance.now() - startTime)}ms, tasks: ${tasks.length}`);
+                dbg(`[loadAllData] Done in ${Math.round(performance.now() - startTime)}ms, tasks: ${tasks.length}`);
                 if (currentUserData?.role === 'employee') {
                     const visible = tasks.filter(t => isTaskVisibleToUser(t)).length;
-                    console.log(`[Visibility] Employee "${currentUserData.name}" sees ${visible}/${tasks.length} tasks`);
+                    dbg(`[Visibility] Employee "${currentUserData.name}" sees ${visible}/${tasks.length} tasks`);
                 }
                 // BUG #1 fix: ініціалізуємо систему ролей після завантаження даних компанії
                 if (typeof window.initRolesPermissions === 'function') {

@@ -1,6 +1,7 @@
 // =====================
         // MY DAY POPUP
         // =====================
+'use strict';
         function showMyDayPopup() {
             // Показуємо тільки раз за сесію і тільки якщо є завдання
             if (myDayPopupShown) return;

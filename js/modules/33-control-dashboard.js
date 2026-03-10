@@ -1,6 +1,7 @@
 // =====================
         // CONTROL DASHBOARD
         // =====================
+'use strict';
         function renderControl() {
             const af = document.getElementById('controlAssigneeFilter')?.value;
             const ff = document.getElementById('controlFunctionFilter')?.value;

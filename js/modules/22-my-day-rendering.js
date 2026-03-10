@@ -1,6 +1,7 @@
 // =====================
         // MY DAY RENDERING
         // =====================
+'use strict';
         function renderMyDay() {
         if (!currentUser) return; // auth guard — avoid crash before auth completes
 

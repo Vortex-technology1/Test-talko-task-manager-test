@@ -1,6 +1,7 @@
 // =====================
     // TASK TIMER — track execution time
     // =====================
+'use strict';
     let activeTimer = null;
     let timerInterval = null;
     
@@ -19,7 +20,7 @@
                 taskId,
                 startTime: activeTimer.startTime
             }));
-        } catch(e) {}
+        } catch(e) { console.error('[52-timer]', e.message); }
         
         updateTimerDisplay(taskId);
         timerInterval = setInterval(() => updateTimerDisplay(taskId), 1000);
@@ -43,7 +44,7 @@
         if (!activeTimer) return;
         
         // Очищаємо збережений таймер
-        try { localStorage.removeItem('talko_activeTimer'); } catch(e) {}
+        try { localStorage.removeItem('talko_activeTimer'); } catch(e) { console.error('[52-timer]', e.message); }
         
         clearInterval(timerInterval);
         timerInterval = null;

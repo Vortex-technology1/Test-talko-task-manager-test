@@ -1,6 +1,7 @@
 // =====================
         // ARCHIVE UI
         // =====================
+'use strict';
         let isArchiveView = false;
         let archiveTasks = [];
         let archiveLastDoc = null;

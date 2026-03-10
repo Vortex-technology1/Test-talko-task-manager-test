@@ -3,6 +3,7 @@
         // =====================
         
         // Санітизація HTML для захисту від XSS
+'use strict';
         function deepCloneTask(task) {
             try { return structuredClone(task); } 
             catch(e) { return JSON.parse(JSON.stringify(task)); }

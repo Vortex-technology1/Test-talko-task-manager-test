@@ -3,6 +3,7 @@
         // =====================
         
         // Skeleton loading helpers
+'use strict';
         let skeletonShown = false;
         
         function showSkeletonLoading() {

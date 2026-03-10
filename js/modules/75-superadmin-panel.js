@@ -3,6 +3,7 @@
 // AI limits + feature flags per company
 // =============================================
 (function() {
+    'use strict';
     const FEATURES = [
         { key: 'statistics',       label: 'Статистика / Метрики' },
         { key: 'processes',        label: 'Бізнес-процеси' },

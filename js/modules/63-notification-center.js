@@ -1,6 +1,7 @@
 // =====================
     // NOTIFICATION CENTER
     // =====================
+'use strict';
     let notifications = [];
     let notificationPanelOpen = false;
     const MAX_NOTIFICATIONS = 50;

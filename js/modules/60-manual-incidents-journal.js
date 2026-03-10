@@ -1,6 +1,7 @@
 // =====================
     // MANUAL INCIDENTS (Journal)
     // =====================
+'use strict';
     window._manualIncidents = [];
     
     async function loadManualIncidents() {

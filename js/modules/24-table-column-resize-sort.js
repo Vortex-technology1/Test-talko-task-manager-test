@@ -1,6 +1,7 @@
 // =====================
         // TABLE COLUMN RESIZE + SORT
         // =====================
+'use strict';
         let taskSortField = localStorage.getItem('taskSortField') || '';
         let taskSortDir = localStorage.getItem('taskSortDir') || 'asc';
         window.hideCompletedTasks = localStorage.getItem('hideCompletedTasks') === 'true';
@@ -85,7 +86,7 @@
                         th.style.minWidth = '';
                     }
                 });
-            } catch(e) {}
+            } catch(e) { console.error('[24-table]', e.message); }
         }
         
         function setTaskTypeFilter(btn) {

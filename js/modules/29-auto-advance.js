@@ -1,6 +1,7 @@
 // =====================
         // AUTO-ADVANCE: Завершення завдання → автопросування процесу
         // =====================
+'use strict';
         async function advanceProcessIfLinked(taskId) {
             // AUTO-ADVANCE вимкнено на фронті — обробляється тільки backend
             // trigger onProcessTaskCompleted (транзакційно, без дублювань)

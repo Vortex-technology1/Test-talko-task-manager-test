@@ -1,6 +1,7 @@
 // =====================
         // FIREBASE CONFIG
         // =====================
+'use strict';
         const firebaseConfig = {
             apiKey: "AIzaSyD1oBJuuFiVVo4HHjjeb81IhGEt1oz4Ydc",
             authDomain: "task-manager-44e84.firebaseapp.com",

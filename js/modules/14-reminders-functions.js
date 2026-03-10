@@ -3,6 +3,7 @@
         // =====================
         
         // Отримуємо вибрані нагадування
+'use strict';
         function getSelectedReminders() {
             const reminders = [];
             if (document.getElementById('taskReminder60')?.checked) reminders.push(60);

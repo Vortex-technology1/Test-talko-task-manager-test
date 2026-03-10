@@ -1,6 +1,7 @@
 // =====================
     // DECISION LOG — track manual management decisions for AGI learning
     // =====================
+'use strict';
     function logDecision(type, details) {
         if (!currentCompany || !currentUser) return;
         const entry = {

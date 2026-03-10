@@ -3,6 +3,7 @@
 // =============================================
 
 (function() {
+    'use strict';
 
 // ---- DEFAULT PERMISSIONS PER ROLE ----
 const DEFAULT_ROLE_PERMISSIONS = {

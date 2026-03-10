@@ -1,6 +1,7 @@
 // =====================
     // PERSONAL ANALYTICS — employee self-insight
     // =====================
+'use strict';
     function renderMyAnalytics() {
         const container = document.getElementById('myAnalytics');
         if (!container || !currentUser) return;

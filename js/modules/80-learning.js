@@ -2,6 +2,7 @@
 // MODULE 80: LEARNING PLATFORM
 // =====================
 (function() {
+    'use strict';
 
     // ── Course Data ──────────────────────────────────────────
         const AI_ASSISTANT_URL = 'https://chatgpt.com/g/g-685640bc592881918743da9332b83f31-ai-alex-talko-technical-lead';

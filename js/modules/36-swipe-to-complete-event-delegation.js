@@ -1,6 +1,7 @@
 // =====================
         // SWIPE TO COMPLETE (Event Delegation)
         // =====================
+'use strict';
         let swipeState = {
             startX: 0,
             currentX: 0,

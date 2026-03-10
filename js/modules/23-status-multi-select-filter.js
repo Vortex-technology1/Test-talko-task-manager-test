@@ -1,6 +1,7 @@
 // =====================
         // STATUS MULTI-SELECT FILTER
         // =====================
+'use strict';
         function toggleStatusDropdown(e) {
             e.stopPropagation();
             const dd = document.getElementById('statusDropdown');
@@ -131,7 +132,7 @@
                     date: df || '',
                     function: ffEl?.value || ''
                 }));
-            } catch(e) {}
+            } catch(e) { console.error('[23-status]', e.message); }
             const tf = document.getElementById('taskTypeFilter')?.value;
             const searchQuery = (document.getElementById('taskSearchInput')?.value || '').toLowerCase().trim();
             

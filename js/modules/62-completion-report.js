@@ -1,6 +1,7 @@
 // =====================
     // COMPLETION REPORT — підтвердження виконання
     // =====================
+'use strict';
     let completionReportTaskId = null;
     let completionReportCallback = null;
     

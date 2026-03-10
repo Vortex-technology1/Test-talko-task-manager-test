@@ -908,8 +908,10 @@
     }
 
 window.onSwitchTab && window.onSwitchTab('flows', function() {
+
+})();
     if (typeof initFlowsModule === 'function') initFlowsModule();
-}); ============================================================
+});
 // 80-bots-flows.js — TALKO Flow Builder (Telegram Bots) v1.0
 // UI для створення і управління ботами / flow-сценаріями
 // ============================================================
@@ -1819,19 +1821,7 @@ window.onSwitchTab && window.onSwitchTab('flows', function() {
     }
 
     // ── Tab hook ───────────────────────────────────────────
-    const _origST = window.switchTab;
-    window.switchTab = function (tab) {
-        if (_origST) _origST(tab);
-        if (tab === 'bots') {
-            if (window.isFeatureEnabled && window.isFeatureEnabled('bots')) {
-                if (typeof initBotsModule === 'function' && botsFlows.length === 0) {
-                    initBotsModule();
-                } else {
-                    renderBotsListView();
-                }
-            }
-        }
-    };
+    
 
     window.destroyBotsModule = function () {
         if (botsUnsubscribe) botsUnsubscribe();

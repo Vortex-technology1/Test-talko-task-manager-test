@@ -2,6 +2,7 @@
         // KANBAN BOARD (Status + Deadlines)
         // =====================
         
+'use strict';
         function refreshCurrentView() {
             if (currentCalendarView === 'list') renderTasks();
             else if (currentCalendarView === 'kanban' || currentCalendarView === 'deadlines') renderKanbanBoard(currentCalendarView);

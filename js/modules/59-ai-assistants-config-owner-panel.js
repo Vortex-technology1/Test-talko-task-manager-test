@@ -1,6 +1,7 @@
 // =====================
     // AI ASSISTANTS CONFIG (owner panel)
     // =====================
+'use strict';
     function openAiAssistantsModal() {
         if (!isSuperAdmin) {
             showToast(t('adminOnlyTalko'), 'error'); return;

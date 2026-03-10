@@ -1,6 +1,7 @@
 // =====================
     // TASK TEMPLATES
     // =====================
+'use strict';
     let taskTemplates = [];
     
     function toggleAddTaskMenu(event) {

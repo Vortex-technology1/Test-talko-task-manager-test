@@ -1,6 +1,7 @@
 // =====================
         // HELPERS
         // =====================
+'use strict';
         let _selectsUsersHash = '';
         let _selectsFuncsHash = '';
         
@@ -240,6 +241,11 @@
                 var handlers = window._tabHandlers[tabName] || [];
                 handlers.forEach(function(fn) { try { fn(); } catch(e) { console.error('[switchTab handler]', tabName, e); } });
             }
+
+            // ── Bottom nav sync (mobile) — вбудовано тут, не треба override ──
+            document.querySelectorAll('.bottom-nav-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
         }
         
         function updateOverdueBadges() {

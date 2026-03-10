@@ -1146,11 +1146,9 @@
     }
 
     // ── Tab integration ────────────────────────────────────
-    const _origST=window.switchTab;
-    window.switchTab=function(tab){
-        if(_origST) _origST(tab);
-        if(tab==='coordination') loadCoordData().then(()=>renderCoordination());
-    };
+    window.onSwitchTab && window.onSwitchTab('coordination', function() {
+        loadCoordData().then(() => renderCoordination());
+    });
 
     document.addEventListener('DOMContentLoaded',()=>{
         const a=document.querySelector('.tab-btn.active[data-tab]');

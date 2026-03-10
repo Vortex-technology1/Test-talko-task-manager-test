@@ -1,6 +1,7 @@
 // =====================
         // TRANSLATIONS
         // =====================
+'use strict';
         const translations = {
             ua: {
                 // Auth
