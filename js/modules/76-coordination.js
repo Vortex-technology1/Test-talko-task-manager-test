@@ -92,7 +92,7 @@
     const toast = (msg, type='success') => window.showToast && window.showToast(msg, type);
 
     // ── Load ───────────────────────────────────────────────
-    async function loadCoordData() {
+    window._loadCoordData = async function loadCoordData() {
         console.log('[Coord] loadCoordData start, companyId:', window.currentCompanyId);
         if (!window.currentCompanyId) { console.warn('[Coord] no companyId — abort'); return; }
         coordUnsubscribes.forEach(u => u());
@@ -172,7 +172,7 @@
     }
 
     // ── Main render ────────────────────────────────────────
-    function renderCoordination() {
+    window._renderCoordination = function renderCoordination() {
         const root = document.getElementById('coordinationRoot');
         if (!root) return;
         root.innerHTML = `
@@ -1157,14 +1157,41 @@
     }
 
     // ── Tab integration ────────────────────────────────────
-    window.onSwitchTab && window.onSwitchTab('coordination', function() {
-        renderCoordination(); // показуємо UI одразу (порожній стан)
-        loadCoordData();      // потім завантажуємо дані (onSnapshot оновить список)
-    });
+    function initCoordTab() {
+        console.log('[Coord] initCoordTab called, companyId:', window.currentCompanyId);
+        renderCoordination();
+        loadCoordData();
+    }
+    window._initCoordTab = initCoordTab;
 
-    document.addEventListener('DOMContentLoaded',()=>{
-        const a=document.querySelector('.tab-btn.active[data-tab]');
-        if(a?.dataset.tab==='coordination') { renderCoordination(); loadCoordData(); }
+    // Реєструємо через onSwitchTab registry
+    if (window.onSwitchTab) {
+        window.onSwitchTab('coordination', initCoordTab);
+        console.log('[Coord] registered via onSwitchTab');
+    } else {
+        console.warn('[Coord] window.onSwitchTab not found — will retry');
+        // Fallback: чекаємо поки onSwitchTab з'явиться
+        let retries = 0;
+        const retry = setInterval(() => {
+            if (window.onSwitchTab) {
+                window.onSwitchTab('coordination', initCoordTab);
+                console.log('[Coord] registered via onSwitchTab (retry', ++retries, ')');
+                clearInterval(retry);
+            } else if (++retries > 20) {
+                clearInterval(retry);
+                console.error('[Coord] onSwitchTab never appeared');
+            }
+        }, 100);
+    }
+
+    // Fallback через companyLoaded event — якщо вже на coordination вкладці
+    document.addEventListener('companyLoaded', () => {
+        console.log('[Coord] companyLoaded event, checking active tab');
+        const activeTab = document.querySelector('.tab-content.active');
+        if (activeTab && activeTab.id === 'coordinationTab') {
+            console.log('[Coord] coordination is active tab, init');
+            initCoordTab();
+        }
     });
 
 })();

@@ -474,7 +474,7 @@ document.addEventListener('mousedown', function(e) {
                 </button>
 
                 <!-- 5. Контроль — без підменю -->
-                <button class="tab-btn" onclick="switchTab('coordination')" data-tab="coordination" aria-label="Координація">
+                <button class="tab-btn" onclick="switchTab('coordination'); setTimeout(function(){window._initCoordTab&&window._initCoordTab();},100);" data-tab="coordination" aria-label="Координація">
                     <i data-lucide="calendar-check" class="icon"></i>
                     <span data-i18n="tabCoordination">Координація</span>
                 </button>
