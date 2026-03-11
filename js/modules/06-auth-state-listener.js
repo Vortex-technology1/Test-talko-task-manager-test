@@ -6,7 +6,7 @@
             try {
             if (user) {
                 currentUser = user;
-                isSuperAdmin = user.email.toLowerCase() === SUPERADMIN_EMAIL.toLowerCase();
+                window.currentUser = user; // аліас для IIFE модулів
                 
                 // Очищаємо попередні listeners перед ініціалізацією нової сесії
                 cleanupAllListeners();
@@ -40,6 +40,7 @@
                 
                 currentCompany = companyId;
                 window.currentCompanyId = companyId; // для CRM, Marketing, Bots модулів
+                window.currentCompany = companyId;    // аліас для IIFE модулів (76-coordination та ін.)
                 
                 const userDoc = await db.collection('companies').doc(companyId).collection('users').doc(user.uid).get();
                 currentUserData = userDoc.exists ? { id: user.uid, ...userDoc.data() } : { id: user.uid, email: user.email, role: 'employee' };
@@ -160,6 +161,8 @@
                 // Real-time listener для нових завдань з процесів
                 initTasksListener();
             } else {
+                window.currentUser = null;    // cleanup аліасів
+                window.currentCompany = null;
                 document.getElementById('loadingPage').style.display = 'none';
                 document.getElementById('authPage').style.display = 'flex';
                 document.getElementById('mainInterface').style.display = 'none';

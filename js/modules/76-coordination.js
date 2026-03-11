@@ -61,7 +61,7 @@
 
     // ── Helpers ────────────────────────────────────────────
     const db = () => firebase.firestore();
-    const col = name => db().collection('companies').doc(window.currentCompany).collection(name);
+    const col = name => db().collection('companies').doc(window.currentCompanyId).collection(name);
     const uid = () => window.currentUser?.uid;
     const isSA = () => (window.currentUser?.email || '') === 'management.talco@gmail.com';
     const isManager = () => {
@@ -93,7 +93,7 @@
 
     // ── Load ───────────────────────────────────────────────
     async function loadCoordData() {
-        if (!window.currentCompany) return;
+        if (!window.currentCompanyId) return;
         coordUnsubscribes.forEach(u => u());
         coordUnsubscribes = [];
 
@@ -551,7 +551,7 @@
     window.saveCoord = async function() {
         const name = document.getElementById('coordName').value.trim();
         if (!name) { toast('Введіть назву','error'); return; }
-        if (!window.currentCompany) return;
+        if (!window.currentCompanyId) return;
         const participantIds = Array.from(document.querySelectorAll('.coord-participant-cb:checked')).map(cb=>cb.value);
         const filters={};
         ['filterFunctions','filterProjects','filterAssignees','filterOverdue','filterReview']
