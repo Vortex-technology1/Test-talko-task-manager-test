@@ -94,14 +94,14 @@
             }
         }
         function closeNavDropdowns() {
-            ['tasksTabMenu','sysTabMenu','analyticsTabMenu'].forEach(function(id) {
+            ['tasksTabMenu','sysTabMenu','analyticsTabMenu','bizTabMenu'].forEach(function(id) {
                 const m = document.getElementById(id);
                 if (m) m.style.display = 'none';
             });
         }
         // Закриваємо при будь-якому кліку — якщо клік на toggle-кнопку, toggleNavDropdown сам відкриє
         document.addEventListener('click', function(e) {
-            const toggleBtns = ['tasksTabBtn','analyticsTabBtn','sysTabBtn'];
+            const toggleBtns = ['tasksTabBtn','analyticsTabBtn','sysTabBtn','bizNavBtn'];
             const isToggle = toggleBtns.some(function(id) {
                 const el = document.getElementById(id);
                 return el && el.contains(e.target);

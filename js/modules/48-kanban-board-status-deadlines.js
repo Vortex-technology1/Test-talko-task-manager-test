@@ -21,6 +21,7 @@
         function renderKanbanBoard(mode) {
             const container = document.getElementById('kanbanContainer');
             if (!container) return;
+            _visibleTaskIds = null; // Invalidate visibility cache
             
 // console.log(`[Kanban] Rendering mode=${mode}, total tasks=${tasks.length}`);
             

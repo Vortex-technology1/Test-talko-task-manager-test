@@ -3,6 +3,7 @@
         // =====================
 'use strict';
         function renderControl() {
+            _visibleTaskIds = null; // Invalidate visibility cache
             const af = document.getElementById('controlAssigneeFilter')?.value;
             const ff = document.getElementById('controlFunctionFilter')?.value;
             const pf = document.getElementById('controlPeriodFilter')?.value;
