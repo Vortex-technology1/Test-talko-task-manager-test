@@ -63,10 +63,11 @@ function _renderShell() {
     if (!container) return;
 
     const tabs = [
-        ['kanban',    I.funnel,   'Воронка'],
-        ['clients',   I.users,   'Клієнти'],
-        ['analytics', I.chart,   'Аналітика'],
-        ['settings',  I.settings,'Налаштування'],
+        ['kanban',     I.funnel,    'Воронка'],
+        ['clients',    I.users,     'Клієнти'],
+        ['activities', I.calendar,  'Активності'],
+        ['analytics',  I.chart,     'Аналітика'],
+        ['settings',   I.settings,  'Налаштування'],
     ];
 
     container.innerHTML = `
@@ -97,6 +98,7 @@ function _renderShell() {
         <div style="flex:1;overflow:hidden;">
             <div id="crmViewKanban" style="height:100%;overflow:auto;"></div>
             <div id="crmViewClients" style="height:100%;overflow:auto;display:none;padding:1rem;"></div>
+            <div id="crmViewActivities" style="height:100%;overflow:auto;display:none;padding:1rem;"></div>
             <div id="crmViewAnalytics" style="height:100%;overflow:auto;display:none;padding:1rem;"></div>
             <div id="crmViewSettings" style="height:100%;overflow:auto;display:none;padding:1rem;"></div>
         </div>
@@ -107,7 +109,7 @@ function _renderShell() {
 
 window.crmSwitchTab = function(tab) {
     crm.subTab = tab;
-    ['kanban','clients','analytics','settings'].forEach(t => {
+    ['kanban','clients','activities','analytics','settings'].forEach(t => {
         const view = document.getElementById('crmView' + t.charAt(0).toUpperCase() + t.slice(1));
         const btn  = document.getElementById('crmTab_' + t);
         if (view) view.style.display = t === tab ? '' : 'none';
@@ -117,10 +119,11 @@ window.crmSwitchTab = function(tab) {
             btn.style.fontWeight = t === tab ? '600' : '500';
         }
     });
-    if (tab === 'kanban')    _renderKanban();
-    if (tab === 'clients')   _renderClients();
-    if (tab === 'analytics') _renderAnalytics();
-    if (tab === 'settings')  _renderCRMSettings();
+    if (tab === 'kanban')     _renderKanban();
+    if (tab === 'clients')    _renderClients();
+    if (tab === 'activities') _renderActivitiesTab();
+    if (tab === 'analytics')  _renderAnalytics();
+    if (tab === 'settings')   _renderCRMSettings();
 };
 
 // ── Load ───────────────────────────────────────────────────
@@ -807,20 +810,34 @@ window.crmCreateDeal = async function() {
 };
 
 // ══════════════════════════════════════════════════════════
-// КЛІЄНТИ
+// КЛІЄНТИ — список + slide-in картка
 // ══════════════════════════════════════════════════════════
 function _renderClients() {
     const c = document.getElementById('crmViewClients');
     if (!c) return;
     c.innerHTML = `
-    <div style="max-width:640px;margin:0 auto;">
-        <div style="margin-bottom:0.75rem;">
-            <input id="crmClientSearch" type="text" placeholder="Пошук клієнта..."
-                oninput="crmFilterClients(this.value)"
-                style="width:100%;padding:0.5rem 0.75rem;border:1px solid #e8eaed;
-                border-radius:8px;font-size:0.82rem;box-sizing:border-box;background:white;">
+    <div style="display:flex;gap:1rem;height:calc(100vh - 104px);overflow:hidden;">
+        <!-- Список -->
+        <div style="flex:1;min-width:0;overflow-y:auto;">
+            <div style="max-width:640px;margin:0 auto;">
+                <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;align-items:center;">
+                    <input id="crmClientSearch" type="text" placeholder="Пошук за ім'ям, телефоном..."
+                        oninput="crmFilterClients(this.value)"
+                        style="flex:1;padding:0.5rem 0.75rem;border:1px solid #e8eaed;
+                        border-radius:8px;font-size:0.82rem;background:white;">
+                    <button onclick="crmOpenCreateClient()"
+                        style="padding:0.5rem 1rem;background:#22c55e;color:white;border:none;
+                        border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;white-space:nowrap;">
+                        + Клієнт
+                    </button>
+                </div>
+                <div id="crmClientList">${_clientListHTML(crm.clients)}</div>
+            </div>
         </div>
-        <div id="crmClientList">${_clientListHTML(crm.clients)}</div>
+        <!-- Slide-in картка -->
+        <div id="crmClientCard" style="width:320px;flex-shrink:0;display:none;
+            background:white;border-radius:12px;border:1px solid #e8eaed;
+            overflow-y:auto;align-self:flex-start;max-height:100%;"></div>
     </div>`;
 }
 
@@ -840,8 +857,11 @@ function _clientListHTML(clients) {
         const deals = crm.deals.filter(d => d.clientId===cl.id || d.clientName===cl.name).length;
         const color = colors[(cl.name||'').charCodeAt(0) % 4];
         return `
-        <div style="background:white;border-radius:8px;padding:0.75rem;
-            border:1px solid #e8eaed;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.65rem;">
+        <div onclick="crmOpenClient('${cl.id}')"
+            style="background:white;border-radius:8px;padding:0.75rem;
+            border:1px solid #e8eaed;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.65rem;
+            cursor:pointer;transition:border-color 0.15s;"
+            onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#e8eaed'">
             <div style="width:36px;height:36px;border-radius:50%;background:${color};
                 display:flex;align-items:center;justify-content:center;
                 font-weight:700;color:white;font-size:0.88rem;flex-shrink:0;">
@@ -850,7 +870,8 @@ function _clientListHTML(clients) {
             <div style="flex:1;min-width:0;">
                 <div style="font-weight:600;font-size:0.85rem;color:#111827;">${_esc(cl.name||'Без імені')}</div>
                 <div style="font-size:0.72rem;color:#9ca3af;">
-                    ${cl.phone ? _esc(cl.phone) + ' · ' : ''}${cl.niche ? _esc(cl.niche) : '—'}
+                    ${cl.phone ? _esc(cl.phone) + (cl.niche ? ' · ' : '') : ''}${cl.niche ? _esc(cl.niche) : ''}
+                    ${cl.source === 'telegram' ? '<span style="background:#e0f2fe;color:#0284c7;font-size:0.65rem;padding:1px 5px;border-radius:8px;margin-left:4px;">TG</span>' : ''}
                 </div>
             </div>
             ${deals > 0 ? `<span style="background:#f0fdf4;color:#16a34a;font-size:0.7rem;
@@ -859,8 +880,318 @@ function _clientListHTML(clients) {
     }).join('');
 }
 
+window.crmOpenClient = function(clientId) {
+    const cl = crm.clients.find(c => c.id === clientId);
+    if (!cl) return;
+    const card = document.getElementById('crmClientCard');
+    if (!card) return;
+    card.style.display = 'block';
+
+    const clientDeals = crm.deals.filter(d => d.clientId===cl.id || d.clientName===cl.name);
+    const colors = ['#22c55e','#3b82f6','#8b5cf6','#f59e0b'];
+    const color = colors[(cl.name||'').charCodeAt(0) % 4];
+
+    card.innerHTML = `
+    <div style="padding:1.25rem;">
+        <!-- Заголовок -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;">
+            <div style="display:flex;align-items:center;gap:0.65rem;">
+                <div style="width:44px;height:44px;border-radius:50%;background:${color};
+                    display:flex;align-items:center;justify-content:center;
+                    font-weight:700;color:white;font-size:1rem;">
+                    ${(cl.name||'?').charAt(0).toUpperCase()}
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:0.92rem;color:#111827;">${_esc(cl.name||'Без імені')}</div>
+                    ${cl.niche ? `<div style="font-size:0.72rem;color:#9ca3af;">${_esc(cl.niche)}</div>` : ''}
+                </div>
+            </div>
+            <button onclick="document.getElementById('crmClientCard').style.display='none'"
+                style="background:none;border:none;cursor:pointer;color:#9ca3af;padding:2px;font-size:1rem;">✕</button>
+        </div>
+
+        <!-- Контакти -->
+        <div style="background:#f8fafc;border-radius:8px;padding:0.75rem;margin-bottom:0.75rem;">
+            <div style="font-size:0.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase;margin-bottom:0.5rem;">Контакти</div>
+            ${cl.phone ? `<div style="font-size:0.82rem;color:#374151;margin-bottom:0.25rem;">
+                <span style="color:#9ca3af;">Тел:</span> ${_esc(cl.phone)}</div>` : ''}
+            ${cl.email ? `<div style="font-size:0.82rem;color:#374151;margin-bottom:0.25rem;">
+                <span style="color:#9ca3af;">Email:</span> ${_esc(cl.email)}</div>` : ''}
+            ${cl.telegram ? `<div style="font-size:0.82rem;color:#374151;">
+                <span style="color:#9ca3af;">TG:</span> @${_esc(cl.telegram)}</div>` : ''}
+            ${!cl.phone && !cl.email && !cl.telegram ? '<div style="font-size:0.78rem;color:#d1d5db;">Немає контактних даних</div>' : ''}
+        </div>
+
+        <!-- Теги -->
+        ${(cl.tags||[]).length ? `
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0.75rem;">
+            ${(cl.tags||[]).map(t => `<span style="background:#f0fdf4;color:#16a34a;font-size:0.7rem;
+                padding:2px 8px;border-radius:12px;">${_esc(t)}</span>`).join('')}
+        </div>` : ''}
+
+        <!-- Примітка -->
+        ${cl.note ? `
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;
+            padding:0.6rem 0.75rem;margin-bottom:0.75rem;font-size:0.8rem;color:#374151;line-height:1.5;">
+            ${_esc(cl.note)}
+        </div>` : ''}
+
+        <!-- Угоди клієнта -->
+        <div style="font-size:0.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase;margin-bottom:0.4rem;">
+            Угоди (${clientDeals.length})
+        </div>
+        ${clientDeals.length ? clientDeals.slice(0,5).map(d => {
+            const stage = (crm.pipeline?.stages||[]).find(s=>s.id===d.stage);
+            return `<div onclick="crmOpenDeal('${d.id}')" style="background:white;border:1px solid #e8eaed;border-radius:7px;
+                padding:0.5rem 0.65rem;margin-bottom:0.3rem;cursor:pointer;display:flex;align-items:center;gap:0.5rem;"
+                onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#e8eaed'">
+                <div style="width:6px;height:6px;border-radius:50%;background:${stage?.color||'#6b7280'};flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.8rem;font-weight:500;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_esc(d.title||d.clientName||'Угода')}</div>
+                    <div style="font-size:0.68rem;color:#9ca3af;">${stage?.label||d.stage}</div>
+                </div>
+                ${d.amount ? `<span style="font-size:0.75rem;font-weight:600;color:#374151;">${Number(d.amount).toLocaleString()}</span>` : ''}
+            </div>`;
+        }).join('') : '<div style="font-size:0.78rem;color:#d1d5db;text-align:center;padding:0.75rem;">Угод немає</div>'}
+
+        <!-- Кнопки дій -->
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+            <button onclick="crmNewDealFromClient('${_esc(cl.name||'')}')"
+                style="flex:1;padding:0.45rem;background:#22c55e;color:white;border:none;
+                border-radius:7px;cursor:pointer;font-size:0.78rem;font-weight:600;">
+                + Угода
+            </button>
+            <button onclick="crmDeleteClient('${cl.id}')"
+                style="padding:0.45rem 0.65rem;background:#fef2f2;color:#ef4444;border:1px solid #fecaca;
+                border-radius:7px;cursor:pointer;font-size:0.78rem;">
+                Видалити
+            </button>
+        </div>
+    </div>`;
+};
+
+window.crmNewDealFromClient = function(clientName) {
+    crmOpenCreateDeal();
+    setTimeout(() => {
+        const inp = document.getElementById('crmDealClient');
+        if (inp) inp.value = clientName;
+    }, 150);
+};
+
+window.crmDeleteClient = async function(clientId) {
+    if (!confirm('Видалити клієнта?')) return;
+    try {
+        await window.companyRef().collection('crm_clients').doc(clientId).delete();
+        crm.clients = crm.clients.filter(c => c.id !== clientId);
+        document.getElementById('crmClientCard').style.display = 'none';
+        _renderClients();
+        if (window.showToast) showToast('Клієнта видалено', 'success');
+    } catch(e) { if (window.showToast) showToast('Помилка: ' + e.message, 'error'); }
+};
+
+window.crmOpenCreateClient = function() {
+    const overlay = document.createElement('div');
+    overlay.id = 'crmCreateClientOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    const inp = (id, label, ph, type='text') => `
+        <div style="margin-bottom:0.6rem;">
+            <label style="font-size:0.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;display:block;margin-bottom:3px;">${label}</label>
+            <input id="ccc_${id}" type="${type}" placeholder="${ph}"
+                style="width:100%;padding:0.5rem 0.6rem;border:1.5px solid #e5e7eb;border-radius:8px;font-size:0.82rem;box-sizing:border-box;">
+        </div>`;
+    overlay.innerHTML = `
+    <div style="background:white;border-radius:14px;padding:1.5rem;width:380px;max-width:95vw;">
+        <div style="font-weight:700;font-size:1rem;margin-bottom:1rem;">Новий клієнт</div>
+        ${inp('name',"Ім'я","Ім'я клієнта")}
+        ${inp('phone','Телефон','+380...')}
+        ${inp('email','Email','email@example.com','email')}
+        ${inp('niche','Ніша/Сфера','Стоматологія, Будівництво...')}
+        ${inp('telegram','Telegram','username')}
+        <div style="margin-bottom:0.6rem;">
+            <label style="font-size:0.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;display:block;margin-bottom:3px;">Примітка</label>
+            <textarea id="ccc_note" rows="2" placeholder="Довільна нотатка"
+                style="width:100%;padding:0.5rem 0.6rem;border:1.5px solid #e5e7eb;border-radius:8px;font-size:0.82rem;box-sizing:border-box;resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.25rem;">
+            <button onclick="crmSaveNewClient()"
+                style="flex:1;padding:0.55rem;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+                Зберегти
+            </button>
+            <button onclick="document.getElementById('crmCreateClientOverlay').remove()"
+                style="padding:0.55rem 1rem;background:#f3f4f6;color:#374151;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">
+                Скасувати
+            </button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+};
+
+window.crmSaveNewClient = async function() {
+    const v = id => document.getElementById('ccc_' + id)?.value?.trim() || '';
+    const name = v('name');
+    if (!name) { if(window.showToast) showToast('Вкажіть ім\'я','error'); return; }
+    try {
+        const ref = await window.companyRef().collection('crm_clients').add({
+            name, phone: v('phone'), email: v('email'), niche: v('niche'),
+            telegram: v('telegram'), note: v('note'), source: 'manual',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        crm.clients.unshift({ id: ref.id, name, phone: v('phone'), email: v('email'),
+            niche: v('niche'), telegram: v('telegram'), note: v('note'), source: 'manual' });
+        document.getElementById('crmCreateClientOverlay')?.remove();
+        _renderClients();
+        if (window.showToast) showToast('Клієнта додано', 'success');
+    } catch(e) { if(window.showToast) showToast('Помилка: ' + e.message, 'error'); }
+};
+
 // ══════════════════════════════════════════════════════════
-// АНАЛІТИКА
+// АКТИВНОСТІ — глобальний лог всіх дій по угодах
+// ══════════════════════════════════════════════════════════
+const ACT_ICONS = {
+    call: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2.17h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    meeting: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    email: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+    note: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+    task: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 14l2 2 4-4"/></svg>',
+};
+const ACT_COLORS = { call:'#3b82f6', meeting:'#8b5cf6', email:'#f59e0b', note:'#6b7280', task:'#22c55e' };
+const ACT_LABELS = { call:'Дзвінок', meeting:'Зустріч', email:'Лист', note:'Нотатка', task:'Завдання' };
+
+async function _renderActivitiesTab() {
+    const c = document.getElementById('crmViewActivities');
+    if (!c) return;
+    c.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:0.82rem;">Завантаження...</div>';
+
+    // Завантажуємо з усіх угод
+    let allActivities = [];
+    try {
+        const snap = await window.companyRef().collection('crm_deals').get();
+        for (const dealDoc of snap.docs) {
+            const histSnap = await dealDoc.ref.collection('history').orderBy('at','desc').limit(50).get();
+            const deal = { id: dealDoc.id, ...dealDoc.data() };
+            histSnap.docs.forEach(h => {
+                allActivities.push({ ...h.data(), id: h.id, dealId: deal.id, dealTitle: deal.title || deal.clientName || 'Угода' });
+            });
+        }
+    } catch(e) { /* тихо */ }
+
+    allActivities.sort((a,b) => {
+        const ta = a.at?.seconds || 0, tb = b.at?.seconds || 0;
+        return tb - ta;
+    });
+
+    const filterTypes = ['all','call','meeting','email','note','task','created','stage_changed'];
+    let activeFilter = 'all';
+
+    const render = (filter) => {
+        const filtered = filter === 'all' ? allActivities : allActivities.filter(a => a.type === filter);
+        const addForm = `
+        <div style="background:white;border:1px solid #e8eaed;border-radius:10px;padding:1rem;margin-bottom:0.75rem;">
+            <div style="font-weight:600;font-size:0.85rem;color:#111827;margin-bottom:0.65rem;">Нова активність</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+                ${Object.entries(ACT_LABELS).map(([k,v]) => `
+                <button onclick="actSetType('${k}')" id="actType_${k}"
+                    style="padding:0.4rem;border:1.5px solid #e8eaed;border-radius:7px;
+                    background:white;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;
+                    gap:4px;justify-content:center;color:#374151;">
+                    ${ACT_ICONS[k]} ${v}
+                </button>`).join('')}
+            </div>
+            <select id="actDealSelect" style="width:100%;padding:0.4rem 0.5rem;border:1.5px solid #e8eaed;
+                border-radius:7px;font-size:0.8rem;margin-bottom:0.4rem;background:white;">
+                <option value="">Оберіть угоду...</option>
+                ${crm.deals.filter(d=>d.stage!=='won'&&d.stage!=='lost').map(d =>
+                    `<option value="${d.id}">${_esc(d.title||d.clientName||'Угода')}</option>`).join('')}
+            </select>
+            <textarea id="actNoteText" rows="2" placeholder="Нотатка / деталі..."
+                style="width:100%;padding:0.4rem 0.5rem;border:1.5px solid #e8eaed;border-radius:7px;
+                font-size:0.8rem;box-sizing:border-box;resize:vertical;"></textarea>
+            <button onclick="actSave()"
+                style="margin-top:0.4rem;padding:0.45rem 1rem;background:#22c55e;color:white;
+                border:none;border-radius:7px;cursor:pointer;font-size:0.8rem;font-weight:600;">
+                Зберегти активність
+            </button>
+        </div>`;
+
+        const filterBar = `
+        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+            ${[['all','Всі'],...Object.entries(ACT_LABELS)].map(([k,v]) => `
+            <button onclick="actFilter('${k}')"
+                style="padding:0.3rem 0.65rem;border-radius:999px;border:1.5px solid ${k===filter?'#22c55e':'#e8eaed'};
+                background:${k===filter?'#f0fdf4':'white'};color:${k===filter?'#16a34a':'#6b7280'};
+                font-size:0.72rem;cursor:pointer;font-weight:${k===filter?'700':'400'};">
+                ${v}
+            </button>`).join('')}
+        </div>`;
+
+        const timeline = filtered.length ? filtered.slice(0, 60).map(a => {
+            const ts = a.at?.toDate ? a.at.toDate().toLocaleDateString('uk-UA',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+            const type = a.type || 'note';
+            const icon = ACT_ICONS[type] || ACT_ICONS.note;
+            const color = ACT_COLORS[type] || '#6b7280';
+            const label = ACT_LABELS[type] || type;
+            return `
+            <div style="display:flex;gap:0.75rem;margin-bottom:0.75rem;align-items:flex-start;">
+                <div style="width:30px;height:30px;border-radius:50%;background:${color}18;
+                    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${color};margin-top:2px;">
+                    ${icon}
+                </div>
+                <div style="flex:1;background:white;border:1px solid #e8eaed;border-radius:8px;padding:0.6rem 0.75rem;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+                        <div style="display:flex;align-items:center;gap:0.4rem;">
+                            <span style="font-size:0.72rem;font-weight:700;color:${color};
+                                background:${color}12;padding:1px 7px;border-radius:10px;">${label}</span>
+                            <span style="font-size:0.75rem;font-weight:600;color:#374151;">
+                                ${_esc(a.dealTitle||'Угода')}
+                            </span>
+                        </div>
+                        <span style="font-size:0.68rem;color:#9ca3af;">${ts}</span>
+                    </div>
+                    ${a.note ? `<div style="font-size:0.8rem;color:#6b7280;margin-top:3px;">${_esc(a.note)}</div>` : ''}
+                    ${a.by ? `<div style="font-size:0.68rem;color:#9ca3af;margin-top:2px;">${_esc(a.by)}</div>` : ''}
+                </div>
+            </div>`;
+        }).join('') : '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:0.82rem;">Активностей не знайдено</div>';
+
+        c.innerHTML = `<div style="max-width:680px;margin:0 auto;">${addForm}${filterBar}${timeline}</div>`;
+
+        // Стан кнопок типу
+        window._actCurrentType = 'note';
+        window.actSetType = (t) => {
+            window._actCurrentType = t;
+            Object.keys(ACT_LABELS).forEach(k => {
+                const btn = document.getElementById('actType_' + k);
+                if (btn) {
+                    btn.style.borderColor = k === t ? ACT_COLORS[k] : '#e8eaed';
+                    btn.style.background = k === t ? ACT_COLORS[k] + '12' : 'white';
+                    btn.style.color = k === t ? ACT_COLORS[k] : '#374151';
+                }
+            });
+        };
+        window.actFilter = (f) => { activeFilter = f; render(f); };
+    };
+
+    render(activeFilter);
+
+    window.actSave = async () => {
+        const dealId = document.getElementById('actDealSelect')?.value;
+        const note = document.getElementById('actNoteText')?.value?.trim();
+        const type = window._actCurrentType || 'note';
+        if (!dealId) { if(window.showToast) showToast('Оберіть угоду','error'); return; }
+        try {
+            await window.companyRef().collection('crm_deals').doc(dealId)
+                .collection('history').add({
+                    type, note: note || '',
+                    by: window.currentUser?.email || 'manager',
+                    at: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+            if (window.showToast) showToast('Активність збережено', 'success');
+            await _renderActivitiesTab();
+        } catch(e) { if(window.showToast) showToast('Помилка: ' + e.message, 'error'); }
+    };
+}
+
+
 // ══════════════════════════════════════════════════════════
 function _renderAnalytics() {
     const c = document.getElementById('crmViewAnalytics');

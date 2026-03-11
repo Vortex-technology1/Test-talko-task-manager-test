@@ -2236,6 +2236,7 @@ ru: {
                 botsActionStopFlow: '⏹ Остановить флоу',
                 botsEndNode: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#ef4444"/></svg></span> Конец цепочки',
 },
+
 pl: {
                 // Auth
                 authSubtitle: 'Zarządzanie zadaniami dla biznesu',
@@ -3351,6 +3352,7 @@ pl: {
                 botsActionStartFlow: '▶ Uruchom sekwencję',
                 botsActionStopFlow: '⏹ Zatrzymaj sekwencję',
                 botsEndNode: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#ef4444"/></svg></span> Koniec sekwencji',
+                assigneeRequired: 'Wybierz wykonawcę',
 },
 en: {
                 // Auth
@@ -4475,7 +4477,41 @@ en: {
                 botsEndNode: '<span style="display:inline-flex;align-items:center;vertical-align:middle;line-height:1;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#ef4444"/></svg></span> End of flow',
 
 
+                assigneeRequired: 'Select an assignee',
+                dayFri: 'Fri',
+                dayMon: 'Mon',
+                daySat: 'Sat',
+                dayTue: 'Tue',
+                dayWed: 'Wed',
+                fri: 'Friday',
+                sat: 'Saturday',
+                saturday: 'Saturday',
+                sun: 'Sunday',
+                sunday: 'Sunday',
+                thu: 'Thursday',
+                thursday: 'Thursday',
+                tue: 'Tuesday',
+                tuesday: 'Tuesday',
+                wed: 'Wednesday',
+                wednesday: 'Wednesday',
 },
+                assigneeRequired: 'Bitte Beauftragten auswählen',
+                dayFri: 'Fr',
+                dayMon: 'Mo',
+                daySat: 'Sa',
+                dayTue: 'Di',
+                dayWed: 'Mi',
+                fri: 'Freitag',
+                sat: 'Samstag',
+                saturday: 'Samstag',
+                sun: 'Sonntag',
+                sunday: 'Sonntag',
+                thu: 'Donnerstag',
+                thursday: 'Donnerstag',
+                tue: 'Dienstag',
+                tuesday: 'Dienstag',
+                wed: 'Mittwoch',
+                wednesday: 'Mittwoch',
 
             de: {
                 // Auth
@@ -5662,6 +5698,23 @@ en: {
                 ru: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
                 pl: ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'],
                 en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                assigneeRequired: 'Bitte Beauftragten auswählen',
+                dayFri: 'Fr',
+                dayMon: 'Mo',
+                daySat: 'Sa',
+                dayTue: 'Di',
+                dayWed: 'Mi',
+                fri: 'Freitag',
+                sat: 'Samstag',
+                saturday: 'Samstag',
+                sun: 'Sonntag',
+                sunday: 'Sonntag',
+                thu: 'Donnerstag',
+                thursday: 'Donnerstag',
+                tue: 'Dienstag',
+                tuesday: 'Dienstag',
+                wed: 'Mittwoch',
+                wednesday: 'Mittwoch',
                 de: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
             };
             return months[currentLang] || months['ua'];

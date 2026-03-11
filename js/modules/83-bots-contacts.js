@@ -1827,11 +1827,10 @@ async function renderBroadcastTab() {
 
     let history = [];
     try {
-        const snap = await firebase.firestore()
-            window.companyRef().collection(window.DB_COLS.BROADCASTS)
+        const snap = await window.companyRef().collection(window.DB_COLS.BROADCASTS)
             .orderBy('createdAt', 'desc').limit(20).get();
         history = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } catch(e) { console.error('[83-bots-contacts]', e.message); }
+    } catch(e) { console.error('[83-bots-contacts] broadcasts:', e.message); }
 
     const sectionStyle = 'background:white;border-radius:14px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);';
     const labelStyle = 'font-size:0.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;display:block;margin-bottom:0.4rem;';

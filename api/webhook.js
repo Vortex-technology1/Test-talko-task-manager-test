@@ -855,6 +855,98 @@ async function finish(session, flow, compRef, channel) {
             );
         }
 
+        // ── AUTO CRM: записуємо в crm_clients + crm_deals ───
+        try {
+            const clientName = session.senderName || d.name || d.phone || 'Лід з бота';
+
+            // Перевіряємо чи вже є клієнт з таким senderId
+            const existingClients = await compRef.collection('crm_clients')
+                .where('senderId', '==', String(session.senderId)).limit(1).get();
+
+            let clientId;
+            if (!existingClients.empty) {
+                clientId = existingClients.docs[0].id;
+                // Оновлюємо поля якщо з'явились нові дані
+                await compRef.collection('crm_clients').doc(clientId).set({
+                    phone:       d.phone || '',
+                    niche:       d.business_type || d.niche || '',
+                    mainProblem: d.main_problem || '',
+                    mainGoal:    d.main_goal || '',
+                    aiSummary:   d.ai_response || '',
+                    updatedAt:   admin.firestore.FieldValue.serverTimestamp(),
+                }, { merge: true });
+            } else {
+                // Новий клієнт
+                const clientRef = compRef.collection('crm_clients').doc();
+                clientId = clientRef.id;
+                await clientRef.set({
+                    id:          clientId,
+                    name:        clientName,
+                    type:        'person',
+                    phone:       d.phone || '',
+                    telegram:    session.username ? `@${session.username}` : '',
+                    niche:       d.business_type || d.niche || '',
+                    source:      'telegram',
+                    role:        d.role || '',
+                    mainProblem: d.main_problem || '',
+                    mainGoal:    d.main_goal || '',
+                    searchTime:  d.search_time || '',
+                    aiSummary:   d.ai_response || '',
+                    botContactId: contactId,
+                    senderId:    String(session.senderId),
+                    tags:        session.tags || [],
+                    createdAt:   admin.firestore.FieldValue.serverTimestamp(),
+                    updatedAt:   admin.firestore.FieldValue.serverTimestamp(),
+                });
+            }
+
+            // Перевіряємо чи вже є відкрита угода з цим клієнтом з цієї воронки
+            const existingDeals = await compRef.collection('crm_deals')
+                .where('botContactId', '==', contactId)
+                .where('flowId', '==', flow?.id || '')
+                .limit(1).get();
+
+            if (existingDeals.empty) {
+                // Отримуємо першу стадію воронки
+                const pipSnap = await compRef.collection('crm_pipeline')
+                    .where('isDefault', '==', true).limit(1).get();
+                const pipeline = !pipSnap.empty ? pipSnap.docs[0].data() : null;
+                const firstStage = pipeline?.stages?.[0] || { id: 'new', label: 'Новий', color: '#6b7280' };
+
+                const dealRef = compRef.collection('crm_deals').doc();
+                await dealRef.set({
+                    id:           dealRef.id,
+                    title:        `Лід: ${clientName}`,
+                    clientId,
+                    clientName,
+                    clientNiche:  d.business_type || d.niche || '',
+                    stage:        firstStage.id,
+                    stageColor:   firstStage.color,
+                    status:       'open',
+                    amount:       0,
+                    currency:     'UAH',
+                    source:       'telegram_bot',
+                    flowId:       flow?.id || null,
+                    flowName:     flow?.name || '',
+                    botContactId: contactId,
+                    description:  d.ai_response || d.main_problem || '',
+                    tags:         session.tags || [],
+                    createdAt:    admin.firestore.FieldValue.serverTimestamp(),
+                    updatedAt:    admin.firestore.FieldValue.serverTimestamp(),
+                });
+
+                await dealRef.collection('history').add({
+                    type: 'created',
+                    note: `Автоматично створено з воронки "${flow?.name || 'bot'}"`,
+                    by:   'system',
+                    at:   admin.firestore.FieldValue.serverTimestamp(),
+                });
+            }
+        } catch(crmErr) {
+            console.error('[finish][auto-crm]', crmErr.message);
+        }
+        // ── END AUTO CRM ─────────────────────────────────────
+
     } catch(e) { console.error('[finish]', e.message); }
 }
 
