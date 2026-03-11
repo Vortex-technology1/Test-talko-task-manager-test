@@ -507,9 +507,19 @@
 
 
 })();
-window.onSwitchTab && window.onSwitchTab('landing', function() {
-    if (typeof initLandingPages === 'function') initLandingPages();
-});
+
+function _registerTab(tabName, fn) {
+    if (window.onSwitchTab) {
+        window.onSwitchTab(tabName, fn);
+    } else {
+        var t = 0;
+        var iv = setInterval(function() {
+            if (window.onSwitchTab) { window.onSwitchTab(tabName, fn); clearInterval(iv); }
+            else if (++t > 30) clearInterval(iv);
+        }, 100);
+    }
+}
+_registerTab('marketing', function() { if (typeof window.initLandingPagesModule === 'function') window.initLandingPagesModule(); });
 
 // ============================================================
 // 78-landing-pages.js — TALKO Landing Pages Manager v1.0

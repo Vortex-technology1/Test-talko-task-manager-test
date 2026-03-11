@@ -388,9 +388,19 @@ function _esc(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-window.onSwitchTab && window.onSwitchTab('sites', function() {
-    window.initSitesModule();
-});
+
+function _registerTab(tabName, fn) {
+    if (window.onSwitchTab) {
+        window.onSwitchTab(tabName, fn);
+    } else {
+        var t = 0;
+        var iv = setInterval(function() {
+            if (window.onSwitchTab) { window.onSwitchTab(tabName, fn); clearInterval(iv); }
+            else if (++t > 30) clearInterval(iv);
+        }, 100);
+    }
+}
+_registerTab('sites', function() { window.initSitesModule(); });
 // Показуємо кнопку якщо feature увімкнена
 document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {

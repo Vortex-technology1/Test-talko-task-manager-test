@@ -279,9 +279,19 @@ window.intgTestTelegram = async function() {
 };
 
 // ── Tab hook ───────────────────────────────────────────────
-window.onSwitchTab && window.onSwitchTab('integrations', function() {
-    window.initIntegrationsModule();
-});
+
+function _registerTab(tabName, fn) {
+    if (window.onSwitchTab) {
+        window.onSwitchTab(tabName, fn);
+    } else {
+        var t = 0;
+        var iv = setInterval(function() {
+            if (window.onSwitchTab) { window.onSwitchTab(tabName, fn); clearInterval(iv); }
+            else if (++t > 30) clearInterval(iv);
+        }, 100);
+    }
+}
+_registerTab('integrations', function() { window.initIntegrationsModule(); });
 
     // ── Register in TALKO namespace ──────────────────────────
     if (window.TALKO) {

@@ -232,6 +232,9 @@
                 case 'bizstructure': if (typeof showBizStructureTab === 'function') showBizStructureTab(); break;
                 case 'ownerDashboard': if (typeof renderOwnerDashboard === 'function') renderOwnerDashboard(); break;
                 case 'learning': if (typeof window.initLearning === 'function') window.initLearning(); break;
+                case 'marketing': if (typeof window.initLandingPagesModule === 'function') window.initLandingPagesModule(); break;
+                case 'sites': if (typeof window.initSitesModule === 'function') window.initSitesModule(); break;
+                case 'integrations': if (typeof window.initIntegrationsModule === 'function') window.initIntegrationsModule(); break;
             }
             
             updateOverdueBadges();
