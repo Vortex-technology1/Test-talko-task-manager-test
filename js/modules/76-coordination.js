@@ -92,7 +92,7 @@
     const toast = (msg, type='success') => window.showToast && window.showToast(msg, type);
 
     // ── Load ───────────────────────────────────────────────
-    window._loadCoordData = async function loadCoordData() {
+    async function loadCoordData() {
         console.log('[Coord] loadCoordData start, companyId:', window.currentCompanyId);
         if (!window.currentCompanyId) { console.warn('[Coord] no companyId — abort'); return; }
         coordUnsubscribes.forEach(u => u());
@@ -172,7 +172,7 @@
     }
 
     // ── Main render ────────────────────────────────────────
-    window._renderCoordination = function renderCoordination() {
+    function renderCoordination() {
         const root = document.getElementById('coordinationRoot');
         if (!root) return;
         root.innerHTML = `
