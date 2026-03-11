@@ -162,7 +162,7 @@ function _siteCard(site) {
                 </button>
                 <div style="display:flex;gap:0.3rem;">
                     ${isPublished && site.publicUrl ? `
-                    <button onclick="window.open('${_esc(site.publicUrl)}','_blank')"
+                    <button onclick="sitesTrackVisit('${site.id}');window.open('${_esc(site.publicUrl)}','_blank')"
                         style="flex:1;padding:0.35rem;background:#f0fdf4;color:#16a34a;border:none;
                         border-radius:7px;cursor:pointer;font-size:0.72rem;" title="Відкрити сайт">🔗</button>` : ''}
                     <button onclick="sitesTogglePublish('${site.id}','${site.status}')"
@@ -400,6 +400,71 @@ function _registerTab(tabName, fn) {
         }, 100);
     }
 }
+// ── Трекінг відвідувань ──────────────────────────────────
+window.sitesTrackVisit = async function(siteId) {
+    if (!siteId || !window.currentCompany) return;
+    try {
+        const ref = window.companyRef().collection(window.DB_COLS.SITES || 'sites').doc(siteId);
+        await ref.update({
+            visits: firebase.firestore.FieldValue.increment(1),
+            lastVisitAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        // Оновлюємо локальний об'єкт
+        const s = sl.sites.find(x => x.id === siteId);
+        if (s) s.visits = (s.visits || 0) + 1;
+    } catch(e) { /* тихо */ }
+};
+
+// ── Аналітика сайту ──────────────────────────────────────
+window.sitesOpenAnalytics = async function(siteId) {
+    const site = sl.sites.find(s => s.id === siteId);
+    if (!site) return;
+    const name = _esc(site.name || 'Сайт');
+
+    // Завантажуємо submissions для підрахунку лідів
+    let leads = 0;
+    try {
+        const snap = await window.companyRef()
+            .collection(window.DB_COLS.SITES || 'sites').doc(siteId)
+            .collection('forms').get();
+        for (const fd of snap.docs) {
+            const sub = await fd.ref.collection('submissions').get();
+            leads += sub.size;
+        }
+    } catch(e) {}
+
+    const visits = site.visits || 0;
+    const conv = visits > 0 ? Math.round(leads / visits * 100) : 0;
+    const lastVisit = site.lastVisitAt?.toDate
+        ? site.lastVisitAt.toDate().toLocaleString('uk-UA',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+        : '—';
+
+    window.showAlertModal(`
+        <div style="min-width:280px;">
+            <div style="font-weight:700;font-size:1rem;margin-bottom:1rem;">${name} — Аналітика</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
+                <div style="background:#f0fdf4;border-radius:8px;padding:0.75rem;text-align:center;">
+                    <div style="font-size:1.4rem;font-weight:800;color:#22c55e;">${visits}</div>
+                    <div style="font-size:0.7rem;color:#6b7280;">Відвідувань</div>
+                </div>
+                <div style="background:#eff6ff;border-radius:8px;padding:0.75rem;text-align:center;">
+                    <div style="font-size:1.4rem;font-weight:800;color:#3b82f6;">${leads}</div>
+                    <div style="font-size:0.7rem;color:#6b7280;">Заявок</div>
+                </div>
+                <div style="background:#fefce8;border-radius:8px;padding:0.75rem;text-align:center;">
+                    <div style="font-size:1.4rem;font-weight:800;color:#f59e0b;">${conv}%</div>
+                    <div style="font-size:0.7rem;color:#6b7280;">Конверсія</div>
+                </div>
+                <div style="background:#f9fafb;border-radius:8px;padding:0.75rem;text-align:center;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#374151;">${lastVisit}</div>
+                    <div style="font-size:0.7rem;color:#6b7280;">Останній візит</div>
+                </div>
+            </div>
+            ${visits === 0 ? '<div style="font-size:0.78rem;color:#9ca3af;text-align:center;">Поки що немає даних. Відвідування трекуються при кліку на кнопку 🔗</div>' : ''}
+        </div>
+    `);
+};
+
 _registerTab('sites', function() { window.initSitesModule(); });
 // Показуємо кнопку якщо feature увімкнена
 document.addEventListener('DOMContentLoaded', function () {

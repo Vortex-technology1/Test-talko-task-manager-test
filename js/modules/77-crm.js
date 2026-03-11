@@ -873,67 +873,199 @@ function _renderAnalytics() {
     const avgDeal  = won > 0 ? Math.round(revenue/won) : 0;
     const conv     = total > 0 ? Math.round(won/total*100) : 0;
 
+    // KPI картки
     const kpis = [
         ['Конверсія', conv+'%', '#22c55e'],
         ['Revenue', _fmt(revenue), '#16a34a'],
         ['Avg Deal', _fmt(avgDeal), '#3b82f6'],
         ['Програно', lost, '#ef4444'],
     ];
+
+    // По місяцях (останні 6)
+    const months = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        const label = d.toLocaleString('uk-UA', {month:'short'});
+        const newDeals = crm.deals.filter(dl => (dl.createdAt?.toDate ? dl.createdAt.toDate() : new Date(dl.createdAt||0)).toISOString().startsWith(key)).length;
+        const wonDeals = crm.deals.filter(dl => dl.stage==='won' && (dl.updatedAt?.toDate ? dl.updatedAt.toDate() : new Date(dl.updatedAt||0)).toISOString().startsWith(key)).length;
+        const lostDeals = crm.deals.filter(dl => dl.stage==='lost' && (dl.updatedAt?.toDate ? dl.updatedAt.toDate() : new Date(dl.updatedAt||0)).toISOString().startsWith(key)).length;
+        const wonRevenue = crm.deals.filter(dl => dl.stage==='won' && (dl.updatedAt?.toDate ? dl.updatedAt.toDate() : new Date(dl.updatedAt||0)).toISOString().startsWith(key)).reduce((s,dl)=>s+(dl.amount||0),0);
+        months.push({ label, newDeals, wonDeals, lostDeals, wonRevenue });
+    }
+    const maxBar = Math.max(...months.map(m => Math.max(m.newDeals, m.wonDeals, m.lostDeals)), 1);
+    const maxRev = Math.max(...months.map(m => m.wonRevenue), 1);
+
+    // По стадіях
     const byStage = stages.map(s => ({
         ...s,
         count: crm.deals.filter(d => d.stage===s.id).length,
         amount: crm.deals.filter(d => d.stage===s.id).reduce((sm,d) => sm+(d.amount||0), 0),
     }));
-    const sources = crm.deals.reduce((acc, d) => {
-        const src = d.source||'manual'; acc[src]=(acc[src]||0)+1; return acc;
-    }, {});
-    const srcIcons = { telegram:I.tg, instagram:I.ig, site_form:I.web, manual:I.user };
+
+    // Джерела лідів — для пай-чарту
+    const sources = crm.deals.reduce((acc, d) => { const src=d.source||'manual'; acc[src]=(acc[src]||0)+1; return acc; }, {});
+    const srcColors = { telegram:'#3b82f6', instagram:'#e879f9', site_form:'#22c55e', manual:'#f59e0b' };
+    const srcLabels = { telegram:'Telegram', instagram:'Instagram', site_form:'Сайт', manual:'Вручну' };
+    const totalSrc = Object.values(sources).reduce((s,v)=>s+v, 0) || 1;
+
+    // Топ-5 менеджерів
+    const byUser = {};
+    crm.deals.filter(d=>d.stage==='won').forEach(d => {
+        const uid = d.assigneeId || d.creatorId || 'unknown';
+        if (!byUser[uid]) byUser[uid] = { uid, amount: 0, count: 0 };
+        byUser[uid].amount += d.amount||0;
+        byUser[uid].count++;
+    });
+    const topManagers = Object.values(byUser)
+        .sort((a,b) => b.amount - a.amount)
+        .slice(0, 5)
+        .map(u => ({ ...u, name: (typeof users!=='undefined' ? users.find(x=>x.id===u.uid) : null)?.name || 'Невідомо' }));
+    const maxMgr = topManagers[0]?.amount || 1;
 
     c.innerHTML = `
-    <div style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:0.75rem;">
-        <!-- KPI cards -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+    <div style="max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:0.75rem;padding-bottom:2rem;">
+
+        <!-- KPI картки -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.5rem;">
             ${kpis.map(([l,v,col]) => `
-            <div style="background:white;border-radius:8px;padding:0.9rem;border:1px solid #e8eaed;border-top:3px solid ${col};">
-                <div style="font-size:1.2rem;font-weight:700;color:${col};">${v}</div>
-                <div style="font-size:0.7rem;color:#9ca3af;margin-top:2px;">${l}</div>
+            <div style="background:white;border-radius:10px;padding:0.9rem;border:1px solid #e8eaed;border-top:3px solid ${col};text-align:center;">
+                <div style="font-size:1.3rem;font-weight:800;color:${col};">${v}</div>
+                <div style="font-size:0.69rem;color:#9ca3af;margin-top:2px;">${l}</div>
             </div>`).join('')}
         </div>
 
-        <!-- By stage -->
-        <div style="background:white;border-radius:8px;padding:1rem;border:1px solid #e8eaed;">
-            <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.75rem;color:#111827;">Розподіл по стадіях</div>
-            ${byStage.filter(s => s.count > 0).map(s => {
-                const pct = total > 0 ? Math.round(s.count/total*100) : 0;
-                return `
-                <div style="margin-bottom:0.6rem;">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                        <span style="font-size:0.78rem;font-weight:500;color:#374151;">${_esc(s.label)}</span>
-                        <span style="font-size:0.72rem;color:#9ca3af;">${s.count} · ${_fmt(s.amount)}</span>
+        <!-- Барчарт: Нових / Виграно / Програно по місяцях -->
+        <div style="background:white;border-radius:10px;padding:1rem;border:1px solid #e8eaed;">
+            <div style="font-weight:700;font-size:0.85rem;color:#111827;margin-bottom:0.75rem;">📊 Угоди по місяцях</div>
+            <div style="display:flex;align-items:flex-end;gap:0.5rem;height:120px;padding-bottom:24px;position:relative;">
+                ${months.map(m => `
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;position:relative;">
+                    <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:96px;">
+                        <div style="flex:1;background:#3b82f6;border-radius:3px 3px 0 0;height:${Math.round(m.newDeals/maxBar*96)}px;min-height:${m.newDeals?2:0}px;" title="Нових: ${m.newDeals}"></div>
+                        <div style="flex:1;background:#22c55e;border-radius:3px 3px 0 0;height:${Math.round(m.wonDeals/maxBar*96)}px;min-height:${m.wonDeals?2:0}px;" title="Виграно: ${m.wonDeals}"></div>
+                        <div style="flex:1;background:#ef4444;border-radius:3px 3px 0 0;height:${Math.round(m.lostDeals/maxBar*96)}px;min-height:${m.lostDeals?2:0}px;" title="Програно: ${m.lostDeals}"></div>
                     </div>
-                    <div style="background:#f1f5f9;border-radius:3px;height:6px;overflow:hidden;">
-                        <div style="height:100%;background:${s.color};width:${pct}%;border-radius:3px;transition:width 0.3s;"></div>
-                    </div>
-                </div>`;
-            }).join('')}
+                    <div style="position:absolute;bottom:-20px;font-size:0.65rem;color:#9ca3af;white-space:nowrap;">${m.label}</div>
+                </div>`).join('')}
+            </div>
+            <div style="display:flex;gap:1rem;margin-top:0.5rem;">
+                <span style="font-size:0.7rem;color:#6b7280;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#3b82f6;border-radius:2px;display:inline-block;"></span>Нових</span>
+                <span style="font-size:0.7rem;color:#6b7280;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#22c55e;border-radius:2px;display:inline-block;"></span>Виграно</span>
+                <span style="font-size:0.7rem;color:#6b7280;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#ef4444;border-radius:2px;display:inline-block;"></span>Програно</span>
+            </div>
         </div>
 
-        <!-- Sources -->
-        <div style="background:white;border-radius:8px;padding:1rem;border:1px solid #e8eaed;">
-            <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.75rem;color:#111827;">Джерела лідів</div>
-            ${Object.keys(sources).length ? Object.entries(sources).map(([src, cnt]) => `
-            <div style="display:flex;justify-content:space-between;align-items:center;
-                padding:0.4rem 0;border-bottom:1px solid #f9fafb;">
-                <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:#374151;">
-                    ${srcIcons[src] || I.deal}
-                    ${{ telegram:'Telegram', instagram:'Instagram', site_form:'Сайт', manual:'Вручну' }[src] || src}
+        <!-- Лінійний: Revenue тренд -->
+        <div style="background:white;border-radius:10px;padding:1rem;border:1px solid #e8eaed;">
+            <div style="font-weight:700;font-size:0.85rem;color:#111827;margin-bottom:0.75rem;">📈 Revenue тренд (виграні угоди)</div>
+            <div style="position:relative;height:80px;margin-bottom:20px;">
+                <svg width="100%" height="80" viewBox="0 0 600 80" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="#22c55e" stop-opacity="0.02"/>
+                        </linearGradient>
+                    </defs>
+                    ${(() => {
+                        const pts = months.map((m,i) => ({
+                            x: Math.round(i * 600/5),
+                            y: Math.round(80 - (m.wonRevenue/maxRev)*72)
+                        }));
+                        const path = pts.map((p,i) => (i===0?'M':'L')+p.x+','+p.y).join(' ');
+                        const fill = path + ' L600,80 L0,80 Z';
+                        return `<path d="${fill}" fill="url(#revGrad)"/>
+                                <path d="${path}" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                ${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#22c55e"/>`).join('')}`;
+                    })()}
+                </svg>
+                <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                    ${months.map(m=>`<div style="font-size:0.62rem;color:#9ca3af;flex:1;text-align:center;">${m.label}</div>`).join('')}
                 </div>
-                <span style="font-weight:700;font-size:0.82rem;color:#22c55e;">${cnt}</span>
-            </div>`).join('') : '<div style="color:#9ca3af;font-size:0.8rem;">Немає даних</div>'}
+            </div>
         </div>
+
+        <!-- 2 колонки: Пай-чарт + Воронка конверсії -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+
+            <!-- Пай-чарт: джерела -->
+            <div style="background:white;border-radius:10px;padding:1rem;border:1px solid #e8eaed;">
+                <div style="font-weight:700;font-size:0.85rem;color:#111827;margin-bottom:0.75rem;">🥧 Джерела лідів</div>
+                ${Object.keys(sources).length ? `
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <svg width="80" height="80" viewBox="-1 -1 2 2" style="transform:rotate(-90deg);flex-shrink:0;">
+                        ${(() => {
+                            let offset = 0;
+                            return Object.entries(sources).map(([src, cnt]) => {
+                                const pct = cnt / totalSrc;
+                                const color = srcColors[src] || '#6b7280';
+                                const x1 = Math.cos(2*Math.PI*offset);
+                                const y1 = Math.sin(2*Math.PI*offset);
+                                offset += pct;
+                                const x2 = Math.cos(2*Math.PI*offset);
+                                const y2 = Math.sin(2*Math.PI*offset);
+                                const large = pct > 0.5 ? 1 : 0;
+                                return pct > 0.001 ? `<path d="M0,0 L${x1},${y1} A1,1,0,${large},1,${x2},${y2} Z" fill="${color}" stroke="white" stroke-width="0.03"/>` : '';
+                            }).join('');
+                        })()}
+                    </svg>
+                    <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                        ${Object.entries(sources).map(([src,cnt]) => `
+                        <div style="display:flex;align-items:center;gap:5px;">
+                            <span style="width:8px;height:8px;border-radius:2px;background:${srcColors[src]||'#6b7280'};flex-shrink:0;"></span>
+                            <span style="font-size:0.72rem;color:#374151;flex:1;">${srcLabels[src]||src}</span>
+                            <span style="font-size:0.72rem;font-weight:700;color:#111;">${Math.round(cnt/totalSrc*100)}%</span>
+                        </div>`).join('')}
+                    </div>
+                </div>` : '<div style="color:#9ca3af;font-size:0.8rem;">Немає даних</div>'}
+            </div>
+
+            <!-- Воронка конверсії -->
+            <div style="background:white;border-radius:10px;padding:1rem;border:1px solid #e8eaed;">
+                <div style="font-weight:700;font-size:0.85rem;color:#111827;margin-bottom:0.75rem;">🔽 Воронка конверсії</div>
+                ${byStage.filter(s=>s.count>0).map(s => {
+                    const pct = total > 0 ? Math.round(s.count/total*100) : 0;
+                    return `
+                    <div style="margin-bottom:0.45rem;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+                            <span style="font-size:0.74rem;color:#374151;font-weight:500;">${_esc(s.label)}</span>
+                            <span style="font-size:0.7rem;color:#9ca3af;">${s.count} · ${pct}%</span>
+                        </div>
+                        <div style="background:#f1f5f9;border-radius:3px;height:5px;">
+                            <div style="height:100%;background:${s.color||'#22c55e'};width:${pct}%;border-radius:3px;transition:width 0.3s;"></div>
+                        </div>
+                    </div>`;
+                }).join('') || '<div style="color:#9ca3af;font-size:0.8rem;">Немає даних</div>'}
+            </div>
+        </div>
+
+        <!-- Топ-5 менеджерів -->
+        <div style="background:white;border-radius:10px;padding:1rem;border:1px solid #e8eaed;">
+            <div style="font-weight:700;font-size:0.85rem;color:#111827;margin-bottom:0.75rem;">🏆 Топ менеджери (виграні угоди)</div>
+            ${topManagers.length ? topManagers.map((u,i) => `
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+                <div style="width:22px;height:22px;border-radius:50%;background:${['#f59e0b','#9ca3af','#cd7c2b','#22c55e','#3b82f6'][i]};
+                    display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:white;flex-shrink:0;">${i+1}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.8rem;font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_esc(u.name)}</div>
+                    <div style="background:#f1f5f9;border-radius:3px;height:4px;margin-top:3px;">
+                        <div style="height:100%;background:#22c55e;width:${Math.round(u.amount/maxMgr*100)}%;border-radius:3px;"></div>
+                    </div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#22c55e;">${_fmt(u.amount)}</div>
+                    <div style="font-size:0.65rem;color:#9ca3af;">${u.count} угод</div>
+                </div>
+            </div>`).join('') : '<div style="color:#9ca3af;font-size:0.8rem;">Ще немає закритих угод</div>'}
+        </div>
+
     </div>`;
 }
 
+
+// ══════════════════════════════════════════════════════════
+// НАЛАШТУВАННЯ CRM
 
 // ══════════════════════════════════════════════════════════
 // НАЛАШТУВАННЯ CRM — воронки, стадії, кольори
